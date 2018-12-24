@@ -1,0 +1,14 @@
+<resources>
+    <string name="date_placeholder">Monday, Nov 26</string>
+
+    <string name="app_name">NBA Schedule</string>
+
+    <string name="back_nav">Back nav button</string>
+    <string name="forward_nav">Forward nav button</string>
+
+
+    <string name="record">(7&#8211;10)</string>
+
+
+
+</resources>
