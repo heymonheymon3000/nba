@@ -19,17 +19,27 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
+import io.reactivex.observables.ConnectableObservable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import nanodegree.android.nba.BuildConfig;
 import nanodegree.android.nba.R;
 import nanodegree.android.nba.persistence.pojo.response.boxScore.BoxScore;
 import nanodegree.android.nba.persistence.pojo.response.dailySchedule.DailySchedule;
 import nanodegree.android.nba.persistence.pojo.response.dailySchedule.Game;
 import nanodegree.android.nba.rest.ApiUtils;
-import nanodegree.android.nba.rest.GameService;
 import nanodegree.android.nba.utils.DisplayDateUtils;
 import nanodegree.android.nba.utils.DisplayMetricUtils;
 import retrofit2.Call;
@@ -47,25 +57,26 @@ public class MyGameFragment extends Fragment {
     private ProgressBar spinner;
     private ImageView mBackNavImageView;
     private ImageView mForwardNavImageView;
-    private GameService gameService;
 
     public final static String YEAR = "YEAR";
     public final static String MONTH = "MONTH";
     public final static String DAY = "DAY";
 
-
-
     public Integer year;
     public Integer month;
     public Integer day;
+    public Boolean loadData;
 
-    private final static Integer delay = 2000;
+    private final static Integer delay = 1;
 
     private OnFragmentInteractionListener mListener;
 
+    private CompositeDisposable disposable = new CompositeDisposable();
+    private ArrayList<Game> gamesList = new ArrayList<>();
 
-
-
+    public interface OnFragmentInteractionListener {
+        void onFragmentInteraction2();
+    }
 
     public static MyGameFragment newInstance(Calendar cal) {
         MyGameFragment fragment = new MyGameFragment();
@@ -78,40 +89,21 @@ public class MyGameFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        this.mContext = context;
-        if (mContext instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) mContext;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        gameService = ApiUtils.getGameService();
 
         if(getArguments() == null) {
             Calendar cal = DisplayDateUtils.getCurrentDate(DisplayDateUtils.MY_GAME);
             year = cal.get(Calendar.YEAR);
             month = cal.get(Calendar.MONTH)+1;
             day = cal.get(Calendar.DATE);
+            loadData = false;
         } else {
             year = getArguments().getInt(YEAR);
             month = getArguments().getInt(MONTH)+1;
             day = getArguments().getInt(DAY);
+            loadData = true;
         }
-
-//        Log.i("NUMBERS", "YEAR=> " + year + " MONTH=> " + month + " DAY=> " + day);
     }
 
     @Override
@@ -154,10 +146,7 @@ public class MyGameFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setupRecyclerView();
-        setupModelView();
     }
-
-
 
     private void setupRecyclerView() {
         int marginInDp = 8;
@@ -182,75 +171,182 @@ public class MyGameFragment extends Fragment {
                         cardHeightInDp);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mGameAdapter);
+
+        if(loadData) {
+            ConnectableObservable<List<Game>> gamesObservable = getGamesObservable().replay();
+
+            /**
+             * Fetching all games for a given day
+             * Observable emits List<Game> at once
+             * All the items will be added to RecyclerView
+             * */
+            disposable.add(
+                gamesObservable
+                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<List<Game>>(){
+                        @Override
+                        public void onNext(List<Game> games) {
+                            if(games.size() == 0) {
+                                enableView();
+                            }
+
+                            // Refreshing list
+                            gamesList.clear();
+                            gamesList.addAll(games);
+
+                            mGameAdapter.setGames(gamesList);
+                            mGameAdapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            showError(e);
+                        }
+
+                        @Override
+                        public void onComplete() {
+                        }
+                    })
+            );
+
+            /**
+             * Fetching individual team box score
+             * First FlatMap converts single List<Game> to multiple emissions
+             * Second FlatMap makes HTTP call on each Game emission
+             * */
+            disposable.add(
+                gamesObservable
+                    .subscribeOn(Schedulers.io())
+                    .delay(delay, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                    /**
+                     * Converting List<Game> emission to single Game emissions
+                     * */
+                    .flatMap(new Function<List<Game>, ObservableSource<Game>>() {
+                        @Override
+                        public ObservableSource<Game> apply(List<Game> games) throws Exception {
+                            return Observable.fromIterable(games);                    }
+                    })
+                    /**
+                     * Fetching Box Score on each Game emission one at a time
+                     * */
+                    .concatMap(new Function<Game, ObservableSource<Game>>() {
+                        @Override
+                        public ObservableSource<Game> apply(Game game) throws Exception {
+                            /**
+                             * Need to wait here for a hot second because there is a
+                             * time limit of 1 second before hitting the API again.
+                             */
+                            Thread.sleep(delay * 1000);
+                            return getBoxScoreObservable(game);
+                        }
+                    })
+                    .subscribeWith(new DisposableObserver<Game>() {
+                        @Override
+                        public void onNext(Game game) {
+                            int position = gamesList.indexOf(game);
+
+                            if (position == -1) {
+                                // TODO - take action
+                                // Game not found in the list
+                                // This shouldn't happen
+                                return;
+                            }
+
+                            gamesList.set(position, game);
+                            mGameAdapter.setGames(gamesList);
+                            mGameAdapter.notifyItemChanged(position);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            showError(e);
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            enableView();
+                        }
+                    }));
+
+            disableView();
+
+            // Calling connect to start emission
+            gamesObservable.connect();
+        }
     }
 
-    private void getBoxScore(final List<Game> games) {
-//        Handler handler = new Handler();
-//        for (int i = 1; i <= games.size(); i++) {
-//            final Game game = games.get(i-1);
-//            // The REST API that we are using only allows request every 1 second; otherwise the result will be unsuccessfully.
-//            handler.postDelayed(new Runnable() {
-//                @Override
-//                public void run() {
-//                    gameService.getBoxScore("en", game.getId(), ".json", BuildConfig.NBA_DB_API_KEY).enqueue(new Callback<BoxScore>() {
-//                        @Override
-//                        public void onResponse(Call<BoxScore> call, Response<BoxScore> boxScoreResponse) {
-//                            BoxScore boxScore = boxScoreResponse.body();
-//
-//                            game.setGameStatus(boxScore.getClock());
-//                            game.setAwayPoints(boxScore.getAway().getPoints());
-//                            game.setHomePoints(boxScore.getHome().getPoints());
-//
-//                            mGameAdapter.setGames(games);
-//                        }
-//
-//                        @Override
-//                        public void onFailure(Call<BoxScore> call, Throwable t) {
-//                            Log.i(TAG, "FAILED " + t.getMessage());
-//                        }
-//                    });
-//                }
-//            }, delay * i);
-//        }
-//
-//        Handler h = new Handler();
-//        h.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                enableView();
-//            }
-//        }, (delay * (games.size()+1)));
+    /**
+     * Making Retrofit call to fetch all games for a given day
+     */
+    private Observable<List<Game>> getGamesObservable() {
+        return ApiUtils.getGameService().getGameScheduleByDate("en",
+                year, month, day, ".json", BuildConfig.NBA_DB_API_KEY)
+            .toObservable()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .map(new Function<DailySchedule, List<Game>>() {
+                @Override
+                public List<Game> apply(DailySchedule dailySchedule) throws Exception {
+                    return dailySchedule.getGames();
+                }
+            })
+            .flatMap(new Function<List<Game>, ObservableSource<Game>>() {
+                @Override
+                public ObservableSource<Game> apply(List<Game> games) throws Exception {
+                    return Observable.fromIterable(games);
+                }
+            })
+            .filter(new Predicate<Game>() {
+                @Override
+                public boolean test(Game game) throws Exception {
+                    if(game.getAway().getAlias().equals("LAL") ||
+                        game.getHome().getAlias().equals("LAL")) {
+                        return true;
+                    }
+                    return false;
+                }
+            })
+            .toList()
+            .toObservable();
     }
 
-    private void setupModelView() {
-        disableView();
-
-//        Handler handler = new Handler();
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                gameService.getDailySchedule("en", year,
-//                        month, day, ".json", BuildConfig.NBA_DB_API_KEY).enqueue(new Callback<DailySchedule>() {
-//                    @Override
-//                    public void onResponse(@NonNull Call<DailySchedule> call, @NonNull Response<DailySchedule> response) {
-//                        if(response.isSuccessful()) {
-//                            getBoxScore(response.body().getGames());
-//                        } else {
-//                            enableView();
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onFailure(@NonNull Call<DailySchedule> call,@NonNull Throwable t) {
-//                        Toast.makeText(mContext,
-//                                "Something went wrong, please check your internet connection and try again! " + t.getMessage(),
-//                                Toast.LENGTH_LONG).show();
-//                        enableView();
-//                    }
-//                });
-//            }
-//        }, delay);
+    /**
+     * Making Retrofit call to get single Box Score
+     * get Box Score HTTP call returns Box Score object, but
+     * map() operator is used to change the return type to Game
+     */
+    private Observable<Game> getBoxScoreObservable(final Game game) {
+        return ApiUtils.getGameService()
+            .getBoxScore("en", game.getId(), ".json", BuildConfig.NBA_DB_API_KEY)
+            .toObservable()
+            .subscribeOn(Schedulers.io())
+            .delay(delay, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+            .map(new Function<BoxScore, Game>() {
+                @Override
+                public Game apply(BoxScore boxScore) throws Exception {
+                    game.setGameStatus(boxScore.getClock());
+                    game.setAwayPoints(boxScore.getAway().getPoints());
+                    game.setHomePoints(boxScore.getHome().getPoints());
+                    return game;
+                }
+            });
     }
+
+    /**
+     * Snackbar shows observer error
+     */
+    private void showError(Throwable e) {
+        Log.e(TAG, "showError: " + e.getMessage() + " MY_GAME_FRAGMENT");
+
+//        Snackbar snackbar = Snackbar
+//                .make(coordinatorLayout, e.getMessage(), Snackbar.LENGTH_LONG);
+//        View sbView = snackbar.getView();
+//        TextView textView = sbView.findViewById(android.support.design.R.id.snackbar_text);
+//        textView.setTextColor(Color.YELLOW);
+//        snackbar.show();
+    }
+
+
 
     private void disableView() {
         mBackNavImageView.setClickable(false);
@@ -265,8 +361,6 @@ public class MyGameFragment extends Fragment {
         spinner.setVisibility(View.VISIBLE);
     }
 
-
-
     private void enableView() {
         mBackNavImageView.setClickable(true);
         mBackNavImageView.setClickable(true);
@@ -280,7 +374,27 @@ public class MyGameFragment extends Fragment {
         mRecyclerView.setAlpha(1);
     }
 
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction2();
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        this.mContext = context;
+        if (mContext instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) mContext;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        disposable.dispose();
     }
 }

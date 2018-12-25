@@ -37,8 +37,8 @@ public class TabAdapter extends FragmentStatePagerAdapter {
         }
     }
 
-    public void replaceFragment(Fragment oldFragment, Fragment newFragment) {
-        mFragmentList.set(mFragmentList.indexOf(oldFragment), newFragment);
+    public void replaceFragment(Integer index, Fragment newFragment) {
+        mFragmentList.set(index, newFragment);
         notifyDataSetChanged();
     }
 

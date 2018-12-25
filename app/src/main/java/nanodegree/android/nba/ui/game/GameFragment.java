@@ -206,6 +206,10 @@ public class GameFragment extends Fragment {
                 .subscribeWith(new DisposableObserver<List<Game>>(){
                     @Override
                     public void onNext(List<Game> games) {
+                        if(games.size() == 0) {
+                            enableView();
+                        }
+
                         // Refreshing list
                         gamesList.clear();
                         gamesList.addAll(games);
@@ -316,7 +320,7 @@ public class GameFragment extends Fragment {
      * Snackbar shows observer error
      */
     private void showError(Throwable e) {
-        Log.e(TAG, "showError: " + e.getMessage());
+        Log.e(TAG, "showError: " + e.getMessage() + " GAME_FRAGMENT");
 
 //        Snackbar snackbar = Snackbar
 //                .make(coordinatorLayout, e.getMessage(), Snackbar.LENGTH_LONG);

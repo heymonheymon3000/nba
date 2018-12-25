@@ -1,10 +1,13 @@
 package nanodegree.android.nba.ui.game;
 
+import android.content.Context;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.AttributeSet;
+import android.view.View;
 
 import nanodegree.android.nba.R;
 import nanodegree.android.nba.utils.DisplayDateUtils;
@@ -17,9 +20,9 @@ public class GameActivity extends AppCompatActivity
     private TabAdapter adapter;
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    private  GameFragment gameFragment;
-    private  MyGameFragment myGameFragment;
     private FragmentManager fm;
+    private MyGameFragment myGameFragment;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,11 +33,9 @@ public class GameActivity extends AppCompatActivity
         fm = getSupportFragmentManager();
         adapter = new TabAdapter(getSupportFragmentManager());
 
-        gameFragment = new GameFragment();
-        adapter.addFragment(gameFragment, "All Games");
-
+        adapter.addFragment(new GameFragment(), "All Games");
         myGameFragment = new MyGameFragment();
-        adapter.addFragment(myGameFragment, "My Games");
+        adapter.addFragment(new MyGameFragment(), "My Games");
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
@@ -43,13 +44,14 @@ public class GameActivity extends AppCompatActivity
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if(tab.getText().toString().equals("My Games")) {
-                    fm.beginTransaction().detach(myGameFragment).attach(myGameFragment).commit();
+                    onFragmentInteraction2();
                     tabLayout.removeOnTabSelectedListener(this);
                 }
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {}
+
             @Override
             public void onTabReselected(TabLayout.Tab tab) {}
         });
@@ -57,15 +59,13 @@ public class GameActivity extends AppCompatActivity
 
     @Override
     public void onFragmentInteraction() {
-        GameFragment  newFragment = GameFragment.newInstance(DisplayDateUtils.getCurrentDate(DisplayDateUtils.GAME));
-        adapter.replaceFragment(gameFragment, newFragment);
-        gameFragment = newFragment;
+        GameFragment newFragment = GameFragment.newInstance(DisplayDateUtils.getCurrentDate(DisplayDateUtils.GAME));
+        adapter.replaceFragment(0, newFragment);
     }
 
     @Override
     public void onFragmentInteraction2() {
         MyGameFragment newFragment = MyGameFragment.newInstance(DisplayDateUtils.getCurrentDate(DisplayDateUtils.MY_GAME));
-        adapter.replaceFragment(myGameFragment, newFragment);
-        myGameFragment = newFragment;
+        adapter.replaceFragment(1, newFragment);
     }
 }
