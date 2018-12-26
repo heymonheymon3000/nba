@@ -6,9 +6,13 @@
     <string name="back_nav">Back nav button</string>
     <string name="forward_nav">Forward nav button</string>
 
+    <string name="disable_alpha_value">0.5</string>
+    <string name="enable_alpha_value">1.0</string>
+
+
+
 
     <string name="record">(7&#8211;10)</string>
-
 
 
 </resources>

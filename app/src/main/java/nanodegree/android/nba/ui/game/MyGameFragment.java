@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,6 +58,7 @@ public class MyGameFragment extends Fragment {
     private ProgressBar spinner;
     private ImageView mBackNavImageView;
     private ImageView mForwardNavImageView;
+    private LinearLayout linearLayout;
 
     public final static String YEAR = "YEAR";
     public final static String MONTH = "MONTH";
@@ -73,10 +75,6 @@ public class MyGameFragment extends Fragment {
 
     private CompositeDisposable disposable = new CompositeDisposable();
     private ArrayList<Game> gamesList = new ArrayList<>();
-
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction2();
-    }
 
     public static MyGameFragment newInstance(Calendar cal) {
         MyGameFragment fragment = new MyGameFragment();
@@ -123,7 +121,7 @@ public class MyGameFragment extends Fragment {
             public void onClick(View v) {
                 mGameDateTextView.setText(DisplayDateUtils.getYesterdayDate(DisplayDateUtils.MY_GAME));
                 if (mListener != null) {
-                    mListener.onFragmentInteraction2();
+                    mListener.updateFragment(1);
                 }
             }
         });
@@ -134,10 +132,12 @@ public class MyGameFragment extends Fragment {
             public void onClick(View v) {
                 mGameDateTextView.setText(DisplayDateUtils.getTomorrowDate(DisplayDateUtils.MY_GAME));
                 if (mListener != null) {
-                    mListener.onFragmentInteraction2();
+                    mListener.updateFragment(1);
                 }
             }
         });
+
+        linearLayout = rootView.findViewById(R.id.linearLayout);
 
         return rootView;
     }
@@ -357,8 +357,11 @@ public class MyGameFragment extends Fragment {
         mForwardNavImageView.setEnabled(false);
         mForwardNavImageView.setImageAlpha(50);
 
-        mRecyclerView.setAlpha(Float.valueOf("0.5"));
+        linearLayout.setAlpha(Float.parseFloat(
+                getContext().getString(R.string.disable_alpha_value)));
         spinner.setVisibility(View.VISIBLE);
+
+        mListener.enableTabs(false);
     }
 
     private void enableView() {
@@ -371,7 +374,10 @@ public class MyGameFragment extends Fragment {
         mForwardNavImageView.setImageAlpha(255);
 
         spinner.setVisibility(View.GONE);
-        mRecyclerView.setAlpha(1);
+        linearLayout.setAlpha(Float.parseFloat(
+                getContext().getString(R.string.enable_alpha_value)));
+
+        mListener.enableTabs(true);
     }
 
     @Override

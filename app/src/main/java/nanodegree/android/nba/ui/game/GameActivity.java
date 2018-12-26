@@ -8,14 +8,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import nanodegree.android.nba.R;
 import nanodegree.android.nba.utils.DisplayDateUtils;
 
 public class GameActivity extends AppCompatActivity
-        implements
-        GameFragment.OnFragmentInteractionListener,
-        MyGameFragment.OnFragmentInteractionListener {
+        implements OnFragmentInteractionListener {
 
     private TabAdapter adapter;
     private TabLayout tabLayout;
@@ -23,13 +23,13 @@ public class GameActivity extends AppCompatActivity
     private FragmentManager fm;
     private MyGameFragment myGameFragment;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         viewPager = findViewById(R.id.viewPager);
         tabLayout = findViewById(R.id.tabLayout);
+
         fm = getSupportFragmentManager();
         adapter = new TabAdapter(getSupportFragmentManager());
 
@@ -44,7 +44,7 @@ public class GameActivity extends AppCompatActivity
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if(tab.getText().toString().equals("My Games")) {
-                    onFragmentInteraction2();
+                    updateFragment(1);
                     tabLayout.removeOnTabSelectedListener(this);
                 }
             }
@@ -58,14 +58,37 @@ public class GameActivity extends AppCompatActivity
     }
 
     @Override
-    public void onFragmentInteraction() {
-        GameFragment newFragment = GameFragment.newInstance(DisplayDateUtils.getCurrentDate(DisplayDateUtils.GAME));
-        adapter.replaceFragment(0, newFragment);
+    public void updateFragment(Integer index) {
+        switch (index) {
+            case 0:
+                GameFragment gameFragment = GameFragment.newInstance(DisplayDateUtils.getCurrentDate(DisplayDateUtils.GAME));
+                adapter.replaceFragment(0, gameFragment);
+                break;
+            case 1:
+                MyGameFragment myGameFragment = MyGameFragment.newInstance(DisplayDateUtils.getCurrentDate(DisplayDateUtils.MY_GAME));
+                adapter.replaceFragment(1, myGameFragment);
+                break;
+        }
     }
 
     @Override
-    public void onFragmentInteraction2() {
-        MyGameFragment newFragment = MyGameFragment.newInstance(DisplayDateUtils.getCurrentDate(DisplayDateUtils.MY_GAME));
-        adapter.replaceFragment(1, newFragment);
+    public void enableTabs(Boolean tabsEnabled) {
+        if(tabsEnabled) {
+            LinearLayout tabStrip = ((LinearLayout)tabLayout.getChildAt(0));
+            tabStrip.setEnabled(true);
+            for(int i = 0; i < tabStrip.getChildCount(); i++) {
+                tabStrip.getChildAt(i).setClickable(true);
+            }
+            tabLayout.setAlpha(Float.parseFloat(
+                    getApplicationContext().getString(R.string.enable_alpha_value)));
+        } else {
+            LinearLayout tabStrip = ((LinearLayout)tabLayout.getChildAt(0));
+            tabStrip.setEnabled(false);
+            for(int i = 0; i < tabStrip.getChildCount(); i++) {
+                tabStrip.getChildAt(i).setClickable(false);
+            }
+            tabLayout.setAlpha(Float.parseFloat(
+                    getApplicationContext().getString(R.string.disable_alpha_value)));
+        }
     }
 }
