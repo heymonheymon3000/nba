@@ -315,8 +315,8 @@ public class MyGameFragment extends Fragment {
             .filter(new Predicate<Game>() {
                 @Override
                 public boolean test(Game game) throws Exception {
-                    if(game.getAway().getAlias().equals("LAL") ||
-                        game.getHome().getAlias().equals("LAL")) {
+                    if(game.getAway().getAlias().equals("CHI") ||
+                        game.getHome().getAlias().equals("CHI")) {
                         return true;
                     }
                     return false;

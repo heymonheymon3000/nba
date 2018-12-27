@@ -3,6 +3,8 @@ package nanodegree.android.nba.ui.game;
 import android.content.Context;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.Fragment;
+
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -41,7 +43,6 @@ public class GameActivity extends AppCompatActivity
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private FragmentManager fm;
-    private MyGameFragment myGameFragment;
 
     public static HashMap<String, TeamInfo> teamInfoHashMap = new HashMap<>();
     public static HashMap<String, String> teamLookup = new HashMap<>();
@@ -57,9 +58,7 @@ public class GameActivity extends AppCompatActivity
         adapter = new TabAdapter(getSupportFragmentManager());
 
         createTeamInfoMap();
-
         adapter.addFragment(new GameFragment(), getBaseContext().getString(R.string.all_games));
-        myGameFragment = new MyGameFragment();
         adapter.addFragment(new MyGameFragment(), getBaseContext().getString(R.string.my_games));
 
         viewPager.setAdapter(adapter);
@@ -88,10 +87,12 @@ public class GameActivity extends AppCompatActivity
             case 0:
                 GameFragment gameFragment = GameFragment.newInstance(DisplayDateUtils.getCurrentDate(DisplayDateUtils.GAME));
                 adapter.replaceFragment(0, gameFragment);
+                adapter.notifyDataSetChanged();
                 break;
             case 1:
                 MyGameFragment myGameFragment = MyGameFragment.newInstance(DisplayDateUtils.getCurrentDate(DisplayDateUtils.MY_GAME));
                 adapter.replaceFragment(1, myGameFragment);
+                adapter.notifyDataSetChanged();
                 break;
         }
     }
