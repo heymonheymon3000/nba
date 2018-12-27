@@ -32,8 +32,8 @@ public interface GameService {
             @Path("format") String format,
             @Query("api_key") String api_key);
 
-    @GET("nba/trial/v5/{language_code}/{year}/{season}/standings{format}")
-    Call<Standing> getStanding(
+    @GET("nba/trial/v5/{language_code}/seasons/{year}/{season}/standings{format}")
+    Single<Standing> getStanding(
             @Path("language_code") String language_code,
             @Path("year") Integer year,
             @Path("season") String season,

@@ -29,6 +29,7 @@ import android.os.Handler;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -62,6 +63,10 @@ import nanodegree.android.nba.R;
 import nanodegree.android.nba.persistence.pojo.response.boxScore.BoxScore;
 import nanodegree.android.nba.persistence.pojo.response.dailySchedule.DailySchedule;
 import nanodegree.android.nba.persistence.pojo.response.dailySchedule.Game;
+import nanodegree.android.nba.persistence.pojo.response.standing.Conference;
+import nanodegree.android.nba.persistence.pojo.response.standing.Division;
+import nanodegree.android.nba.persistence.pojo.response.standing.Standing;
+import nanodegree.android.nba.persistence.pojo.response.standing.Team;
 import nanodegree.android.nba.rest.ApiUtils;
 import nanodegree.android.nba.rest.GameService;
 import nanodegree.android.nba.utils.DisplayDateUtils;
@@ -98,6 +103,7 @@ public class GameFragment extends Fragment {
     private CompositeDisposable disposable = new CompositeDisposable();
     private ArrayList<Game> gamesList = new ArrayList<>();
 
+    private HashMap<String, String> recordMap = new HashMap<String, String>();
 
     public static GameFragment newInstance(Calendar cal) {
         GameFragment fragment = new GameFragment();
@@ -169,6 +175,7 @@ public class GameFragment extends Fragment {
         setupRecyclerView();
     }
 
+    @SuppressLint("CheckResult")
     private void setupRecyclerView() {
         int marginInDp = 8;
         int marginInPixel = DisplayMetricUtils.convertDpToPixel(8);
@@ -202,7 +209,7 @@ public class GameFragment extends Fragment {
          * */
         disposable.add(
             gamesObservable
-                .subscribeOn(AndroidSchedulers.mainThread())
+                .delay(delay, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableObserver<List<Game>>(){
                     @Override
                     public void onNext(List<Game> games) {
@@ -225,6 +232,7 @@ public class GameFragment extends Fragment {
 
                     @Override
                     public void onComplete() {
+
                     }
                 })
         );
@@ -290,8 +298,33 @@ public class GameFragment extends Fragment {
 
         disableView();
 
-        // Calling connect to start emission
-        gamesObservable.connect();
+        disposable.add(
+            getTeamStandingObservable().
+                subscribe(new Consumer<HashMap<String, String>>() {
+                    @Override
+                    public void accept(HashMap<String, String> stringStringHashMap) throws Exception {
+                        Thread.sleep(1000);
+                        gamesObservable.connect();
+                    }
+                })
+        );
+    }
+
+    /**
+     * Making Retrofit call to fetch all games for a given day
+     */
+    private Observable<List<Game>> getGamesObservable() {
+        return ApiUtils.getGameService().getGameScheduleByDate("en",
+            year, month, day, ".json",BuildConfig.NBA_DB_API_KEY)
+            .toObservable()
+            .subscribeOn(Schedulers.io())
+            .delay(delay, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+            .map(new Function<DailySchedule, List<Game>>() {
+                @Override
+                public List<Game> apply(DailySchedule dailySchedule) throws Exception {
+                    return dailySchedule.getGames();
+                }
+            });
     }
 
     /**
@@ -311,40 +344,47 @@ public class GameFragment extends Fragment {
                     game.setGameStatus(boxScore.getClock());
                     game.setAwayPoints(boxScore.getAway().getPoints());
                     game.setHomePoints(boxScore.getHome().getPoints());
+                    game.setAwayRecord(recordMap.get(game.getAway().getAlias()));
+                    game.setHomeRecord(recordMap.get(game.getHome().getAlias()));
                     return game;
                 }
             });
     }
 
     /**
-     * Snackbar shows observer error
+     * Gets Team standing
      */
-    private void showError(Throwable e) {
-        Log.e(TAG, "showError: " + e.getMessage() + " GAME_FRAGMENT");
+    private Observable<HashMap<String, String>> getTeamStandingObservable() {
 
-//        Snackbar snackbar = Snackbar
-//                .make(coordinatorLayout, e.getMessage(), Snackbar.LENGTH_LONG);
-//        View sbView = snackbar.getView();
-//        TextView textView = sbView.findViewById(android.support.design.R.id.snackbar_text);
-//        textView.setTextColor(Color.YELLOW);
-//        snackbar.show();
+        Log.i("CALLED", "getTeamStandingObservable was called");
+        return ApiUtils.getGameService().getStanding("en", 2018,
+                "REG",".json", BuildConfig.NBA_DB_API_KEY)
+                .toObservable()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(new Function<Standing, HashMap<String, String>>() {
+                    @Override
+                    public HashMap<String, String> apply(Standing standing) throws Exception {
+                        recordMap.clear();
+                        for(Conference conference : standing.getConferences()) {
+                            for(Division division : conference.getDivisions()) {
+                                for(Team team : division.getTeams()) {
+                                    StringBuilder sb = new StringBuilder();
+                                    sb.append("(");
+                                    sb.append(Integer.toString(team.getWins()));
+                                    sb.append("-");
+                                    sb.append(Integer.toString(team.getLosses()));
+                                    sb.append(")");
+                                    String key = GameActivity.teamLookup.get(team.getName());
+                                    recordMap.put(key, sb.toString());
+                                }
+                            }
+                        }
+                        return recordMap;
+                    }
+                });
     }
 
-    /**
-     * Making Retrofit call to fetch all games for a given day
-     */
-    private Observable<List<Game>> getGamesObservable() {
-        return ApiUtils.getGameService().getGameScheduleByDate("en", year, month, day, ".json",BuildConfig.NBA_DB_API_KEY)
-            .toObservable()
-            .subscribeOn(Schedulers.io())
-            .delay(delay, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-            .map(new Function<DailySchedule, List<Game>>() {
-                @Override
-                public List<Game> apply(DailySchedule dailySchedule) throws Exception {
-                    return dailySchedule.getGames();
-                }
-            });
-    }
 
     private void disableView() {
         mBackNavImageView.setClickable(false);
@@ -400,5 +440,19 @@ public class GameFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         disposable.dispose();
+    }
+
+    /**
+     * Snackbar shows observer error
+     */
+    private void showError(Throwable e) {
+        Log.e(TAG, "showError: " + e.getMessage() + " GAME_FRAGMENT");
+
+//        Snackbar snackbar = Snackbar
+//                .make(coordinatorLayout, e.getMessage(), Snackbar.LENGTH_LONG);
+//        View sbView = snackbar.getView();
+//        TextView textView = sbView.findViewById(android.support.design.R.id.snackbar_text);
+//        textView.setTextColor(Color.YELLOW);
+//        snackbar.show();
     }
 }

@@ -17,7 +17,7 @@ public class GamesBehind {
     private Double conference;
     @SerializedName("division")
     @Expose
-    private Integer division;
+    private Double division;
 
     /**
      * No args constructor for use in serialization
@@ -32,7 +32,7 @@ public class GamesBehind {
      * @param conference
      * @param league
      */
-    public GamesBehind(Double league, Double conference, Integer division) {
+    public GamesBehind(Double league, Double conference, Double division) {
         super();
         this.league = league;
         this.conference = conference;
@@ -55,11 +55,11 @@ public class GamesBehind {
         this.conference = conference;
     }
 
-    public Integer getDivision() {
+    public Double getDivision() {
         return division;
     }
 
-    public void setDivision(Integer division) {
+    public void setDivision(Double division) {
         this.division = division;
     }
 

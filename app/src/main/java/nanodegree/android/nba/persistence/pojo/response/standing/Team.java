@@ -30,7 +30,7 @@ public class Team {
     private Double winPct;
     @SerializedName("points_for")
     @Expose
-    private Integer pointsFor;
+    private Double pointsFor;
     @SerializedName("points_against")
     @Expose
     private Double pointsAgainst;
@@ -77,7 +77,7 @@ public class Team {
      * @param srId
      * @param wins
      */
-    public Team(String id, String name, String market, Integer wins, Integer losses, Double winPct, Integer pointsFor, Double pointsAgainst, Double pointDiff, String srId, String reference, GamesBehind gamesBehind, Streak streak, List<Record> records) {
+    public Team(String id, String name, String market, Integer wins, Integer losses, Double winPct, Double pointsFor, Double pointsAgainst, Double pointDiff, String srId, String reference, GamesBehind gamesBehind, Streak streak, List<Record> records) {
         super();
         this.id = id;
         this.name = name;
@@ -143,11 +143,11 @@ public class Team {
         this.winPct = winPct;
     }
 
-    public Integer getPointsFor() {
+    public Double getPointsFor() {
         return pointsFor;
     }
 
-    public void setPointsFor(Integer pointsFor) {
+    public void setPointsFor(Double pointsFor) {
         this.pointsFor = pointsFor;
     }
 

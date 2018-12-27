@@ -14,8 +14,9 @@ public class Game implements Serializable
 
     private String gameStatus;
     private Long awayPoints;
+    private String awayRecord;
     private Long homePoints;
-
+    private String homeRecord;
 
     @SerializedName("id")
     @Expose
@@ -211,6 +212,22 @@ public class Game implements Serializable
 
     public void setGameStatus(String gameStatus) {
         this.gameStatus = gameStatus;
+    }
+
+    public String getAwayRecord() {
+        return awayRecord;
+    }
+
+    public void setAwayRecord(String awayRecord) {
+        this.awayRecord = awayRecord;
+    }
+
+    public String getHomeRecord() {
+        return homeRecord;
+    }
+
+    public void setHomeRecord(String homeRecord) {
+        this.homeRecord = homeRecord;
     }
 
     @Override

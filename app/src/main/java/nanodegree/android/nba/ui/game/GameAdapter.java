@@ -96,7 +96,7 @@ public class GameAdapter
                 .into(holder.mAwayTeamLogoImageView);
 
         holder.mAwayTeamLogoTextView.setText(awayTeamInfo.getName());
-        holder.mAwayTeamRecordTextView.setText(R.string.record);
+        holder.mAwayTeamRecordTextView.setText(game.getAwayRecord());
         if(game.getHomePoints() == null) {
             holder.mHomeTeamScoreTextView.setText("");
         } else {
@@ -111,7 +111,7 @@ public class GameAdapter
                 .into(holder.mHomeTeamLogoImageView);
 
         holder.mHomeTeamLogoTextView.setText(homeTeamInfo.getName());
-        holder.mHomeTeamRecordTextView.setText(R.string.record);
+        holder.mHomeTeamRecordTextView.setText(game.getHomeRecord());
         if(game.getHomePoints() == null) {
             holder.mHomeTeamScoreTextView.setText("");
         } else {

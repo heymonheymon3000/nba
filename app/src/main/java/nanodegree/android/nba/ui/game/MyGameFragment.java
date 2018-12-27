@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -30,6 +31,7 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.observables.ConnectableObservable;
@@ -40,6 +42,10 @@ import nanodegree.android.nba.R;
 import nanodegree.android.nba.persistence.pojo.response.boxScore.BoxScore;
 import nanodegree.android.nba.persistence.pojo.response.dailySchedule.DailySchedule;
 import nanodegree.android.nba.persistence.pojo.response.dailySchedule.Game;
+import nanodegree.android.nba.persistence.pojo.response.standing.Conference;
+import nanodegree.android.nba.persistence.pojo.response.standing.Division;
+import nanodegree.android.nba.persistence.pojo.response.standing.Standing;
+import nanodegree.android.nba.persistence.pojo.response.standing.Team;
 import nanodegree.android.nba.rest.ApiUtils;
 import nanodegree.android.nba.utils.DisplayDateUtils;
 import nanodegree.android.nba.utils.DisplayMetricUtils;
@@ -72,6 +78,7 @@ public class MyGameFragment extends Fragment {
     private final static Integer delay = 1;
 
     private OnFragmentInteractionListener mListener;
+    private HashMap<String, String> recordMap = new HashMap<String, String>();
 
     private CompositeDisposable disposable = new CompositeDisposable();
     private ArrayList<Game> gamesList = new ArrayList<>();
@@ -181,32 +188,33 @@ public class MyGameFragment extends Fragment {
              * All the items will be added to RecyclerView
              * */
             disposable.add(
-                gamesObservable
-                    .subscribeOn(AndroidSchedulers.mainThread())
-                    .subscribeWith(new DisposableObserver<List<Game>>(){
-                        @Override
-                        public void onNext(List<Game> games) {
-                            if(games.size() == 0) {
-                                enableView();
-                            }
+                    gamesObservable
+                            .delay(delay, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                            .subscribeWith(new DisposableObserver<List<Game>>(){
+                                @Override
+                                public void onNext(List<Game> games) {
+                                    if(games.size() == 0) {
+                                        enableView();
+                                    }
 
-                            // Refreshing list
-                            gamesList.clear();
-                            gamesList.addAll(games);
+                                    // Refreshing list
+                                    gamesList.clear();
+                                    gamesList.addAll(games);
 
-                            mGameAdapter.setGames(gamesList);
-                            mGameAdapter.notifyDataSetChanged();
-                        }
+                                    mGameAdapter.setGames(gamesList);
+                                    mGameAdapter.notifyDataSetChanged();
+                                }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            showError(e);
-                        }
+                                @Override
+                                public void onError(Throwable e) {
+                                    showError(e);
+                                }
 
-                        @Override
-                        public void onComplete() {
-                        }
-                    })
+                                @Override
+                                public void onComplete() {
+
+                                }
+                            })
             );
 
             /**
@@ -215,63 +223,71 @@ public class MyGameFragment extends Fragment {
              * Second FlatMap makes HTTP call on each Game emission
              * */
             disposable.add(
-                gamesObservable
-                    .subscribeOn(Schedulers.io())
-                    .delay(delay, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                    /**
-                     * Converting List<Game> emission to single Game emissions
-                     * */
-                    .flatMap(new Function<List<Game>, ObservableSource<Game>>() {
-                        @Override
-                        public ObservableSource<Game> apply(List<Game> games) throws Exception {
-                            return Observable.fromIterable(games);                    }
-                    })
-                    /**
-                     * Fetching Box Score on each Game emission one at a time
-                     * */
-                    .concatMap(new Function<Game, ObservableSource<Game>>() {
-                        @Override
-                        public ObservableSource<Game> apply(Game game) throws Exception {
+                    gamesObservable
+                            .subscribeOn(Schedulers.io())
+                            .delay(delay, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                             /**
-                             * Need to wait here for a hot second because there is a
-                             * time limit of 1 second before hitting the API again.
-                             */
-                            Thread.sleep(delay * 1000);
-                            return getBoxScoreObservable(game);
-                        }
-                    })
-                    .subscribeWith(new DisposableObserver<Game>() {
-                        @Override
-                        public void onNext(Game game) {
-                            int position = gamesList.indexOf(game);
+                             * Converting List<Game> emission to single Game emissions
+                             * */
+                            .flatMap(new Function<List<Game>, ObservableSource<Game>>() {
+                                @Override
+                                public ObservableSource<Game> apply(List<Game> games) throws Exception {
+                                    return Observable.fromIterable(games);                    }
+                            })
+                            /**
+                             * Fetching Box Score on each Game emission on at a time
+                             * */
+                            .concatMap(new Function<Game, ObservableSource<Game>>() {
+                                @Override
+                                public ObservableSource<Game> apply(Game game) throws Exception {
+                                    /**
+                                     * Need to wait here for a hot second because there is a
+                                     * time limit of 1 second before hitting the API again.
+                                     */
+                                    Thread.sleep(delay * 1000);
+                                    return getBoxScoreObservable(game);
+                                }
+                            })
+                            .subscribeWith(new DisposableObserver<Game>() {
+                                @Override
+                                public void onNext(Game game) {
+                                    int position = gamesList.indexOf(game);
 
-                            if (position == -1) {
-                                // TODO - take action
-                                // Game not found in the list
-                                // This shouldn't happen
-                                return;
-                            }
+                                    if (position == -1) {
+                                        // TODO - take action
+                                        // Game not found in the list
+                                        // This shouldn't happen
+                                        return;
+                                    }
 
-                            gamesList.set(position, game);
-                            mGameAdapter.setGames(gamesList);
-                            mGameAdapter.notifyItemChanged(position);
-                        }
+                                    gamesList.set(position, game);
+                                    mGameAdapter.setGames(gamesList);
+                                    mGameAdapter.notifyItemChanged(position);
+                                }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            showError(e);
-                        }
+                                @Override
+                                public void onError(Throwable e) {
+                                    showError(e);
+                                }
 
-                        @Override
-                        public void onComplete() {
-                            enableView();
-                        }
-                    }));
+                                @Override
+                                public void onComplete() {
+                                    enableView();
+                                }
+                            }));
 
             disableView();
 
-            // Calling connect to start emission
-            gamesObservable.connect();
+            disposable.add(
+                    getTeamStandingObservable().
+                            subscribe(new Consumer<HashMap<String, String>>() {
+                                @Override
+                                public void accept(HashMap<String, String> stringStringHashMap) throws Exception {
+                                    Thread.sleep(1000);
+                                    gamesObservable.connect();
+                                }
+                            })
+            );
         }
     }
 
@@ -327,6 +343,8 @@ public class MyGameFragment extends Fragment {
                     game.setGameStatus(boxScore.getClock());
                     game.setAwayPoints(boxScore.getAway().getPoints());
                     game.setHomePoints(boxScore.getHome().getPoints());
+                    game.setAwayRecord(recordMap.get(game.getAway().getAlias()));
+                    game.setHomeRecord(recordMap.get(game.getHome().getAlias()));
                     return game;
                 }
             });
@@ -347,6 +365,40 @@ public class MyGameFragment extends Fragment {
     }
 
 
+
+    /**
+     * Gets Team standing
+     */
+    private Observable<HashMap<String, String>> getTeamStandingObservable() {
+
+        Log.i("CALLED", "getTeamStandingObservable was called");
+        return ApiUtils.getGameService().getStanding("en", 2018,
+                "REG",".json", BuildConfig.NBA_DB_API_KEY)
+                .toObservable()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(new Function<Standing, HashMap<String, String>>() {
+                    @Override
+                    public HashMap<String, String> apply(Standing standing) throws Exception {
+                        recordMap.clear();
+                        for(Conference conference : standing.getConferences()) {
+                            for(Division division : conference.getDivisions()) {
+                                for(Team team : division.getTeams()) {
+                                    StringBuilder sb = new StringBuilder();
+                                    sb.append("(");
+                                    sb.append(Integer.toString(team.getWins()));
+                                    sb.append("-");
+                                    sb.append(Integer.toString(team.getLosses()));
+                                    sb.append(")");
+                                    String key = GameActivity.teamLookup.get(team.getName());
+                                    recordMap.put(key, sb.toString());
+                                }
+                            }
+                        }
+                        return recordMap;
+                    }
+                });
+    }
 
     private void disableView() {
         mBackNavImageView.setClickable(false);
