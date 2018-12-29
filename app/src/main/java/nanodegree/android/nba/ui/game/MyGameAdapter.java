@@ -136,7 +136,6 @@ public class MyGameAdapter
 
     public void setGames(List<Game> games) {
         this.mGames = games;
-        notifyDataSetChanged();
     }
 
     public class MasterListGameAdapterViewHolder extends

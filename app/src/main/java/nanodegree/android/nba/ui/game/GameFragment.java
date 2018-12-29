@@ -220,9 +220,6 @@ public class GameFragment extends Fragment {
                         // Refreshing list
                         gamesList.clear();
                         gamesList.addAll(games);
-
-                        mGameAdapter.setGames(gamesList);
-                        mGameAdapter.notifyDataSetChanged();
                     }
 
                     @Override
@@ -231,9 +228,7 @@ public class GameFragment extends Fragment {
                     }
 
                     @Override
-                    public void onComplete() {
-
-                    }
+                    public void onComplete() {}
                 })
         );
 
@@ -282,7 +277,6 @@ public class GameFragment extends Fragment {
 
                         gamesList.set(position, game);
                         mGameAdapter.setGames(gamesList);
-                        mGameAdapter.notifyItemChanged(position);
                     }
 
                     @Override
@@ -292,6 +286,7 @@ public class GameFragment extends Fragment {
 
                     @Override
                     public void onComplete() {
+                        mGameAdapter.notifyDataSetChanged();
                         enableView();
                     }
                 }));
@@ -346,6 +341,19 @@ public class GameFragment extends Fragment {
                     game.setHomePoints(boxScore.getHome().getPoints());
                     game.setAwayRecord(recordMap.get(game.getAway().getAlias()));
                     game.setHomeRecord(recordMap.get(game.getHome().getAlias()));
+
+                    if(boxScore.getStatus().equals("inprogress")) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("Q");
+                        sb.append(boxScore.getQuarter());
+                        sb.append(" ");
+                        sb.append(boxScore.getClock());
+                        game.setStatus("inprogress");
+                        game.setTimeOnClock(sb.toString());
+                    } else if(boxScore.getStatus().equals("halftime")) {
+                        game.setStatus("halftime");
+                        game.setTimeOnClock("halftime");
+                    }
                     return game;
                 }
             });

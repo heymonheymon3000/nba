@@ -133,6 +133,10 @@ public class GameAdapter
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+        } else if(game.getStatus().equals("inprogress")) {
+            return game.getTimeOnClock();
+        } else if(game.getStatus().equals("halftime")) {
+            return "Halftime";
         }
         return "";
     }
@@ -153,7 +157,6 @@ public class GameAdapter
 
     public void setGames(List<Game> games) {
         this.mGames = games;
-        notifyDataSetChanged();
     }
 
     public class MasterListGameAdapterViewHolder extends

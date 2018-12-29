@@ -17,6 +17,7 @@ public class Game implements Serializable
     private String awayRecord;
     private Long homePoints;
     private String homeRecord;
+    private String timeOnClock;
 
     @SerializedName("id")
     @Expose
@@ -228,6 +229,14 @@ public class Game implements Serializable
 
     public void setHomeRecord(String homeRecord) {
         this.homeRecord = homeRecord;
+    }
+
+    public String getTimeOnClock() {
+        return timeOnClock;
+    }
+
+    public void setTimeOnClock(String timeOnClock) {
+        this.timeOnClock = timeOnClock;
     }
 
     @Override

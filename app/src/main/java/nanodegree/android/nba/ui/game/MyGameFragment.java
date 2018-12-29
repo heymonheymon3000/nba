@@ -200,9 +200,6 @@ public class MyGameFragment extends Fragment {
                                     // Refreshing list
                                     gamesList.clear();
                                     gamesList.addAll(games);
-
-                                    mGameAdapter.setGames(gamesList);
-                                    mGameAdapter.notifyDataSetChanged();
                                 }
 
                                 @Override
@@ -211,9 +208,7 @@ public class MyGameFragment extends Fragment {
                                 }
 
                                 @Override
-                                public void onComplete() {
-
-                                }
+                                public void onComplete() {}
                             })
             );
 
@@ -262,7 +257,6 @@ public class MyGameFragment extends Fragment {
 
                                     gamesList.set(position, game);
                                     mGameAdapter.setGames(gamesList);
-                                    mGameAdapter.notifyItemChanged(position);
                                 }
 
                                 @Override
@@ -272,6 +266,7 @@ public class MyGameFragment extends Fragment {
 
                                 @Override
                                 public void onComplete() {
+                                    mGameAdapter.notifyDataSetChanged();
                                     enableView();
                                 }
                             }));
