@@ -2,7 +2,6 @@ package nanodegree.android.nba.ui.game;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Looper;
@@ -18,14 +17,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import android.os.Handler;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,8 +30,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-
-
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableSource;
@@ -44,17 +38,9 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Function3;
-
-
-
-
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
-
-
-
 import io.reactivex.android.schedulers.AndroidSchedulers;
-
 import io.reactivex.observables.ConnectableObservable;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -75,35 +61,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-
-public class GameFragment extends Fragment {
-
+public class GameFragment extends BaseFragment {
     private String TAG = GameFragment.class.getSimpleName();
 
     private GameAdapter mGameAdapter;
-    private RecyclerView mRecyclerView;
-    private Context mContext;
-    private TextView mGameDateTextView;
-    private ProgressBar spinner;
-    private ImageView mBackNavImageView;
-    private ImageView mForwardNavImageView;
-    private LinearLayout linearLayout;
-    public final static String YEAR = "YEAR";
-    public final static String MONTH = "MONTH";
-    public final static String DAY = "DAY";
-
-    public Integer year;
-    public Integer month;
-    public Integer day;
-
-    private final static Integer delay = 1;
-
-    private OnFragmentInteractionListener mListener;
-
-    private CompositeDisposable disposable = new CompositeDisposable();
-    private ArrayList<Game> gamesList = new ArrayList<>();
-
-    private HashMap<String, String> recordMap = new HashMap<String, String>();
 
     public static GameFragment newInstance(Calendar cal) {
         GameFragment fragment = new GameFragment();
@@ -119,30 +80,48 @@ public class GameFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(getArguments() == null) {
+        if (getArguments() == null) {
             Calendar cal = DisplayDateUtils.getCurrentDate(DisplayDateUtils.GAME);
             year = cal.get(Calendar.YEAR);
-            month = cal.get(Calendar.MONTH)+1;
+            month = cal.get(Calendar.MONTH) + 1;
             day = cal.get(Calendar.DATE);
         } else {
             year = getArguments().getInt(YEAR);
-            month = getArguments().getInt(MONTH)+1;
+            month = getArguments().getInt(MONTH) + 1;
             day = getArguments().getInt(DAY);
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView  = inflater.inflate(R.layout.fragment_game, container, false);
-        spinner = rootView.findViewById(R.id.progressBar);
-        spinner.setVisibility(View.GONE);
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
 
-        mRecyclerView = rootView.findViewById(R.id.rv_game_card);
-        mGameDateTextView = rootView.findViewById(R.id.game_date);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        setupClickListeners();
+        setupRecyclerView();
+        fetchData();
+    }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    private void setupClickListeners() {
         mGameDateTextView.setText(DisplayDateUtils.getTodayDate(DisplayDateUtils.GAME));
-
-        mBackNavImageView = rootView.findViewById(R.id.back_image_view);
         mBackNavImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -153,7 +132,6 @@ public class GameFragment extends Fragment {
             }
         });
 
-        mForwardNavImageView = rootView.findViewById(R.id.forward_image_view);
         mForwardNavImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -163,42 +141,15 @@ public class GameFragment extends Fragment {
                 }
             }
         });
-
-        linearLayout = rootView.findViewById(R.id.linearLayout);
-
-        return rootView;
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        setupRecyclerView();
-    }
-
-    @SuppressLint("CheckResult")
-    private void setupRecyclerView() {
-        int marginInDp = 8;
-        int marginInPixel = DisplayMetricUtils.convertDpToPixel(8);
-        int deviceWidthInDp = DisplayMetricUtils.convertPixelsToDp(
-                DisplayMetricUtils.getDeviceWidth(getActivity()));
-
-        int column = deviceWidthInDp / 300;
-        int totalMarginInDp = marginInDp * (column + 1);
-        int cardWidthInDp = (deviceWidthInDp - totalMarginInDp) / column;
-        int cardHeightInDp = 100;//(int) (2.0f / 3.0f * cardWidthInDp);
-
-        RecyclerViewMarginDecoration decoration =
-                new RecyclerViewMarginDecoration(RecyclerViewMarginDecoration.ORIENTATION_VERTICAL,
-                        marginInPixel, column);
-        GridLayoutManager layoutManager = new GridLayoutManager(mContext, column,
-                LinearLayoutManager.VERTICAL,false);
-        mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.addItemDecoration(decoration);
+    private void fetchData() {
         mGameAdapter =
-                new GameAdapter(Objects.requireNonNull(mContext), cardWidthInDp,
+                new GameAdapter(Objects.requireNonNull(mContext),
+                        cardWidthInDp,
                         cardHeightInDp);
-        mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mGameAdapter);
+
 
         ConnectableObservable<List<Game>> gamesObservable = getGamesObservable().replay();
 
@@ -239,8 +190,8 @@ public class GameFragment extends Fragment {
          * */
         disposable.add(
             gamesObservable
-            .subscribeOn(Schedulers.io())
-            .delay(delay, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .delay(delay, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 /**
                  * Converting List<Game> emission to single Game emissions
                  * */
@@ -297,170 +248,12 @@ public class GameFragment extends Fragment {
             getTeamStandingObservable().
                 subscribe(new Consumer<HashMap<String, String>>() {
                     @Override
-                    public void accept(HashMap<String, String> stringStringHashMap) throws Exception {
+                    public void accept(HashMap<String, String> stringStringHashMap)
+                            throws Exception {
                         Thread.sleep(1000);
                         gamesObservable.connect();
                     }
                 })
         );
-    }
-
-    /**
-     * Making Retrofit call to fetch all games for a given day
-     */
-    private Observable<List<Game>> getGamesObservable() {
-        return ApiUtils.getGameService().getGameScheduleByDate("en",
-            year, month, day, ".json",BuildConfig.NBA_DB_API_KEY)
-            .toObservable()
-            .subscribeOn(Schedulers.io())
-            .delay(delay, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-            .map(new Function<DailySchedule, List<Game>>() {
-                @Override
-                public List<Game> apply(DailySchedule dailySchedule) throws Exception {
-                    return dailySchedule.getGames();
-                }
-            });
-    }
-
-    /**
-     * Making Retrofit call to get single Box Score
-     * get Box Score HTTP call returns Box Score object, but
-     * map() operator is used to change the return type to Game
-     */
-    private Observable<Game> getBoxScoreObservable(final Game game) {
-        return ApiUtils.getGameService()
-            .getBoxScore("en", game.getId(), ".json", BuildConfig.NBA_DB_API_KEY)
-            .toObservable()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .map(new Function<BoxScore, Game>() {
-                @Override
-                public Game apply(BoxScore boxScore) throws Exception {
-                    game.setGameStatus(boxScore.getClock());
-                    game.setAwayPoints(boxScore.getAway().getPoints());
-                    game.setHomePoints(boxScore.getHome().getPoints());
-                    game.setAwayRecord(recordMap.get(game.getAway().getAlias()));
-                    game.setHomeRecord(recordMap.get(game.getHome().getAlias()));
-
-                    if(boxScore.getStatus().equals("inprogress")) {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("Q");
-                        sb.append(boxScore.getQuarter());
-                        sb.append(" ");
-                        sb.append(boxScore.getClock());
-                        game.setStatus("inprogress");
-                        game.setTimeOnClock(sb.toString());
-                    } else if(boxScore.getStatus().equals("halftime")) {
-                        game.setStatus("halftime");
-                        game.setTimeOnClock("halftime");
-                    }
-                    return game;
-                }
-            });
-    }
-
-    /**
-     * Gets Team standing
-     */
-    private Observable<HashMap<String, String>> getTeamStandingObservable() {
-
-        Log.i("CALLED", "getTeamStandingObservable was called");
-        return ApiUtils.getGameService().getStanding("en", 2018,
-                "REG",".json", BuildConfig.NBA_DB_API_KEY)
-                .toObservable()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .map(new Function<Standing, HashMap<String, String>>() {
-                    @Override
-                    public HashMap<String, String> apply(Standing standing) throws Exception {
-                        recordMap.clear();
-                        for(Conference conference : standing.getConferences()) {
-                            for(Division division : conference.getDivisions()) {
-                                for(Team team : division.getTeams()) {
-                                    StringBuilder sb = new StringBuilder();
-                                    sb.append("(");
-                                    sb.append(Integer.toString(team.getWins()));
-                                    sb.append("-");
-                                    sb.append(Integer.toString(team.getLosses()));
-                                    sb.append(")");
-                                    String key = GameActivity.teamLookup.get(team.getName());
-                                    recordMap.put(key, sb.toString());
-                                }
-                            }
-                        }
-                        return recordMap;
-                    }
-                });
-    }
-
-
-    private void disableView() {
-        mBackNavImageView.setClickable(false);
-        mBackNavImageView.setClickable(false);
-        mBackNavImageView.setImageAlpha(50);
-
-        mForwardNavImageView.setEnabled(false);
-        mForwardNavImageView.setEnabled(false);
-        mForwardNavImageView.setImageAlpha(50);
-
-        linearLayout.setAlpha(Float.parseFloat(
-                getContext().getString(R.string.disable_alpha_value)));
-        spinner.setVisibility(View.VISIBLE);
-
-        mListener.enableTabs(false);
-    }
-
-    private void enableView() {
-        mBackNavImageView.setClickable(true);
-        mBackNavImageView.setClickable(true);
-        mBackNavImageView.setImageAlpha(255);
-
-        mForwardNavImageView.setEnabled(true);
-        mForwardNavImageView.setEnabled(true);
-        mForwardNavImageView.setImageAlpha(255);
-
-        spinner.setVisibility(View.GONE);
-        linearLayout.setAlpha(Float.parseFloat(
-                getContext().getString(R.string.enable_alpha_value)));
-
-        mListener.enableTabs(true);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        this.mContext = context;
-        if (mContext instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) mContext;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        disposable.dispose();
-    }
-
-    /**
-     * Snackbar shows observer error
-     */
-    private void showError(Throwable e) {
-        Log.e(TAG, "showError: " + e.getMessage() + " GAME_FRAGMENT");
-
-//        Snackbar snackbar = Snackbar
-//                .make(coordinatorLayout, e.getMessage(), Snackbar.LENGTH_LONG);
-//        View sbView = snackbar.getView();
-//        TextView textView = sbView.findViewById(android.support.design.R.id.snackbar_text);
-//        textView.setTextColor(Color.YELLOW);
-//        snackbar.show();
     }
 }

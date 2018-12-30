@@ -1,6 +1,5 @@
 package nanodegree.android.nba.ui.game;
 
-
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,14 +18,12 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -54,34 +51,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class MyGameFragment extends Fragment {
+public class MyGameFragment extends BaseFragment {
     private String TAG = MyGameFragment.class.getSimpleName();
 
     private MyGameAdapter mGameAdapter;
-    private RecyclerView mRecyclerView;
-    private Context mContext;
-    private TextView mGameDateTextView;
-    private ProgressBar spinner;
-    private ImageView mBackNavImageView;
-    private ImageView mForwardNavImageView;
-    private LinearLayout linearLayout;
-
-    public final static String YEAR = "YEAR";
-    public final static String MONTH = "MONTH";
-    public final static String DAY = "DAY";
-
-    public Integer year;
-    public Integer month;
-    public Integer day;
     public Boolean loadData;
-
-    private final static Integer delay = 1;
-
-    private OnFragmentInteractionListener mListener;
-    private HashMap<String, String> recordMap = new HashMap<String, String>();
-
-    private CompositeDisposable disposable = new CompositeDisposable();
-    private ArrayList<Game> gamesList = new ArrayList<>();
 
     public static MyGameFragment newInstance(Calendar cal) {
         MyGameFragment fragment = new MyGameFragment();
@@ -97,15 +71,15 @@ public class MyGameFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(getArguments() == null) {
+        if (getArguments() == null) {
             Calendar cal = DisplayDateUtils.getCurrentDate(DisplayDateUtils.MY_GAME);
             year = cal.get(Calendar.YEAR);
-            month = cal.get(Calendar.MONTH)+1;
+            month = cal.get(Calendar.MONTH) + 1;
             day = cal.get(Calendar.DATE);
             loadData = false;
         } else {
             year = getArguments().getInt(YEAR);
-            month = getArguments().getInt(MONTH)+1;
+            month = getArguments().getInt(MONTH) + 1;
             day = getArguments().getInt(DAY);
             loadData = true;
         }
@@ -113,185 +87,38 @@ public class MyGameFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView  = inflater.inflate(R.layout.fragment_my_game, container, false);
-        spinner = rootView.findViewById(R.id.progressBar);
-        spinner.setVisibility(View.GONE);
-
-        mRecyclerView = rootView.findViewById(R.id.rv_game_card);
-        mGameDateTextView = rootView.findViewById(R.id.game_date);
-
-        mGameDateTextView.setText(DisplayDateUtils.getTodayDate(DisplayDateUtils.MY_GAME));
-
-        mBackNavImageView = rootView.findViewById(R.id.back_image_view);
-        mBackNavImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mGameDateTextView.setText(DisplayDateUtils.getYesterdayDate(DisplayDateUtils.MY_GAME));
-                if (mListener != null) {
-                    mListener.updateFragment(1);
-                }
-            }
-        });
-
-        mForwardNavImageView = rootView.findViewById(R.id.forward_image_view);
-        mForwardNavImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mGameDateTextView.setText(DisplayDateUtils.getTomorrowDate(DisplayDateUtils.MY_GAME));
-                if (mListener != null) {
-                    mListener.updateFragment(1);
-                }
-            }
-        });
-
-        linearLayout = rootView.findViewById(R.id.linearLayout);
-
-        return rootView;
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        setupClickListeners();
         setupRecyclerView();
+        fetchData();
     }
 
-    private void setupRecyclerView() {
-        int marginInDp = 8;
-        int marginInPixel = DisplayMetricUtils.convertDpToPixel(8);
-        int deviceWidthInDp = DisplayMetricUtils.convertPixelsToDp(
-                DisplayMetricUtils.getDeviceWidth(getActivity()));
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+    }
 
-        int column = deviceWidthInDp / 300;
-        int totalMarginInDp = marginInDp * (column + 1);
-        int cardWidthInDp = (deviceWidthInDp - totalMarginInDp) / column;
-        int cardHeightInDp = 100;//(int) (2.0f / 3.0f * cardWidthInDp);
+    @Override
+    public void onDetach() {
+        super.onDetach();
+    }
 
-        RecyclerViewMarginDecoration decoration =
-                new RecyclerViewMarginDecoration(RecyclerViewMarginDecoration.ORIENTATION_VERTICAL,
-                        marginInPixel, column);
-        GridLayoutManager layoutManager = new GridLayoutManager(mContext, column,
-                LinearLayoutManager.VERTICAL,false);
-        mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.addItemDecoration(decoration);
-        mGameAdapter =
-                new MyGameAdapter(Objects.requireNonNull(mContext), cardWidthInDp,
-                        cardHeightInDp);
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setAdapter(mGameAdapter);
-
-        if(loadData) {
-            ConnectableObservable<List<Game>> gamesObservable = getGamesObservable().replay();
-
-            /**
-             * Fetching all games for a given day
-             * Observable emits List<Game> at once
-             * All the items will be added to RecyclerView
-             * */
-            disposable.add(
-                    gamesObservable
-                            .delay(delay, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                            .subscribeWith(new DisposableObserver<List<Game>>(){
-                                @Override
-                                public void onNext(List<Game> games) {
-                                    if(games.size() == 0) {
-                                        enableView();
-                                    }
-
-                                    // Refreshing list
-                                    gamesList.clear();
-                                    gamesList.addAll(games);
-                                }
-
-                                @Override
-                                public void onError(Throwable e) {
-                                    showError(e);
-                                }
-
-                                @Override
-                                public void onComplete() {}
-                            })
-            );
-
-            /**
-             * Fetching individual team box score
-             * First FlatMap converts single List<Game> to multiple emissions
-             * Second FlatMap makes HTTP call on each Game emission
-             * */
-            disposable.add(
-                    gamesObservable
-                            .subscribeOn(Schedulers.io())
-                            .delay(delay, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                            /**
-                             * Converting List<Game> emission to single Game emissions
-                             * */
-                            .flatMap(new Function<List<Game>, ObservableSource<Game>>() {
-                                @Override
-                                public ObservableSource<Game> apply(List<Game> games) throws Exception {
-                                    return Observable.fromIterable(games);                    }
-                            })
-                            /**
-                             * Fetching Box Score on each Game emission on at a time
-                             * */
-                            .concatMap(new Function<Game, ObservableSource<Game>>() {
-                                @Override
-                                public ObservableSource<Game> apply(Game game) throws Exception {
-                                    /**
-                                     * Need to wait here for a hot second because there is a
-                                     * time limit of 1 second before hitting the API again.
-                                     */
-                                    Thread.sleep(delay * 1000);
-                                    return getBoxScoreObservable(game);
-                                }
-                            })
-                            .subscribeWith(new DisposableObserver<Game>() {
-                                @Override
-                                public void onNext(Game game) {
-                                    int position = gamesList.indexOf(game);
-
-                                    if (position == -1) {
-                                        // TODO - take action
-                                        // Game not found in the list
-                                        // This shouldn't happen
-                                        return;
-                                    }
-
-                                    gamesList.set(position, game);
-                                    mGameAdapter.setGames(gamesList);
-                                }
-
-                                @Override
-                                public void onError(Throwable e) {
-                                    showError(e);
-                                }
-
-                                @Override
-                                public void onComplete() {
-                                    mGameAdapter.notifyDataSetChanged();
-                                    enableView();
-                                }
-                            }));
-
-            disableView();
-
-            disposable.add(
-                    getTeamStandingObservable().
-                            subscribe(new Consumer<HashMap<String, String>>() {
-                                @Override
-                                public void accept(HashMap<String, String> stringStringHashMap) throws Exception {
-                                    Thread.sleep(1000);
-                                    gamesObservable.connect();
-                                }
-                            })
-            );
-        }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 
     /**
      * Making Retrofit call to fetch all games for a given day
      */
-    private Observable<List<Game>> getGamesObservable() {
+    protected Observable<List<Game>> getGamesObservable() {
         return ApiUtils.getGameService().getGameScheduleByDate("en",
-                year, month, day, ".json", BuildConfig.NBA_DB_API_KEY)
+            year, month, day, ".json", BuildConfig.NBA_DB_API_KEY)
             .toObservable()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -311,7 +138,7 @@ public class MyGameFragment extends Fragment {
                 @Override
                 public boolean test(Game game) throws Exception {
                     if(game.getAway().getAlias().equals("CHI") ||
-                        game.getHome().getAlias().equals("CHI")) {
+                            game.getHome().getAlias().equals("CHI")) {
                         return true;
                     }
                     return false;
@@ -321,133 +148,139 @@ public class MyGameFragment extends Fragment {
             .toObservable();
     }
 
-    /**
-     * Making Retrofit call to get single Box Score
-     * get Box Score HTTP call returns Box Score object, but
-     * map() operator is used to change the return type to Game
-     */
-    private Observable<Game> getBoxScoreObservable(final Game game) {
-        return ApiUtils.getGameService()
-            .getBoxScore("en", game.getId(), ".json", BuildConfig.NBA_DB_API_KEY)
-            .toObservable()
-            .subscribeOn(Schedulers.io())
-            .delay(delay, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-            .map(new Function<BoxScore, Game>() {
-                @Override
-                public Game apply(BoxScore boxScore) throws Exception {
-                    game.setGameStatus(boxScore.getClock());
-                    game.setAwayPoints(boxScore.getAway().getPoints());
-                    game.setHomePoints(boxScore.getHome().getPoints());
-                    game.setAwayRecord(recordMap.get(game.getAway().getAlias()));
-                    game.setHomeRecord(recordMap.get(game.getHome().getAlias()));
-                    return game;
+    private void setupClickListeners() {
+        mGameDateTextView.setText(DisplayDateUtils.getTodayDate(DisplayDateUtils.MY_GAME));
+        mBackNavImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mGameDateTextView.setText(DisplayDateUtils.getYesterdayDate(DisplayDateUtils.MY_GAME));
+                if (mListener != null) {
+                    mListener.updateFragment(1);
                 }
-            });
+            }
+        });
+
+        mForwardNavImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mGameDateTextView.setText(DisplayDateUtils.getTomorrowDate(DisplayDateUtils.MY_GAME));
+                if (mListener != null) {
+                    mListener.updateFragment(1);
+                }
+            }
+        });
     }
 
-    /**
-     * Snackbar shows observer error
-     */
-    private void showError(Throwable e) {
-        Log.e(TAG, "showError: " + e.getMessage() + " MY_GAME_FRAGMENT");
+    private void fetchData() {
+        mGameAdapter =
+                new MyGameAdapter(Objects.requireNonNull(mContext), cardWidthInDp,
+                        cardHeightInDp);
+        mRecyclerView.setAdapter(mGameAdapter);
 
-//        Snackbar snackbar = Snackbar
-//                .make(coordinatorLayout, e.getMessage(), Snackbar.LENGTH_LONG);
-//        View sbView = snackbar.getView();
-//        TextView textView = sbView.findViewById(android.support.design.R.id.snackbar_text);
-//        textView.setTextColor(Color.YELLOW);
-//        snackbar.show();
-    }
+        if(loadData) {
+            ConnectableObservable<List<Game>> gamesObservable = getGamesObservable().replay();
 
-
-
-    /**
-     * Gets Team standing
-     */
-    private Observable<HashMap<String, String>> getTeamStandingObservable() {
-
-        Log.i("CALLED", "getTeamStandingObservable was called");
-        return ApiUtils.getGameService().getStanding("en", 2018,
-                "REG",".json", BuildConfig.NBA_DB_API_KEY)
-                .toObservable()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .map(new Function<Standing, HashMap<String, String>>() {
-                    @Override
-                    public HashMap<String, String> apply(Standing standing) throws Exception {
-                        recordMap.clear();
-                        for(Conference conference : standing.getConferences()) {
-                            for(Division division : conference.getDivisions()) {
-                                for(Team team : division.getTeams()) {
-                                    StringBuilder sb = new StringBuilder();
-                                    sb.append("(");
-                                    sb.append(Integer.toString(team.getWins()));
-                                    sb.append("-");
-                                    sb.append(Integer.toString(team.getLosses()));
-                                    sb.append(")");
-                                    String key = GameActivity.teamLookup.get(team.getName());
-                                    recordMap.put(key, sb.toString());
-                                }
+            /**
+             * Fetching all games for a given day
+             * Observable emits List<Game> at once
+             * All the items will be added to RecyclerView
+             * */
+            disposable.add(
+                gamesObservable
+                    .delay(delay, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<List<Game>>(){
+                        @Override
+                        public void onNext(List<Game> games) {
+                            if(games.size() == 0) {
+                                enableView();
                             }
+
+                            // Refreshing list
+                            gamesList.clear();
+                            gamesList.addAll(games);
                         }
-                        return recordMap;
+
+                        @Override
+                        public void onError(Throwable e) {
+                            showError(e);
+                        }
+
+                        @Override
+                        public void onComplete() {}
+                    })
+        );
+
+        /**
+         * Fetching individual team box score
+         * First FlatMap converts single List<Game> to multiple emissions
+         * Second FlatMap makes HTTP call on each Game emission
+         * */
+        disposable.add(
+            gamesObservable
+                .subscribeOn(Schedulers.io())
+                .delay(delay, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                /**
+                 * Converting List<Game> emission to single Game emissions
+                 * */
+                .flatMap(new Function<List<Game>, ObservableSource<Game>>() {
+                    @Override
+                    public ObservableSource<Game> apply(List<Game> games) throws Exception {
+                        return Observable.fromIterable(games);                    }
+                })
+                /**
+                 * Fetching Box Score on each Game emission on at a time
+                 * */
+                .concatMap(new Function<Game, ObservableSource<Game>>() {
+                    @Override
+                    public ObservableSource<Game> apply(Game game) throws Exception {
+                        /**
+                         * Need to wait here for a hot second because there is a
+                         * time limit of 1 second before hitting the API again.
+                         */
+                        Thread.sleep(delay * 1500);
+                        return getBoxScoreObservable(game);
                     }
-                });
-    }
+                })
+                .subscribeWith(new DisposableObserver<Game>() {
+                    @Override
+                    public void onNext(Game game) {
+                        int position = gamesList.indexOf(game);
 
-    private void disableView() {
-        mBackNavImageView.setClickable(false);
-        mBackNavImageView.setClickable(false);
-        mBackNavImageView.setImageAlpha(50);
+                        if (position == -1) {
+                            // TODO - take action
+                            // Game not found in the list
+                            // This shouldn't happen
+                            return;
+                        }
 
-        mForwardNavImageView.setEnabled(false);
-        mForwardNavImageView.setEnabled(false);
-        mForwardNavImageView.setImageAlpha(50);
+                        gamesList.set(position, game);
+                        mGameAdapter.setGames(gamesList);
+                    }
 
-        linearLayout.setAlpha(Float.parseFloat(
-                getContext().getString(R.string.disable_alpha_value)));
-        spinner.setVisibility(View.VISIBLE);
+                    @Override
+                    public void onError(Throwable e) {
+                        showError(e);
+                    }
 
-        mListener.enableTabs(false);
-    }
+                    @Override
+                    public void onComplete() {
+                        mGameAdapter.notifyDataSetChanged();
+                        enableView();
+                    }
+                }));
 
-    private void enableView() {
-        mBackNavImageView.setClickable(true);
-        mBackNavImageView.setClickable(true);
-        mBackNavImageView.setImageAlpha(255);
+        disableView();
 
-        mForwardNavImageView.setEnabled(true);
-        mForwardNavImageView.setEnabled(true);
-        mForwardNavImageView.setImageAlpha(255);
-
-        spinner.setVisibility(View.GONE);
-        linearLayout.setAlpha(Float.parseFloat(
-                getContext().getString(R.string.enable_alpha_value)));
-
-        mListener.enableTabs(true);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        this.mContext = context;
-        if (mContext instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) mContext;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+        disposable.add(
+            getTeamStandingObservable().
+                subscribe(new Consumer<HashMap<String, String>>() {
+                    @Override
+                    public void accept(HashMap<String, String> stringStringHashMap) throws Exception {
+                        Thread.sleep(1000);
+                        gamesObservable.connect();
+                    }
+                })
+            );
         }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        disposable.dispose();
     }
 }

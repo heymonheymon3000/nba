@@ -116,6 +116,10 @@ public class MyGameAdapter
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+        } else if(game.getStatus().equals("inprogress")) {
+            return game.getTimeOnClock();
+        } else if(game.getStatus().equals("halftime")) {
+            return "Halftime";
         }
         return "";
     }
