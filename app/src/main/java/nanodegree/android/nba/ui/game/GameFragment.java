@@ -88,6 +88,7 @@ public class GameFragment extends Fragment {
     private ImageView mBackNavImageView;
     private ImageView mForwardNavImageView;
     private LinearLayout linearLayout;
+    private TextView noGames;
     private OnFragmentInteractionListener mListener;
     private CompositeDisposable disposable =
             new CompositeDisposable();
@@ -144,6 +145,7 @@ public class GameFragment extends Fragment {
         mBackNavImageView = rootView.findViewById(R.id.back_image_view);
         mForwardNavImageView = rootView.findViewById(R.id.forward_image_view);
         linearLayout = rootView.findViewById(R.id.linearLayout);
+        noGames = rootView.findViewById(R.id.no_games);
 
         return rootView;
     }
@@ -262,7 +264,15 @@ public class GameFragment extends Fragment {
                         }
 
                         @Override
-                        public void onComplete() {}
+                        public void onComplete() {
+                            if(gamesList.isEmpty()) {
+                                mRecyclerView.setVisibility(View.GONE);
+                                noGames.setVisibility(View.VISIBLE);
+                            } else {
+                                noGames.setVisibility(View.GONE);
+                                mRecyclerView.setVisibility(View.VISIBLE);
+                            }
+                        }
                     })
             );
 

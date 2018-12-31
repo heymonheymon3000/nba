@@ -14,8 +14,7 @@
     <string name="format">.json</string>
     <string name="language_code">en</string>
     <string name="season">REG</string>
-
-
+    <string name="no_games">No games are scheduled on this day.</string>
 
 
 </resources>

@@ -50,7 +50,8 @@ public class GameAdapter
                          int cardWidth, int cardHeight) {
 
         picassoInstance =
-                new Picasso.Builder(context.getApplicationContext()).loggingEnabled(true)
+                new Picasso.Builder(context.getApplicationContext())
+                        .loggingEnabled(true)
                         .build();
         this.cardWidth = cardWidth;
         this.cardHeight = cardHeight;
