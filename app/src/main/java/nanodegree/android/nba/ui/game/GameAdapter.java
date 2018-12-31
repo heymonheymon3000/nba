@@ -10,8 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -28,9 +26,7 @@ import nanodegree.android.nba.rest.ApiUtils;
 import nanodegree.android.nba.utils.DisplayMetricUtils;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
-
 import com.squareup.picasso.Picasso;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -39,9 +35,7 @@ import java.util.List;
 import java.util.Date;
 import java.util.Observer;
 import java.util.TimeZone;
-
 import java.util.Locale;
-
 
 public class GameAdapter
         extends RecyclerView.Adapter<GameAdapter.MasterListGameAdapterViewHolder> {
@@ -192,7 +186,6 @@ public class GameAdapter
             mAwayTeamLogoTextView = view.findViewById(R.id.away_team_logo_text_view);
             mAwayTeamRecordTextView = view.findViewById(R.id.away_team_record_text_view);
             mAwayTeamScoreTextView = view.findViewById(R.id.away_team_score_text_view);
-
 
             view.setOnClickListener(this);
         }

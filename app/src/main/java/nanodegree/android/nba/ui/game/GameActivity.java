@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.Fragment;
-
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,11 +12,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -39,27 +36,37 @@ import nanodegree.android.nba.utils.DisplayDateUtils;
 public class GameActivity extends AppCompatActivity
         implements OnFragmentInteractionListener {
 
+    public static HashMap<String, TeamInfo> teamInfoHashMap = new HashMap<>();
+    public static HashMap<String, String> teamLookup = new HashMap<>();
+
     private TabAdapter adapter;
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    private FragmentManager fm;
-
-    public static HashMap<String, TeamInfo> teamInfoHashMap = new HashMap<>();
-    public static HashMap<String, String> teamLookup = new HashMap<>();
+    private FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        createTeamInfoMap();
+
         viewPager = findViewById(R.id.viewPager);
         tabLayout = findViewById(R.id.tabLayout);
 
-        fm = getSupportFragmentManager();
-        adapter = new TabAdapter(getSupportFragmentManager());
+        fragmentManager = getSupportFragmentManager();
 
-        createTeamInfoMap();
-        adapter.addFragment(new GameFragment(), getBaseContext().getString(R.string.all_games));
-        adapter.addFragment(new MyGameFragment(), getBaseContext().getString(R.string.my_games));
+        adapter = new TabAdapter(fragmentManager);
+
+        adapter.addFragment(GameFragment.newInstance(DisplayDateUtils.GAME, 0,
+                DisplayDateUtils.getCurrentDate(DisplayDateUtils.GAME),
+                true,
+                false), getBaseContext().getString(R.string.all_games));
+
+        adapter.addFragment(GameFragment.newInstance(DisplayDateUtils.MY_GAME, 1,
+                DisplayDateUtils.getCurrentDate(DisplayDateUtils.MY_GAME),
+                false,
+                true), getBaseContext().getString(R.string.my_games));
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
@@ -85,12 +92,20 @@ public class GameActivity extends AppCompatActivity
     public void updateFragment(Integer index) {
         switch (index) {
             case 0:
-                GameFragment gameFragment = GameFragment.newInstance(DisplayDateUtils.getCurrentDate(DisplayDateUtils.GAME));
+                GameFragment gameFragment =
+                    GameFragment.newInstance(DisplayDateUtils.GAME, 0,
+                        DisplayDateUtils.getCurrentDate(DisplayDateUtils.GAME),
+                        true,
+                        false);
                 adapter.replaceFragment(0, gameFragment);
                 adapter.notifyDataSetChanged();
                 break;
             case 1:
-                MyGameFragment myGameFragment = MyGameFragment.newInstance(DisplayDateUtils.getCurrentDate(DisplayDateUtils.MY_GAME));
+                GameFragment myGameFragment =
+                    GameFragment.newInstance(DisplayDateUtils.MY_GAME, 1,
+                        DisplayDateUtils.getCurrentDate(DisplayDateUtils.MY_GAME),
+                        true,
+                        true);
                 adapter.replaceFragment(1, myGameFragment);
                 adapter.notifyDataSetChanged();
                 break;
