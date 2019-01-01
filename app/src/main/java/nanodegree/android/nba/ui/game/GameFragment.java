@@ -236,7 +236,8 @@ public class GameFragment extends Fragment {
         if(loadData) {
             disableView();
 
-            ConnectableObservable<List<Game>> gamesObservable = getGamesObservable().replay();
+            ConnectableObservable<List<Game>> gamesObservable =
+                    getGamesObservable().replay();
 
             /**
              * Fetching all games for a given day
