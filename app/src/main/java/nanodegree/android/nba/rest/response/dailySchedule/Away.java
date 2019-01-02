@@ -16,40 +16,9 @@ public class Away implements Serializable
     @SerializedName("alias")
     @Expose
     private String alias;
-    @SerializedName("id")
-    @Expose
-    private String id;
-    @SerializedName("sr_id")
-    @Expose
-    private String srId;
-    @SerializedName("reference")
-    @Expose
-    private String reference;
     private final static long serialVersionUID = -7244452822517430984L;
 
-    /**
-     * No args constructor for use in serialization
-     * 
-     */
-    public Away() {
-    }
-
-    /**
-     * 
-     * @param id
-     * @param alias
-     * @param name
-     * @param reference
-     * @param srId
-     */
-    public Away(String name, String alias, String id, String srId, String reference) {
-        super();
-        this.name = name;
-        this.alias = alias;
-        this.id = id;
-        this.srId = srId;
-        this.reference = reference;
-    }
+    public Away() {}
 
     public String getName() {
         return name;
@@ -67,33 +36,9 @@ public class Away implements Serializable
         this.alias = alias;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getSrId() {
-        return srId;
-    }
-
-    public void setSrId(String srId) {
-        this.srId = srId;
-    }
-
-    public String getReference() {
-        return reference;
-    }
-
-    public void setReference(String reference) {
-        this.reference = reference;
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(id).append(alias).append(name).append(reference).append(srId).toHashCode();
+        return new HashCodeBuilder().append(alias).append(name).toHashCode();
     }
 
     @Override
@@ -105,7 +50,7 @@ public class Away implements Serializable
             return false;
         }
         Away rhs = ((Away) other);
-        return new EqualsBuilder().append(id, rhs.id).append(alias, rhs.alias).append(name, rhs.name).append(reference, rhs.reference).append(srId, rhs.srId).isEquals();
+        return new EqualsBuilder().append(alias, rhs.alias).append(name, rhs.name).isEquals();
     }
 
 }
