@@ -45,14 +45,15 @@ import io.reactivex.observables.ConnectableObservable;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import nanodegree.android.nba.BuildConfig;
+import nanodegree.android.nba.NBAApplication;
 import nanodegree.android.nba.R;
-import nanodegree.android.nba.persistence.pojo.response.boxScore.BoxScore;
-import nanodegree.android.nba.persistence.pojo.response.dailySchedule.DailySchedule;
-import nanodegree.android.nba.persistence.pojo.response.dailySchedule.Game;
-import nanodegree.android.nba.persistence.pojo.response.standing.Conference;
-import nanodegree.android.nba.persistence.pojo.response.standing.Division;
-import nanodegree.android.nba.persistence.pojo.response.standing.Standing;
-import nanodegree.android.nba.persistence.pojo.response.standing.Team;
+import nanodegree.android.nba.rest.response.boxScore.BoxScore;
+import nanodegree.android.nba.rest.response.dailySchedule.DailySchedule;
+import nanodegree.android.nba.rest.response.dailySchedule.Game;
+import nanodegree.android.nba.rest.response.standing.Conference;
+import nanodegree.android.nba.rest.response.standing.Division;
+import nanodegree.android.nba.rest.response.standing.Standing;
+import nanodegree.android.nba.rest.response.standing.Team;
 import nanodegree.android.nba.rest.ApiUtils;
 import nanodegree.android.nba.rest.GameService;
 import nanodegree.android.nba.utils.DisplayDateUtils;
@@ -450,7 +451,7 @@ public class GameFragment extends Fragment {
                             sb.append("-");
                             sb.append(Integer.toString(team.getLosses()));
                             sb.append(")");
-                            String key = GameActivity.teamLookup.get(team.getName());
+                            String key = NBAApplication.teamLookup.get(team.getName());
                             recordMap.put(key, sb.toString());
                         }
                     }

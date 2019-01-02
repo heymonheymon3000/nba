@@ -5,7 +5,7 @@
 //
 //import android.support.annotation.NonNull;
 //
-//import nanodegree.android.nba.persistence.pojo.response.dailySchedule.DailySchedule;
+//import nanodegree.android.nba.rest.response.dailySchedule.DailySchedule;
 //import nanodegree.android.nba.rest.ApiUtils;
 //import nanodegree.android.nba.rest.GameService;
 //import retrofit2.Call;

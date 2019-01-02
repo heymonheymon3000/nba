@@ -4,36 +4,28 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
-import nanodegree.android.nba.BuildConfig;
+
+import nanodegree.android.nba.NBAApplication;
 import nanodegree.android.nba.R;
-import nanodegree.android.nba.persistence.pojo.response.dailySchedule.Game;
-import nanodegree.android.nba.persistence.pojo.response.dailySchedule.TeamInfo;
-import nanodegree.android.nba.persistence.pojo.response.standing.Conference;
-import nanodegree.android.nba.persistence.pojo.response.standing.Division;
-import nanodegree.android.nba.persistence.pojo.response.standing.Standing;
-import nanodegree.android.nba.persistence.pojo.response.standing.Team;
-import nanodegree.android.nba.rest.ApiUtils;
+import nanodegree.android.nba.rest.response.dailySchedule.Game;
+import nanodegree.android.nba.utils.TeamInfo;
+import nanodegree.android.nba.rest.response.standing.Conference;
+import nanodegree.android.nba.rest.response.standing.Division;
+import nanodegree.android.nba.rest.response.standing.Standing;
+import nanodegree.android.nba.rest.response.standing.Team;
 import nanodegree.android.nba.utils.DisplayMetricUtils;
-import retrofit2.http.Path;
-import retrofit2.http.Query;
+
 import com.squareup.picasso.Picasso;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Date;
-import java.util.Observer;
 import java.util.TimeZone;
 import java.util.Locale;
 
@@ -77,8 +69,8 @@ public class GameAdapter
         final Game game = mGames.get(position);
         setCardViewSize(holder);
 
-        TeamInfo awayTeamInfo = GameActivity.teamInfoHashMap.get(game.getAway().getAlias());
-        TeamInfo homeTeamInfo = GameActivity.teamInfoHashMap.get(game.getHome().getAlias());
+        TeamInfo awayTeamInfo = NBAApplication.teamInfoHashMap.get(game.getAway().getAlias());
+        TeamInfo homeTeamInfo = NBAApplication.teamInfoHashMap.get(game.getHome().getAlias());
 
         holder.mGameStatusTextView.setText(getGameStatus(game));
         holder.mTVNetworkTextView.setText(game.getBroadcasts().get(0).getNetwork());
