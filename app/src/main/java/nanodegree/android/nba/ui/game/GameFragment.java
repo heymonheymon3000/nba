@@ -96,12 +96,10 @@ public class GameFragment extends Fragment
             new CompositeDisposable();
     private ArrayList<Game> gamesList =
             new ArrayList<>();
-    private HashMap<String, String> recordMap =
-            new HashMap<String, String>();
+    private HashMap<String, String> recordMap = new HashMap<String, String>();
     private int cardWidthInDp;
     private int cardHeightInDp;
     private GameAdapter mGameAdapter;
-
 
     public static GameFragment newInstance(String tabName, Integer tabIndex,
                                            Calendar cal, Boolean loadData,
@@ -244,42 +242,6 @@ public class GameFragment extends Fragment
         }
     }
 
-
-
-    /**
-     * Gets Team standing
-     */
-    private Observable<HashMap<String, String>> getTeamStandingObservable() {
-        return ApiUtils.getGameService().getStanding(mContext.getString(R.string.language_code),
-                2018,
-                mContext.getString(R.string.season) ,mContext.getString(R.string.format),
-                BuildConfig.NBA_DB_API_KEY)
-        .toObservable()
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .map(new Function<Standing, HashMap<String, String>>() {
-            @Override
-            public HashMap<String, String> apply(Standing standing) throws Exception {
-                recordMap.clear();
-                for(Conference conference : standing.getConferences()) {
-                    for(Division division : conference.getDivisions()) {
-                        for(Team team : division.getTeams()) {
-                            StringBuilder sb = new StringBuilder();
-                            sb.append("(");
-                            sb.append(Integer.toString(team.getWins()));
-                            sb.append("-");
-                            sb.append(Integer.toString(team.getLosses()));
-                            sb.append(")");
-                            String key = NBAApplication.teamLookup.get(team.getName());
-                            recordMap.put(key, sb.toString());
-                        }
-                    }
-                }
-                return recordMap;
-            }
-        });
-    }
-
     private void disableView() {
         mBackNavImageView.setClickable(false);
         mBackNavImageView.setClickable(false);
@@ -409,7 +371,11 @@ public class GameFragment extends Fragment
     public void onLoaderReset(@NonNull Loader<DailyScheduleAgg> loader) {}
 
     private Boolean isMyTeamPlaying(Game game) {
-        return true;
+        if(game.getAway().getAlias().equals("LAL") || game.getHome().getAlias().equals("LAL")) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private GameAgg createGameAgg(Game game, String date) {
@@ -454,6 +420,45 @@ public class GameFragment extends Fragment
             gameAgg.setAwayPoints(boxScore.getAway().getPoints());
             gameAgg.setHomePoints(boxScore.getHome().getPoints());
         }
+
+        if(recordMap.size() == 0) {
+
+            Log.i("recordMap", "recordMap was 0");
+
+            // Pause before sending request.  Otherwise the API will not work.
+            try {
+                Thread.sleep(delay * 1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            Standing standing =
+                    ApiUtils.getGameService().getStanding(mContext.getString(R.string.language_code),
+                    2018,
+                    mContext.getString(R.string.season) ,mContext.getString(R.string.format),
+                    BuildConfig.NBA_DB_API_KEY).blockingGet();
+
+            for(Conference conference : standing.getConferences()) {
+                for(Division division : conference.getDivisions()) {
+                    for(Team team : division.getTeams()) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("(");
+                        sb.append(Integer.toString(team.getWins()));
+                        sb.append("-");
+                        sb.append(Integer.toString(team.getLosses()));
+                        sb.append(")");
+                        String key = NBAApplication.teamLookup.get(team.getName());
+                        recordMap.put(key, sb.toString());
+                    }
+                }
+            }
+        } else {
+            Log.i("recordMap", "recordMap was NOT 0");
+
+        }
+
+        gameAgg.setAwayRecord(recordMap.get(gameAgg.getAwayAlias()));
+        gameAgg.setHomeRecord(recordMap.get(gameAgg.getHomeAlias()));
 
         return gameAgg;
     }
