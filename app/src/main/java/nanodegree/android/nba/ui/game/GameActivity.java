@@ -2,6 +2,8 @@ package nanodegree.android.nba.ui.game;
 
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.LoaderManager;
+
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,21 +19,18 @@ public class GameActivity extends AppCompatActivity
 
     private TabAdapter adapter;
     private TabLayout tabLayout;
-    private ViewPager viewPager;
-    private FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        viewPager = findViewById(R.id.viewPager);
+        ViewPager viewPager = findViewById(R.id.viewPager);
         tabLayout = findViewById(R.id.tabLayout);
 
-        fragmentManager = getSupportFragmentManager();
+        FragmentManager fragmentManager = getSupportFragmentManager();
 
         adapter = new TabAdapter(fragmentManager);
-
         adapter.addFragment(GameFragment.newInstance(DisplayDateUtils.GAME, 0,
                 DisplayDateUtils.getCurrentDate(DisplayDateUtils.GAME),
                 true,
@@ -41,10 +40,9 @@ public class GameActivity extends AppCompatActivity
                 DisplayDateUtils.getCurrentDate(DisplayDateUtils.MY_GAME),
                 false,
                 true), getBaseContext().getString(R.string.my_games));
-
         viewPager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(viewPager);
 
+        tabLayout.setupWithViewPager(viewPager);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {

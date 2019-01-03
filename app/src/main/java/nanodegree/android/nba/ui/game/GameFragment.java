@@ -2,14 +2,13 @@ package nanodegree.android.nba.ui.game;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Looper;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,25 +20,24 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.os.Handler;
-import java.io.IOException;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableSource;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
-import io.reactivex.functions.Function3;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observables.ConnectableObservable;
 import io.reactivex.observers.DisposableObserver;
@@ -47,6 +45,8 @@ import io.reactivex.schedulers.Schedulers;
 import nanodegree.android.nba.BuildConfig;
 import nanodegree.android.nba.NBAApplication;
 import nanodegree.android.nba.R;
+import nanodegree.android.nba.persistence.entity.DailyScheduleAgg;
+import nanodegree.android.nba.persistence.entity.GameAgg;
 import nanodegree.android.nba.rest.response.boxScore.BoxScore;
 import nanodegree.android.nba.rest.response.dailySchedule.DailySchedule;
 import nanodegree.android.nba.rest.response.dailySchedule.Game;
@@ -55,17 +55,18 @@ import nanodegree.android.nba.rest.response.standing.Division;
 import nanodegree.android.nba.rest.response.standing.Standing;
 import nanodegree.android.nba.rest.response.standing.Team;
 import nanodegree.android.nba.rest.ApiUtils;
-import nanodegree.android.nba.rest.GameService;
 import nanodegree.android.nba.utils.DisplayDateUtils;
 import nanodegree.android.nba.utils.DisplayMetricUtils;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import io.reactivex.functions.Predicate;
 
-public class GameFragment extends Fragment {
+import static java.lang.Thread.*;
+
+public class GameFragment extends Fragment
+    implements LoaderManager.LoaderCallbacks<DailyScheduleAgg> {
+
     private String TAG = GameFragment.class.getSimpleName();
 
+    private static final int GAME_FRAGMENT_LOADER = 22;
     private final static Integer delay = 1;
 
     private final static String YEAR = "YEAR";
@@ -130,6 +131,10 @@ public class GameFragment extends Fragment {
         tabIndex = getArguments().getInt(TAB_INDEX);
         loadData = getArguments().getBoolean(LOAD_DATA);
         filterTeams = getArguments().getBoolean(FILTER_TEAMS);
+
+        if(loadData) {
+            getLoaderManager().initLoader(GAME_FRAGMENT_LOADER, null, this);
+        }
     }
 
     @Override
@@ -167,7 +172,7 @@ public class GameFragment extends Fragment {
             mListener = (OnFragmentInteractionListener) mContext;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                + " must implement OnFragmentInteractionListener");
         }
     }
 
@@ -192,7 +197,7 @@ public class GameFragment extends Fragment {
         int column = deviceWidthInDp / 300;
         int totalMarginInDp = marginInDp * (column + 1);
         cardWidthInDp = (deviceWidthInDp - totalMarginInDp) / column;
-        cardHeightInDp = 100; //(int) (2.0f / 3.0f * cardWidthInDp);
+        cardHeightInDp = 100;
 
         RecyclerViewMarginDecoration decoration =
                 new RecyclerViewMarginDecoration(RecyclerViewMarginDecoration.ORIENTATION_VERTICAL,
@@ -235,204 +240,18 @@ public class GameFragment extends Fragment {
         mRecyclerView.setAdapter(mGameAdapter);
 
         if(loadData) {
-            disableView();
-
-            ConnectableObservable<List<Game>> gamesObservable =
-                    getGamesObservable().replay();
-
-            /**
-             * Fetching all games for a given day
-             * Observable emits List<Game> at once
-             * All the items will be added to RecyclerView
-             * */
-            disposable.add(
-                gamesObservable
-                    .delay(delay, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                    .subscribeWith(new DisposableObserver<List<Game>>(){
-                        @Override
-                        public void onNext(List<Game> games) {
-                            if(games.size() == 0) {
-                                enableView();
-                            }
-
-                            // Refreshing list
-                            gamesList.clear();
-                            gamesList.addAll(games);
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            showError(e);
-                        }
-
-                        @Override
-                        public void onComplete() {
-                            if(gamesList.isEmpty()) {
-                                mRecyclerView.setVisibility(View.GONE);
-                                noGames.setVisibility(View.VISIBLE);
-                            } else {
-                                noGames.setVisibility(View.GONE);
-                                mRecyclerView.setVisibility(View.VISIBLE);
-                            }
-                        }
-                    })
-            );
-
-            /**
-             * Fetching individual team box score
-             * First FlatMap converts single List<Game> to multiple emissions
-             * Second concatMap makes HTTP call on each Game emission
-             * */
-            disposable.add(
-                gamesObservable
-                    .subscribeOn(Schedulers.io())
-                    .delay(delay, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                    /**
-                     * Converting List<Game> emission to single Game emissions
-                     * */
-                    .flatMap(new Function<List<Game>, ObservableSource<Game>>() {
-                        @Override
-                        public ObservableSource<Game> apply(List<Game> games) throws Exception {
-                            return Observable.fromIterable(games);                    }
-                    })
-                    /**
-                     * Fetching Box Score on each Game emission on at a time
-                     * */
-                    .concatMap(new Function<Game, ObservableSource<Game>>() {
-                        @Override
-                        public ObservableSource<Game> apply(Game game) throws Exception {
-                            /**
-                             * Need to wait here for a hot second because there is a
-                             * time limit of 1 second before hitting the API again.
-                             */
-                            Thread.sleep(delay * 1000);
-                            return getBoxScoreObservable(game);
-                        }
-                    })
-                    .subscribeWith(new DisposableObserver<Game>() {
-                        @Override
-                        public void onNext(Game game) {
-                            int position = gamesList.indexOf(game);
-
-                            if (position == -1) {
-                                // TODO - take action
-                                // Game not found in the list
-                                // This shouldn't happen
-                                return;
-                            }
-
-                            gamesList.set(position, game);
-                            mGameAdapter.setGames(gamesList);
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            showError(e);
-                        }
-
-                        @Override
-                        public void onComplete() {
-                            mGameAdapter.notifyDataSetChanged();
-                            enableView();
-                        }
-                    }));
-
-            disposable.add(
-                getTeamStandingObservable().
-                    subscribe(new Consumer<HashMap<String, String>>() {
-                        @Override
-                        public void accept(HashMap<String, String> stringStringHashMap)
-                                throws Exception {
-                            Thread.sleep(1000);
-                            gamesObservable.connect();
-                        }
-                    })
-            );
+            getAllGames();
         }
     }
 
-    /**
-     * Making Retrofit call to fetch all games for a given day
-     */
-    private Observable<List<Game>> getGamesObservable() {
-        return ApiUtils.getGameService().getGameScheduleByDate(mContext.getString(R.string.language_code),
-        year, month, day, mContext.getString(R.string.format),BuildConfig.NBA_DB_API_KEY)
-        .toObservable()
-        .subscribeOn(Schedulers.io())
-        .delay(delay, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-        .map(new Function<DailySchedule, List<Game>>() {
-            @Override
-            public List<Game> apply(DailySchedule dailySchedule) throws Exception {
-                return dailySchedule.getGames();
-            }
-        })
-        .flatMap(new Function<List<Game>, ObservableSource<Game>>() {
-            @Override
-            public ObservableSource<Game> apply(List<Game> games) throws Exception {
-                return Observable.fromIterable(games);
-            }
-        })
-        .filter(new Predicate<Game>() {
-            @Override
-            public boolean test(Game game) throws Exception {
-                if(filterTeams) {
-                    if(game.getAway().getAlias().equals("CHI") ||
-                            game.getHome().getAlias().equals("CHI")) {
-                        return true;
-                    }
-                    return false;
-                } else {
-                    return true;
-                }
-            }
-        })
-        .toList()
-        .toObservable();
-    }
 
-    /**
-     * Making Retrofit call to get single Box Score
-     * get Box Score HTTP call returns Box Score object, but
-     * map() operator is used to change the return type to Game
-     */
-    private Observable<Game> getBoxScoreObservable(final Game game) {
-        return ApiUtils.getGameService()
-        .getBoxScore(mContext.getString(R.string.language_code), game.getId(),
-                mContext.getString(R.string.format), BuildConfig.NBA_DB_API_KEY)
-        .toObservable()
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .map(new Function<BoxScore, Game>() {
-            @Override
-            public Game apply(BoxScore boxScore) throws Exception {
-                game.setGameStatus(boxScore.getClock());
-                game.setAwayPoints(boxScore.getAway().getPoints());
-                game.setHomePoints(boxScore.getHome().getPoints());
-                game.setAwayRecord(recordMap.get(game.getAway().getAlias()));
-                game.setHomeRecord(recordMap.get(game.getHome().getAlias()));
-
-                if(boxScore.getStatus().equals("inprogress")) {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("Q");
-                    sb.append(boxScore.getQuarter());
-                    sb.append(" ");
-                    sb.append(boxScore.getClock());
-                    game.setStatus("inprogress");
-                    game.setTimeOnClock(sb.toString());
-                } else if(boxScore.getStatus().equals("halftime")) {
-                    game.setStatus("halftime");
-                    game.setTimeOnClock("halftime");
-                }
-                return game;
-            }
-        });
-    }
 
     /**
      * Gets Team standing
      */
     private Observable<HashMap<String, String>> getTeamStandingObservable() {
-        return ApiUtils.getGameService().getStanding(mContext.getString(R.string.language_code), 2018,
+        return ApiUtils.getGameService().getStanding(mContext.getString(R.string.language_code),
+                2018,
                 mContext.getString(R.string.season) ,mContext.getString(R.string.format),
                 BuildConfig.NBA_DB_API_KEY)
         .toObservable()
@@ -505,5 +324,156 @@ public class GameFragment extends Fragment {
 //        TextView textView = sbView.findViewById(android.support.design.R.id.snackbar_text);
 //        textView.setTextColor(Color.YELLOW);
 //        snackbar.show();
+    }
+
+    private void getAllGames() {
+        Bundle allGamesBundle = new Bundle();
+        LoaderManager loaderManager = getLoaderManager();
+        Loader<DailyScheduleAgg> loader = loaderManager.getLoader(GAME_FRAGMENT_LOADER);
+        if(loader == null) {
+            loaderManager.initLoader(GAME_FRAGMENT_LOADER, allGamesBundle, this);
+        } else {
+            loaderManager.restartLoader(GAME_FRAGMENT_LOADER, allGamesBundle, this);
+        }
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    @Override
+    public Loader<DailyScheduleAgg> onCreateLoader(int id, @Nullable Bundle args) {
+        return new AsyncTaskLoader<DailyScheduleAgg>(this.getContext()) {
+            DailyScheduleAgg resultFromDailyScheduleAgg;
+
+            @Override
+            public DailyScheduleAgg loadInBackground() {
+                DailyScheduleAgg dailyScheduleAgg = new DailyScheduleAgg();
+                ArrayList<GameAgg> gameAggs = new ArrayList<GameAgg>();
+
+                try {
+                    sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                DailySchedule dailySchedule = ApiUtils.getGameService()
+                    .getGameScheduleByDate(mContext.getString(R.string.language_code),
+                        year, month, day, mContext.getString(R.string.format),
+                        BuildConfig.NBA_DB_API_KEY).blockingGet();
+
+                dailyScheduleAgg.setDate(dailySchedule.getDate());
+
+                List<Game> games = dailySchedule.getGames();
+                for(Game game : games) {
+                    if (filterTeams) {
+                        // If the team does NOT match continue and do not create an GameAgg
+                        if (isMyTeamPlaying(game)) {
+                            gameAggs.add(createGameAgg(game, dailyScheduleAgg.getDate()));
+                        } else {
+                            continue; // skip this game
+                        }
+                    } else {
+                        gameAggs.add(createGameAgg(game, dailyScheduleAgg.getDate()));
+                    }
+                }
+
+                dailyScheduleAgg.setGames(gameAggs);
+
+                return dailyScheduleAgg;
+            }
+
+            @Override
+            protected void onStartLoading() {
+                disableView();
+                if(resultFromDailyScheduleAgg != null) {
+                    // To skip loadInBackground call
+                    deliverResult(resultFromDailyScheduleAgg);
+                } else {
+                    forceLoad();
+                }
+            }
+
+            @Override
+            public void deliverResult(DailyScheduleAgg data) {
+                resultFromDailyScheduleAgg = data;
+                super.deliverResult(data);
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<DailyScheduleAgg> loader, DailyScheduleAgg data) {
+        mGameAdapter.setGames(data.getGames());
+        enableView();
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<DailyScheduleAgg> loader) {}
+
+    private Boolean isMyTeamPlaying(Game game) {
+        return true;
+    }
+
+    private GameAgg createGameAgg(Game game, String date) {
+        GameAgg gameAgg = new GameAgg();
+        gameAgg.setId(game.getId());
+        gameAgg.setDailyScheduleId(date);
+        gameAgg.setStatus(game.getStatus());
+        gameAgg.setScheduled(game.getScheduled());
+        gameAgg.setBroadcast(game.getBroadcasts().get(0).getNetwork());
+        gameAgg.setAwayAlias(game.getAway().getAlias());
+        gameAgg.setAwayName(game.getAway().getName());
+        gameAgg.setHomeAlias(game.getHome().getAlias());
+        gameAgg.setHomeName(game.getHome().getName());
+
+        // Pause before sending request.  Otherwise the API will not work.
+        try {
+            Thread.sleep(delay * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        BoxScore boxScore = ApiUtils.getGameService()
+                .getBoxScore("en", gameAgg.getId(),
+                        mContext.getString(R.string.format),
+                        BuildConfig.NBA_DB_API_KEY).blockingGet();
+
+        if(gameAgg.getStatus().equals("scheduled")) {
+            gameAgg.setTimeOnClock(getGameStartTime(game));
+            gameAgg.setAwayPoints(Long.valueOf(0));
+            gameAgg.setHomePoints(Long.valueOf(0));
+        } else if(gameAgg.getStatus().equals("inprogress")) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Q");
+            sb.append(boxScore.getQuarter());
+            sb.append(" ");
+            sb.append(boxScore.getClock());
+            gameAgg.setTimeOnClock(sb.toString());
+            gameAgg.setAwayPoints(boxScore.getAway().getPoints());
+            gameAgg.setHomePoints(boxScore.getHome().getPoints());
+        } else if(gameAgg.getStatus().equals("closed")) {
+            gameAgg.setTimeOnClock("Finish");
+            gameAgg.setAwayPoints(boxScore.getAway().getPoints());
+            gameAgg.setHomePoints(boxScore.getHome().getPoints());
+        }
+
+        return gameAgg;
+    }
+
+    private String getGameStartTime(Game game) {
+        Date date = null;
+        DateFormat dateFormat =
+                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX",
+                        Locale.ENGLISH);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+        try {
+            date = dateFormat.parse(game.getScheduled());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        DateFormat d = new SimpleDateFormat("h:mm a", Locale.ENGLISH);
+        d.setTimeZone(TimeZone.getTimeZone("EST"));
+        return d.format(date)+ " ET";
+
     }
 }

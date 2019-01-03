@@ -7,7 +7,7 @@ import android.arch.persistence.room.Query;
 
 
 import nanodegree.android.nba.persistence.db.NBAContract;
-import nanodegree.android.nba.persistence.entity.DailySchedule;
+import nanodegree.android.nba.persistence.entity.DailyScheduleAgg;
 
 import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
@@ -15,10 +15,10 @@ import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 public interface DailyScheduleDao {
     // CREATE
     @Insert(onConflict = REPLACE)
-    long insert(DailySchedule dailySchedule);
+    long insert(DailyScheduleAgg dailySchedule);
 
     @Insert(onConflict = REPLACE)
-    long[] insertAll(DailySchedule[] dailySchedules);
+    long[] insertAll(DailyScheduleAgg[] dailySchedules);
 
     // READ
     @Query("SELECT COUNT(*) FROM " + NBAContract.DailyScheduleEntry.TABLE_NAME)
@@ -26,7 +26,7 @@ public interface DailyScheduleDao {
 
     // UPDATE
     @Update(onConflict = REPLACE)
-    int update(DailySchedule dailySchedule);
+    int update(DailyScheduleAgg dailySchedule);
 
     // DELETE
     @Query("DELETE FROM " + NBAContract.DailyScheduleEntry.TABLE_NAME + " WHERE "

@@ -11,12 +11,12 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class Game implements Serializable
 {
-    private String gameStatus;
-    private Long awayPoints;
-    private String awayRecord;
-    private Long homePoints;
-    private String homeRecord;
-    private String timeOnClock;
+//    private String gameStatus;
+//    private Long awayPoints;
+//    private String awayRecord;
+//    private Long homePoints;
+//    private String homeRecord;
+//    private String timeOnClock;
 
     @SerializedName("id")
     @Expose
@@ -88,53 +88,53 @@ public class Game implements Serializable
         this.away = away;
     }
 
-    public Long getAwayPoints() {
-        return awayPoints;
-    }
-
-    public void setAwayPoints(Long awayPoints) {
-        this.awayPoints = awayPoints;
-    }
-
-    public Long getHomePoints() {
-        return homePoints;
-    }
-
-    public void setHomePoints(Long homePoints) {
-        this.homePoints = homePoints;
-    }
-
-    public String getGameStatus() {
-        return gameStatus;
-    }
-
-    public void setGameStatus(String gameStatus) {
-        this.gameStatus = gameStatus;
-    }
-
-    public String getAwayRecord() {
-        return awayRecord;
-    }
-
-    public void setAwayRecord(String awayRecord) {
-        this.awayRecord = awayRecord;
-    }
-
-    public String getHomeRecord() {
-        return homeRecord;
-    }
-
-    public void setHomeRecord(String homeRecord) {
-        this.homeRecord = homeRecord;
-    }
-
-    public String getTimeOnClock() {
-        return timeOnClock;
-    }
-
-    public void setTimeOnClock(String timeOnClock) {
-        this.timeOnClock = timeOnClock;
-    }
+//    public Long getAwayPoints() {
+//        return awayPoints;
+//    }
+//
+//    public void setAwayPoints(Long awayPoints) {
+//        this.awayPoints = awayPoints;
+//    }
+//
+//    public Long getHomePoints() {
+//        return homePoints;
+//    }
+//
+//    public void setHomePoints(Long homePoints) {
+//        this.homePoints = homePoints;
+//    }
+//
+//    public String getGameStatus() {
+//        return gameStatus;
+//    }
+//
+//    public void setGameStatus(String gameStatus) {
+//        this.gameStatus = gameStatus;
+//    }
+//
+//    public String getAwayRecord() {
+//        return awayRecord;
+//    }
+//
+//    public void setAwayRecord(String awayRecord) {
+//        this.awayRecord = awayRecord;
+//    }
+//
+//    public String getHomeRecord() {
+//        return homeRecord;
+//    }
+//
+//    public void setHomeRecord(String homeRecord) {
+//        this.homeRecord = homeRecord;
+//    }
+//
+//    public String getTimeOnClock() {
+//        return timeOnClock;
+//    }
+//
+//    public void setTimeOnClock(String timeOnClock) {
+//        this.timeOnClock = timeOnClock;
+//    }
 
     @Override
     public int hashCode() {

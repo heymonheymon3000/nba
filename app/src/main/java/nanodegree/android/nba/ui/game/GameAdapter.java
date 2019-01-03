@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import nanodegree.android.nba.NBAApplication;
 import nanodegree.android.nba.R;
+import nanodegree.android.nba.persistence.entity.GameAgg;
 import nanodegree.android.nba.rest.response.dailySchedule.Game;
 import nanodegree.android.nba.utils.TeamInfo;
 import nanodegree.android.nba.rest.response.standing.Conference;
@@ -34,7 +35,7 @@ public class GameAdapter
 
     private Picasso picassoInstance;
 
-    private List<Game> mGames;
+    private List<GameAgg> mGames;
     private int cardWidth;
     private int cardHeight;
 
@@ -66,14 +67,14 @@ public class GameAdapter
     @Override
     public void onBindViewHolder(@NonNull final MasterListGameAdapterViewHolder holder,
                                  int position) {
-        final Game game = mGames.get(position);
+        final GameAgg game = mGames.get(position);
         setCardViewSize(holder);
 
-        TeamInfo awayTeamInfo = NBAApplication.teamInfoHashMap.get(game.getAway().getAlias());
-        TeamInfo homeTeamInfo = NBAApplication.teamInfoHashMap.get(game.getHome().getAlias());
+        TeamInfo awayTeamInfo = NBAApplication.teamInfoHashMap.get(game.getHomeAlias());
+        TeamInfo homeTeamInfo = NBAApplication.teamInfoHashMap.get(game.getAwayAlias());
 
-        holder.mGameStatusTextView.setText(getGameStatus(game));
-        holder.mTVNetworkTextView.setText(game.getBroadcasts().get(0).getNetwork());
+        holder.mGameStatusTextView.setText(game.getTimeOnClock());
+        holder.mTVNetworkTextView.setText(game.getBroadcast());
 
         picassoInstance
                 .load(awayTeamInfo.getLogo())
@@ -84,7 +85,7 @@ public class GameAdapter
 
         holder.mAwayTeamLogoTextView.setText(awayTeamInfo.getName());
         holder.mAwayTeamRecordTextView.setText(game.getAwayRecord());
-        if(game.getHomePoints() == null) {
+        if(game.getAwayPoints() == null) {
             holder.mHomeTeamScoreTextView.setText("");
         } else {
             holder.mAwayTeamScoreTextView.setText(String.valueOf(game.getAwayPoints()));
@@ -106,28 +107,6 @@ public class GameAdapter
         }
     }
 
-    private String getGameStatus(Game game) {
-        if(game.getStatus().equals("closed")) {
-            return "Finish";
-        } else if(game.getStatus().equals("scheduled")) {
-            try {
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.ENGLISH);
-                dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-                Date date = dateFormat.parse(game.getScheduled());
-                DateFormat d = new SimpleDateFormat("h:mm a", Locale.ENGLISH);
-                d.setTimeZone(TimeZone.getTimeZone("EST"));
-                return d.format(date)+ " ET";
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        } else if(game.getStatus().equals("inprogress")) {
-            return game.getTimeOnClock();
-        } else if(game.getStatus().equals("halftime")) {
-            return "Halftime";
-        }
-        return "";
-    }
-
     private void setCardViewSize(MasterListGameAdapterViewHolder holder) {
         ViewGroup.LayoutParams layoutParams =
                 holder.cardView.getLayoutParams();
@@ -142,8 +121,9 @@ public class GameAdapter
         return mGames.size();
     }
 
-    public void setGames(List<Game> games) {
+    public void setGames(List<GameAgg> games) {
         this.mGames = games;
+        notifyDataSetChanged();
     }
 
     public class MasterListGameAdapterViewHolder extends

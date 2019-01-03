@@ -4,17 +4,19 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
+
+import android.support.annotation.NonNull;
+
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 
 import nanodegree.android.nba.persistence.db.NBAContract;
 
 @Entity(tableName = NBAContract.GameEntry.TABLE_NAME,
-        foreignKeys = @ForeignKey(entity = DailySchedule.class,
+        foreignKeys = @ForeignKey(entity = DailyScheduleAgg.class,
                 parentColumns = NBAContract.DailyScheduleEntry.COLUMN_ID,
                 childColumns = NBAContract.GameEntry.COLUMN_DAILY_SCHEDULE_ID))
-public class Game implements Parcelable {
+public class GameAgg implements Parcelable {
     @PrimaryKey
     @ColumnInfo(index = true, name = NBAContract.GameEntry.COLUMN_ID)
     @NonNull
@@ -59,9 +61,9 @@ public class Game implements Parcelable {
     @ColumnInfo(name = NBAContract.GameEntry.COLUMN_BROADCAST)
     private String broadcast;
 
-    public Game() {}
+    public GameAgg() {}
 
-    private Game(Parcel in) {
+    private GameAgg(Parcel in) {
         id = in.readString();
         dailyScheduleId = in.readString();
         status = in.readString();
@@ -78,16 +80,16 @@ public class Game implements Parcelable {
         broadcast = in.readString();
     }
 
-    public static final Creator<Game> CREATOR = new Creator<Game>() {
+    public static final Creator<GameAgg> CREATOR = new Creator<GameAgg>() {
 
         @Override
-        public Game createFromParcel(Parcel source) {
-            return new Game(source);
+        public GameAgg createFromParcel(Parcel source) {
+            return new GameAgg(source);
         }
 
         @Override
-        public Game[] newArray(int size) {
-            return new Game[size];
+        public GameAgg[] newArray(int size) {
+            return new GameAgg[size];
         }
     };
 

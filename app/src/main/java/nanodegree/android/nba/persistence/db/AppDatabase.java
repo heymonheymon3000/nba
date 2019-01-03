@@ -1,6 +1,5 @@
 package nanodegree.android.nba.persistence.db;
 
-import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Database;
 
 import android.arch.persistence.room.Room;
@@ -9,10 +8,10 @@ import android.content.Context;
 
 import nanodegree.android.nba.persistence.dao.DailyScheduleDao;
 import nanodegree.android.nba.persistence.dao.GameDao;
-import nanodegree.android.nba.persistence.entity.DailySchedule;
-import nanodegree.android.nba.persistence.entity.Game;
+import nanodegree.android.nba.persistence.entity.DailyScheduleAgg;
+import nanodegree.android.nba.persistence.entity.GameAgg;
 
-@Database(entities = {DailySchedule.class, Game.class}, version = 1, exportSchema = false)
+@Database(entities = {DailyScheduleAgg.class, GameAgg.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     private volatile static AppDatabase INSTANCE;
 

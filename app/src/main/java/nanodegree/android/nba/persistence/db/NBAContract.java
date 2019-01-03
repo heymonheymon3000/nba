@@ -11,13 +11,13 @@ public class NBAContract {
     private NBAContract() {}
 
     public static final class DailyScheduleEntry implements BaseColumns {
-        public static final String TABLE_NAME  = "daily_schedule";
+        public static final String TABLE_NAME  = "daily_schedule_agg";
         public static final String COLUMN_ID   = "id";
         public static final String COLUMN_DATE = "date";
     }
 
     public static final class GameEntry implements BaseColumns {
-        public static final String TABLE_NAME               = "game";
+        public static final String TABLE_NAME               = "game_agg";
         public static final String COLUMN_ID                = "id";
         public static final String COLUMN_DAILY_SCHEDULE_ID = "daily_schedule_id";
         public static final String COLUMN_STATUS            = "status";

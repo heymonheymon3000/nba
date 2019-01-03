@@ -9,16 +9,16 @@ import nanodegree.android.nba.persistence.db.NBAContract;
 
 import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
-import nanodegree.android.nba.persistence.entity.Game;
+import nanodegree.android.nba.persistence.entity.GameAgg;
 
 @Dao
 public interface GameDao {
     // CREATE
     @Insert(onConflict = REPLACE)
-    long insert(Game game);
+    long insert(GameAgg game);
 
     @Insert(onConflict = REPLACE)
-    long[] insertAll(Game[] games);
+    long[] insertAll(GameAgg[] games);
 
     // READ
     @Query("SELECT COUNT(*) FROM " + NBAContract.GameEntry.TABLE_NAME)
@@ -26,7 +26,7 @@ public interface GameDao {
 
     // UPDATE
     @Update(onConflict = REPLACE)
-    int update(Game game);
+    int update(GameAgg game);
 
     // DELETE
     @Query("DELETE FROM " + NBAContract.GameEntry.TABLE_NAME + " WHERE "
