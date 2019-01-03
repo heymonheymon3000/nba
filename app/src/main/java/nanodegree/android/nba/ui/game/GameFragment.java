@@ -106,6 +106,19 @@ public class GameFragment extends Fragment
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        this.mContext = context;
+        if (mContext instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) mContext;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -116,10 +129,6 @@ public class GameFragment extends Fragment
         tabIndex = getArguments().getInt(TAB_INDEX);
         loadData = getArguments().getBoolean(LOAD_DATA);
         filterTeams = getArguments().getBoolean(FILTER_TEAMS);
-
-        if(loadData) {
-            getLoaderManager().initLoader(GAME_FRAGMENT_LOADER, null, this);
-        }
     }
 
     @Override
@@ -138,27 +147,10 @@ public class GameFragment extends Fragment
         linearLayout = rootView.findViewById(R.id.linearLayout);
         noGames = rootView.findViewById(R.id.no_games);
 
-        return rootView;
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
         setupClickListeners(tabName, tabIndex);
         setupRecyclerView();
-        fetchData();
-    }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        this.mContext = context;
-        if (mContext instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) mContext;
-        } else {
-            throw new RuntimeException(context.toString()
-                + " must implement OnFragmentInteractionListener");
-        }
+        return rootView;
     }
 
     @Override
@@ -191,6 +183,13 @@ public class GameFragment extends Fragment
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.addItemDecoration(decoration);
         mRecyclerView.setHasFixedSize(true);
+        mGameAdapter =
+                new GameAdapter(Objects.requireNonNull(mContext),
+                        cardWidthInDp,
+                        cardHeightInDp);
+        mRecyclerView.setAdapter(mGameAdapter);
+
+        getAllGames();
     }
 
     private void setupClickListeners(String tabName, Integer index) {
@@ -214,18 +213,6 @@ public class GameFragment extends Fragment
                 }
             }
         });
-    }
-
-    private void fetchData() {
-        mGameAdapter =
-                new GameAdapter(Objects.requireNonNull(mContext),
-                        cardWidthInDp,
-                        cardHeightInDp);
-        mRecyclerView.setAdapter(mGameAdapter);
-
-        if(loadData) {
-            getAllGames();
-        }
     }
 
     private void disableView() {
@@ -275,13 +262,15 @@ public class GameFragment extends Fragment
     }
 
     private void getAllGames() {
-        Bundle allGamesBundle = new Bundle();
-        LoaderManager loaderManager = getLoaderManager();
-        Loader<DailyScheduleAgg> loader = loaderManager.getLoader(GAME_FRAGMENT_LOADER);
-        if(loader == null) {
-            loaderManager.initLoader(GAME_FRAGMENT_LOADER, allGamesBundle, this);
-        } else {
-            loaderManager.restartLoader(GAME_FRAGMENT_LOADER, allGamesBundle, this);
+        if(loadData) {
+            Bundle allGamesBundle = new Bundle();
+            LoaderManager loaderManager = getLoaderManager();
+            Loader<DailyScheduleAgg> loader = loaderManager.getLoader(GAME_FRAGMENT_LOADER);
+            if (loader == null) {
+                loaderManager.initLoader(GAME_FRAGMENT_LOADER, allGamesBundle, this);
+            } else {
+                loaderManager.restartLoader(GAME_FRAGMENT_LOADER, allGamesBundle, this);
+            }
         }
     }
 

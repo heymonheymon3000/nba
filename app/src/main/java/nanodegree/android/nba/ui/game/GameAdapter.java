@@ -95,7 +95,7 @@ public class GameAdapter
                 .into(holder.mHomeTeamLogoImageView);
 
         holder.mHomeTeamLogoTextView.setText(homeTeamInfo.getName());
-        holder.mHomeTeamRecordTextView.setText(GameFragment.recordMap.get(game.getAwayAlias()));
+        holder.mHomeTeamRecordTextView.setText(GameFragment.recordMap.get(game.getHomeAlias()));
         holder.mHomeTeamScoreTextView.setText(game.getHomePoints());
 
     }
