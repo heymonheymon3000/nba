@@ -38,10 +38,7 @@ public class GameAgg implements Parcelable {
     private String awayAlias;
 
     @ColumnInfo(name = NBAContract.GameEntry.COLUMN_AWAY_POINTS)
-    private Long awayPoints;
-
-    @ColumnInfo(name = NBAContract.GameEntry.COLUMN_AWAY_RECORD)
-    private String awayRecord;
+    private String awayPoints;
 
     @ColumnInfo(name = NBAContract.GameEntry.COLUMN_HOME_NAME)
     private String homeName;
@@ -50,10 +47,7 @@ public class GameAgg implements Parcelable {
     private String homeAlias;
 
     @ColumnInfo(name = NBAContract.GameEntry.COLUMN_HOME_POINTS)
-    private Long homePoints;
-
-    @ColumnInfo(name = NBAContract.GameEntry.COLUMN_HOME_RECORD)
-    private String homeRecord;
+    private String homePoints;
 
     @ColumnInfo(name = NBAContract.GameEntry.COLUMN_TIME_ON_CLOCK)
     private String timeOnClock;
@@ -70,12 +64,10 @@ public class GameAgg implements Parcelable {
         scheduled = in.readString();
         awayName = in.readString();
         awayAlias = in.readString();
-        awayPoints = in.readLong();
-        awayRecord = in.readString();
+        awayPoints = in.readString();
         homeName = in.readString();
         homeAlias = in.readString();
-        homePoints = in.readLong();
-        homeRecord = in.readString();
+        homePoints = in.readString();
         timeOnClock = in.readString();
         broadcast = in.readString();
     }
@@ -106,12 +98,10 @@ public class GameAgg implements Parcelable {
         dest.writeString(scheduled);
         dest.writeString(awayName);
         dest.writeString(awayAlias);
-        dest.writeLong(awayPoints);
-        dest.writeString(awayRecord);
+        dest.writeString(awayPoints);
         dest.writeString(homeName);
         dest.writeString(homeAlias);
-        dest.writeLong(homePoints);
-        dest.writeString(homeRecord);
+        dest.writeString(homePoints);
         dest.writeString(timeOnClock);
         dest.writeString(broadcast);
     }
@@ -164,20 +154,12 @@ public class GameAgg implements Parcelable {
         this.awayAlias = awayAlias;
     }
 
-    public Long getAwayPoints() {
+    public String getAwayPoints() {
         return awayPoints;
     }
 
-    public void setAwayPoints(Long awayPoints) {
+    public void setAwayPoints(String awayPoints) {
         this.awayPoints = awayPoints;
-    }
-
-    public String getAwayRecord() {
-        return awayRecord;
-    }
-
-    public void setAwayRecord(String awayRecord) {
-        this.awayRecord = awayRecord;
     }
 
     public String getHomeName() {
@@ -196,20 +178,12 @@ public class GameAgg implements Parcelable {
         this.homeAlias = homeAlias;
     }
 
-    public Long getHomePoints() {
+    public String getHomePoints() {
         return homePoints;
     }
 
-    public void setHomePoints(Long homePoints) {
+    public void setHomePoints(String homePoints) {
         this.homePoints = homePoints;
-    }
-
-    public String getHomeRecord() {
-        return homeRecord;
-    }
-
-    public void setHomeRecord(String homeRecord) {
-        this.homeRecord = homeRecord;
     }
 
     public String getTimeOnClock() {

@@ -12,7 +12,6 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -32,21 +32,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
-import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.observables.ConnectableObservable;
-import io.reactivex.observers.DisposableObserver;
-import io.reactivex.schedulers.Schedulers;
+
 import nanodegree.android.nba.BuildConfig;
 import nanodegree.android.nba.NBAApplication;
 import nanodegree.android.nba.R;
 import nanodegree.android.nba.persistence.entity.DailyScheduleAgg;
 import nanodegree.android.nba.persistence.entity.GameAgg;
+import nanodegree.android.nba.rest.ApiUtils;
 import nanodegree.android.nba.rest.response.boxScore.BoxScore;
 import nanodegree.android.nba.rest.response.dailySchedule.DailySchedule;
 import nanodegree.android.nba.rest.response.dailySchedule.Game;
@@ -54,17 +46,15 @@ import nanodegree.android.nba.rest.response.standing.Conference;
 import nanodegree.android.nba.rest.response.standing.Division;
 import nanodegree.android.nba.rest.response.standing.Standing;
 import nanodegree.android.nba.rest.response.standing.Team;
-import nanodegree.android.nba.rest.ApiUtils;
 import nanodegree.android.nba.utils.DisplayDateUtils;
 import nanodegree.android.nba.utils.DisplayMetricUtils;
-import io.reactivex.functions.Predicate;
 
-import static java.lang.Thread.*;
 
 public class GameFragment extends Fragment
     implements LoaderManager.LoaderCallbacks<DailyScheduleAgg> {
 
     private String TAG = GameFragment.class.getSimpleName();
+    public static HashMap<String, String> recordMap = new HashMap<String, String>();
 
     private static final int GAME_FRAGMENT_LOADER = 22;
     private final static Integer delay = 1;
@@ -76,6 +66,7 @@ public class GameFragment extends Fragment
     private final static String FILTER_TEAMS = "FILTER_TEAMS";
     private final static String TAB_NAME = "TAB_NAME";
     private final static String TAB_INDEX = "TAB_INDEX";
+
     private Integer year;
     private Integer month;
     private Integer day;
@@ -92,11 +83,7 @@ public class GameFragment extends Fragment
     private LinearLayout linearLayout;
     private TextView noGames;
     private OnFragmentInteractionListener mListener;
-    private CompositeDisposable disposable =
-            new CompositeDisposable();
-    private ArrayList<Game> gamesList =
-            new ArrayList<>();
-    private HashMap<String, String> recordMap = new HashMap<String, String>();
+
     private int cardWidthInDp;
     private int cardHeightInDp;
     private GameAdapter mGameAdapter;
@@ -183,7 +170,6 @@ public class GameFragment extends Fragment
     @Override
     public void onDestroy() {
         super.onDestroy();
-        disposable.dispose();
     }
 
     private void setupRecyclerView() {
@@ -195,7 +181,7 @@ public class GameFragment extends Fragment
         int column = deviceWidthInDp / 300;
         int totalMarginInDp = marginInDp * (column + 1);
         cardWidthInDp = (deviceWidthInDp - totalMarginInDp) / column;
-        cardHeightInDp = 100;
+        cardHeightInDp = 120;
 
         RecyclerViewMarginDecoration decoration =
                 new RecyclerViewMarginDecoration(RecyclerViewMarginDecoration.ORIENTATION_VERTICAL,
@@ -307,39 +293,39 @@ public class GameFragment extends Fragment
 
             @Override
             public DailyScheduleAgg loadInBackground() {
-                DailyScheduleAgg dailyScheduleAgg = new DailyScheduleAgg();
-                ArrayList<GameAgg> gameAggs = new ArrayList<GameAgg>();
-
                 try {
-                    sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                    DailyScheduleAgg dailyScheduleAgg = new DailyScheduleAgg();
+                    ArrayList<GameAgg> gameAggs = new ArrayList<GameAgg>();
 
-                DailySchedule dailySchedule = ApiUtils.getGameService()
-                    .getGameScheduleByDate(mContext.getString(R.string.language_code),
-                        year, month, day, mContext.getString(R.string.format),
-                        BuildConfig.NBA_DB_API_KEY).blockingGet();
+                    Thread.sleep(delay * 1000);
 
-                dailyScheduleAgg.setDate(dailySchedule.getDate());
+                    DailySchedule dailySchedule = ApiUtils.getGameService()
+                        .getGameScheduleByDate(mContext.getString(R.string.language_code),
+                            year, month, day, mContext.getString(R.string.format),
+                            BuildConfig.NBA_DB_API_KEY).blockingGet();
 
-                List<Game> games = dailySchedule.getGames();
-                for(Game game : games) {
-                    if (filterTeams) {
-                        // If the team does NOT match continue and do not create an GameAgg
-                        if (isMyTeamPlaying(game)) {
-                            gameAggs.add(createGameAgg(game, dailyScheduleAgg.getDate()));
+                    dailyScheduleAgg.setDate(dailySchedule.getDate());
+
+                    List<Game> games = dailySchedule.getGames();
+                    for(Game game : games) {
+                        if (filterTeams) {
+                            // If the team does NOT match continue and do not create an GameAgg
+                            if (isMyTeamPlaying(game)) {
+                                gameAggs.add(createGameAgg(game, dailyScheduleAgg.getDate()));
+                            } else {
+                                continue; // skip this game
+                            }
                         } else {
-                            continue; // skip this game
+                            gameAggs.add(createGameAgg(game, dailyScheduleAgg.getDate()));
                         }
-                    } else {
-                        gameAggs.add(createGameAgg(game, dailyScheduleAgg.getDate()));
                     }
+
+                    dailyScheduleAgg.setGames(gameAggs);
+
+                    return dailyScheduleAgg;
+                } catch(Exception e) {
+                    return null;
                 }
-
-                dailyScheduleAgg.setGames(gameAggs);
-
-                return dailyScheduleAgg;
             }
 
             @Override
@@ -363,7 +349,20 @@ public class GameFragment extends Fragment
 
     @Override
     public void onLoadFinished(@NonNull Loader<DailyScheduleAgg> loader, DailyScheduleAgg data) {
-        mGameAdapter.setGames(data.getGames());
+        if (data != null) {
+            if(data.getGames().isEmpty()) {
+                mRecyclerView.setVisibility(View.GONE);
+                noGames.setVisibility(View.VISIBLE);
+            } else {
+                noGames.setVisibility(View.GONE);
+                mRecyclerView.setVisibility(View.VISIBLE);
+            }
+            mGameAdapter.setGames(data.getGames());
+        } else {
+            Toast.makeText(this.getContext(),
+                    mContext.getString(R.string.no_connection),
+                    Toast.LENGTH_LONG).show();
+        }
         enableView();
     }
 
@@ -378,7 +377,8 @@ public class GameFragment extends Fragment
         }
     }
 
-    private GameAgg createGameAgg(Game game, String date) {
+    private GameAgg createGameAgg(Game game, String date)
+            throws InterruptedException, ParseException {
         GameAgg gameAgg = new GameAgg();
         gameAgg.setId(game.getId());
         gameAgg.setDailyScheduleId(date);
@@ -390,47 +390,27 @@ public class GameFragment extends Fragment
         gameAgg.setHomeAlias(game.getHome().getAlias());
         gameAgg.setHomeName(game.getHome().getName());
 
-        // Pause before sending request.  Otherwise the API will not work.
-        try {
-            Thread.sleep(delay * 1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Thread.sleep(delay * 1000);
 
         BoxScore boxScore = ApiUtils.getGameService()
                 .getBoxScore("en", gameAgg.getId(),
                         mContext.getString(R.string.format),
                         BuildConfig.NBA_DB_API_KEY).blockingGet();
 
-        if(gameAgg.getStatus().equals("scheduled")) {
+        if(gameAgg.getStatus().equals(mContext.getString(R.string.scheduled))) {
             gameAgg.setTimeOnClock(getGameStartTime(game));
-            gameAgg.setAwayPoints(Long.valueOf(0));
-            gameAgg.setHomePoints(Long.valueOf(0));
-        } else if(gameAgg.getStatus().equals("inprogress")) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Q");
-            sb.append(boxScore.getQuarter());
-            sb.append(" ");
-            sb.append(boxScore.getClock());
-            gameAgg.setTimeOnClock(sb.toString());
-            gameAgg.setAwayPoints(boxScore.getAway().getPoints());
-            gameAgg.setHomePoints(boxScore.getHome().getPoints());
-        } else if(gameAgg.getStatus().equals("closed")) {
-            gameAgg.setTimeOnClock("Finish");
-            gameAgg.setAwayPoints(boxScore.getAway().getPoints());
-            gameAgg.setHomePoints(boxScore.getHome().getPoints());
+        } else if(gameAgg.getStatus().equals(mContext.getString(R.string.inprogress))) {
+            gameAgg.setTimeOnClock(getClockTime(boxScore));
+            gameAgg.setAwayPoints(String.valueOf(boxScore.getAway().getPoints()));
+            gameAgg.setHomePoints(String.valueOf(boxScore.getHome().getPoints()));
+        } else if(gameAgg.getStatus().equals(mContext.getString(R.string.closed))) {
+            gameAgg.setTimeOnClock(mContext.getString(R.string.finish));
+            gameAgg.setAwayPoints(String.valueOf(boxScore.getAway().getPoints()));
+            gameAgg.setHomePoints(String.valueOf(boxScore.getHome().getPoints()));
         }
 
-        if(recordMap.size() == 0) {
-
-            Log.i("recordMap", "recordMap was 0");
-
-            // Pause before sending request.  Otherwise the API will not work.
-            try {
-                Thread.sleep(delay * 1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        if(recordMap.isEmpty()) {
+            Thread.sleep(delay * 1000);
 
             Standing standing =
                     ApiUtils.getGameService().getStanding(mContext.getString(R.string.language_code),
@@ -452,33 +432,30 @@ public class GameFragment extends Fragment
                     }
                 }
             }
-        } else {
-            Log.i("recordMap", "recordMap was NOT 0");
-
         }
-
-        gameAgg.setAwayRecord(recordMap.get(gameAgg.getAwayAlias()));
-        gameAgg.setHomeRecord(recordMap.get(gameAgg.getHomeAlias()));
 
         return gameAgg;
     }
 
-    private String getGameStartTime(Game game) {
-        Date date = null;
+    private String getGameStartTime(Game game) throws ParseException {
         DateFormat dateFormat =
                 new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX",
                         Locale.ENGLISH);
-        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        dateFormat.setTimeZone(TimeZone.getTimeZone(mContext.getString(R.string.gmt)));
+        Date date = dateFormat.parse(game.getScheduled());
+        DateFormat d =
+                new SimpleDateFormat(mContext.getString(
+                        R.string.display_date_pattern), Locale.ENGLISH);
+        d.setTimeZone(TimeZone.getTimeZone(mContext.getString(R.string.est)));
+        return d.format(date) + " " + mContext.getString(R.string.est);
+    }
 
-        try {
-            date = dateFormat.parse(game.getScheduled());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        DateFormat d = new SimpleDateFormat("h:mm a", Locale.ENGLISH);
-        d.setTimeZone(TimeZone.getTimeZone("EST"));
-        return d.format(date)+ " ET";
-
+    private String getClockTime(BoxScore boxScore) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Q");
+        sb.append(boxScore.getQuarter());
+        sb.append(" ");
+        sb.append(boxScore.getClock());
+        return sb.toString();
     }
 }

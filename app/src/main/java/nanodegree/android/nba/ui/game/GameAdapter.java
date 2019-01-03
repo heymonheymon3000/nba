@@ -78,33 +78,26 @@ public class GameAdapter
 
         picassoInstance
                 .load(awayTeamInfo.getLogo())
-                .resize(DisplayMetricUtils.convertDpToPixel(24),
-                        DisplayMetricUtils.convertDpToPixel(24))
+                .resize(DisplayMetricUtils.convertDpToPixel(36),
+                        DisplayMetricUtils.convertDpToPixel(36))
                 .centerCrop()
                 .into(holder.mAwayTeamLogoImageView);
 
         holder.mAwayTeamLogoTextView.setText(awayTeamInfo.getName());
-        holder.mAwayTeamRecordTextView.setText(game.getAwayRecord());
-        if(game.getAwayPoints() == null) {
-            holder.mHomeTeamScoreTextView.setText("");
-        } else {
-            holder.mAwayTeamScoreTextView.setText(String.valueOf(game.getAwayPoints()));
-        }
+        holder.mAwayTeamRecordTextView.setText(GameFragment.recordMap.get(game.getAwayAlias()));
+        holder.mAwayTeamScoreTextView.setText(game.getAwayPoints());
 
         picassoInstance
                 .load(homeTeamInfo.getLogo())
-                .resize(DisplayMetricUtils.convertDpToPixel(24),
-                        DisplayMetricUtils.convertDpToPixel(24))
+                .resize(DisplayMetricUtils.convertDpToPixel(36),
+                        DisplayMetricUtils.convertDpToPixel(36))
                 .centerCrop()
                 .into(holder.mHomeTeamLogoImageView);
 
         holder.mHomeTeamLogoTextView.setText(homeTeamInfo.getName());
-        holder.mHomeTeamRecordTextView.setText(game.getHomeRecord());
-        if(game.getHomePoints() == null) {
-            holder.mHomeTeamScoreTextView.setText("");
-        } else {
-            holder.mHomeTeamScoreTextView.setText(String.valueOf(game.getHomePoints()));
-        }
+        holder.mHomeTeamRecordTextView.setText(GameFragment.recordMap.get(game.getAwayAlias()));
+        holder.mHomeTeamScoreTextView.setText(game.getHomePoints());
+
     }
 
     private void setCardViewSize(MasterListGameAdapterViewHolder holder) {

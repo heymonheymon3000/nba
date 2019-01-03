@@ -15,6 +15,17 @@
     <string name="language_code">en</string>
     <string name="season">REG</string>
     <string name="no_games">No games are scheduled on this day.</string>
+    <string name="no_connection">Something went wrong, please check your internet connection and try again!</string>
 
+
+    <string name="scheduled">scheduled</string>
+    <string name="inprogress">inprogress</string>
+    <string name="closed">closed</string>
+    <string name="finish">Finish</string>
+
+    <string name="gmt">GMT</string>
+    <string name="est">EST</string>
+    <string name="et">ET</string>
+    <string name="display_date_pattern">h:mm a</string>
 
 </resources>
