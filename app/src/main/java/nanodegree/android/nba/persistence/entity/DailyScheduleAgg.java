@@ -6,6 +6,7 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import nanodegree.android.nba.persistence.db.NBAContract;
 
@@ -13,11 +14,12 @@ import java.util.ArrayList;
 
 @Entity(tableName = NBAContract.DailyScheduleEntry.TABLE_NAME)
 public class DailyScheduleAgg implements Parcelable {
+    @NonNull
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(index = true, name = NBAContract.DailyScheduleEntry.COLUMN_ID)
     private long id;
 
-    @ColumnInfo(name = NBAContract.DailyScheduleEntry.COLUMN_DATE)
+    @ColumnInfo(index = true, name = NBAContract.DailyScheduleEntry.COLUMN_DATE)
     private String date;
 
     @Ignore

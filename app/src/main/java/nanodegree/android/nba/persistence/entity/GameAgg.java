@@ -17,9 +17,9 @@ import nanodegree.android.nba.persistence.db.NBAContract;
                 parentColumns = NBAContract.DailyScheduleEntry.COLUMN_ID,
                 childColumns = NBAContract.GameEntry.COLUMN_DAILY_SCHEDULE_ID))
 public class GameAgg implements Parcelable {
+    @NonNull
     @PrimaryKey
     @ColumnInfo(index = true, name = NBAContract.GameEntry.COLUMN_ID)
-    @NonNull
     private String id;
 
     @ColumnInfo(index = true, name = NBAContract.GameEntry.COLUMN_DAILY_SCHEDULE_ID)

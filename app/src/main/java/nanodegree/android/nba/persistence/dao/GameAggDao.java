@@ -12,7 +12,7 @@ import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 import nanodegree.android.nba.persistence.entity.GameAgg;
 
 @Dao
-public interface GameDao {
+public interface GameAggDao {
     // CREATE
     @Insert(onConflict = REPLACE)
     long insert(GameAgg game);

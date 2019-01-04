@@ -12,6 +12,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,8 @@ import java.util.TimeZone;
 import nanodegree.android.nba.BuildConfig;
 import nanodegree.android.nba.NBAApplication;
 import nanodegree.android.nba.R;
+import nanodegree.android.nba.persistence.dao.DailyScheduleAggDao;
+import nanodegree.android.nba.persistence.db.AppDatabase;
 import nanodegree.android.nba.persistence.entity.DailyScheduleAgg;
 import nanodegree.android.nba.persistence.entity.GameAgg;
 import nanodegree.android.nba.rest.ApiUtils;
@@ -283,15 +286,78 @@ public class GameFragment extends Fragment
             @Override
             public DailyScheduleAgg loadInBackground() {
                 try {
+                    Calendar todayCal = Calendar.getInstance();
+
+                    Calendar requestedDateCal = Calendar.getInstance();
+                    requestedDateCal.set(year, month-1, day);
+
+                    /**
+                     * if the request date is before today, lets get the DailyScheduleAgg
+                     * from the db.
+                     */
+                    if (requestedDateCal.before(todayCal)) {
+                        String date = createDailyScheduleAggDate();
+                        DailyScheduleAggDao dailyScheduleAggDao =
+                                AppDatabase.getInstance(mContext).dailyScheduleAggDao();
+                        DailyScheduleAgg dailyScheduleAgg = dailyScheduleAggDao.getDailyScheduleAggWithDate(date);
+                        if(dailyScheduleAgg == null) {
+                            dailyScheduleAgg = getDailyScheduleAggFromNetwork();
+                            dailyScheduleAggDao.insert(dailyScheduleAgg);
+                            dailyScheduleAgg = dailyScheduleAggDao.getDailyScheduleAggWithDate(date);
+                            if(dailyScheduleAgg == null) {
+                                Log.i("dailyScheduleAgg", "dailyScheduleAgg => STILL FUCKING NULL");
+                            } else {
+                                Log.i("dailyScheduleAgg", "dailyScheduleAgg => NOT NULL");
+                                Log.i("dailyScheduleAgg", "ID => "  + dailyScheduleAgg.getId() + " DATE => "  + dailyScheduleAgg.getDate());
+
+                            }
+
+
+
+//                            // create dailyScheduleAgg and store in db
+//                            Log.i("dailyScheduleAgg", "dailyScheduleAgg => NULL");
+                        } else {
+                            // we got what we needed.
+                            Log.i("dailyScheduleAgg", "dailyScheduleAgg => we got what we needed");
+                        }
+                    }
+
+                    return getDailyScheduleAggFromNetwork();
+
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onStartLoading() {
+                disableView();
+                if(resultFromDailyScheduleAgg != null) {
+                    // To skip loadInBackground call
+                    deliverResult(resultFromDailyScheduleAgg);
+                } else {
+                    forceLoad();
+                }
+            }
+
+            @Override
+            public void deliverResult(DailyScheduleAgg data) {
+                resultFromDailyScheduleAgg = data;
+                super.deliverResult(data);
+            }
+
+            private DailyScheduleAgg getDailyScheduleAggFromNetwork()
+                    throws ParseException, InterruptedException {
+                try {
                     DailyScheduleAgg dailyScheduleAgg = new DailyScheduleAgg();
                     ArrayList<GameAgg> gameAggs = new ArrayList<GameAgg>();
 
                     Thread.sleep(delay * 1000);
 
                     DailySchedule dailySchedule = ApiUtils.getGameService()
-                        .getGameScheduleByDate(mContext.getString(R.string.language_code),
-                            year, month, day, mContext.getString(R.string.format),
-                            BuildConfig.NBA_DB_API_KEY).blockingGet();
+                            .getGameScheduleByDate(mContext.getString(R.string.language_code),
+                                    year, month, day, mContext.getString(R.string.format),
+                                    BuildConfig.NBA_DB_API_KEY).blockingGet();
 
                     dailyScheduleAgg.setDate(dailySchedule.getDate());
 
@@ -313,25 +379,8 @@ public class GameFragment extends Fragment
 
                     return dailyScheduleAgg;
                 } catch(Exception e) {
-                    return null;
+                    throw e;
                 }
-            }
-
-            @Override
-            protected void onStartLoading() {
-                disableView();
-                if(resultFromDailyScheduleAgg != null) {
-                    // To skip loadInBackground call
-                    deliverResult(resultFromDailyScheduleAgg);
-                } else {
-                    forceLoad();
-                }
-            }
-
-            @Override
-            public void deliverResult(DailyScheduleAgg data) {
-                resultFromDailyScheduleAgg = data;
-                super.deliverResult(data);
             }
         };
     }
@@ -446,5 +495,15 @@ public class GameFragment extends Fragment
         sb.append(" ");
         sb.append(boxScore.getClock());
         return sb.toString();
+    }
+
+    private String createDailyScheduleAggDate() {
+        StringBuilder date = new StringBuilder();
+        date.append(year);
+        date.append("-");
+        date.append(String.format(Locale.ENGLISH, "%02d", month));
+        date.append("-");
+        date.append(String.format(Locale.ENGLISH, "%02d", day));
+        return date.toString();
     }
 }

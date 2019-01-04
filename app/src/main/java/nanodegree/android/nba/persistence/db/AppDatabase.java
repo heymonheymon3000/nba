@@ -6,10 +6,11 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
-import nanodegree.android.nba.persistence.dao.DailyScheduleDao;
-import nanodegree.android.nba.persistence.dao.GameDao;
+import nanodegree.android.nba.persistence.dao.DailyScheduleAggDao;
+import nanodegree.android.nba.persistence.dao.GameAggDao;
 import nanodegree.android.nba.persistence.entity.DailyScheduleAgg;
 import nanodegree.android.nba.persistence.entity.GameAgg;
+
 
 @Database(entities = {DailyScheduleAgg.class, GameAgg.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
@@ -20,7 +21,7 @@ public abstract class AppDatabase extends RoomDatabase {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            AppDatabase.class, "nba_schedule.db").build();
+                            AppDatabase.class, "nba_schedule3.db").build();
                 }
             }
         }
@@ -28,7 +29,7 @@ public abstract class AppDatabase extends RoomDatabase {
         return INSTANCE;
     }
 
-    public abstract DailyScheduleDao dailyScheduleDao();
+    public abstract DailyScheduleAggDao dailyScheduleAggDao();
 
-    public abstract GameDao gameDao();
+    public abstract GameAggDao gameAggDao();
 }
