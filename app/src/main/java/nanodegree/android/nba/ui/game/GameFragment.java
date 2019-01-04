@@ -339,65 +339,32 @@ public class GameFragment extends Fragment
                         dailyScheduleAggDao.getDailyScheduleAggById(id);
 
                 if(dailyScheduleAgg == null) {
-                    Log.i("DailyScheduleAgg",
-                            "DailyScheduleAgg was not in db");
+                    // cache DailyScheduleAgg into db
+                    insertDailyScheduleAggIntoDb();
 
-                    Log.i("DailyScheduleAgg",
-                            "Start getting DailyScheduleAgg from remote host");
-                    dailyScheduleAgg = getDailyScheduleAggFromNetwork();
-                    Log.i("DailyScheduleAgg",
-                            "Finished getting DailyScheduleAgg from remote host");
-
-                    Log.i("DailyScheduleAgg",
-                            "Start inserting DailyScheduleAgg into db");
-                    dailyScheduleAggDao.insert(dailyScheduleAgg);
-                    Log.i("DailyScheduleAgg",
-                            "Finished inserting DailyScheduleAgg into db");
-
-                    for(GameAgg ga : dailyScheduleAgg.getGames()) {
-                        Log.i("DailyScheduleAgg",
-                                "Start inserting GameAgg into db");
-                        gameAggDao.insert(ga);
-                        Log.i("DailyScheduleAgg",
-                                "Finished inserting GameAgg into db");
-                    }
-
-                    Log.i("DailyScheduleAgg",
-                            "Start getting DailyScheduleAgg from db");
+                    // build dailyScheduleAgg object from db
                     dailyScheduleAgg = dailyScheduleAggDao.getDailyScheduleAggById(id);
-                    Log.i("DailyScheduleAgg",
-                            "Finished getting DailyScheduleAgg from db");
-
-                    Log.i("DailyScheduleAgg",
-                            "Start getting DailyScheduleAgg.GameAgg from db");
-                    List<GameAgg> gameAgg = gameAggDao.getGameAggByDailyScheduleId(id);
-                    Log.i("DailyScheduleAgg",
-                            "Finished getting DailyScheduleAgg.GameAgg from db");
-
-                    Log.i("DailyScheduleAgg",
-                            "Start setting DailyScheduleAgg.GameAgg from db");
-                    dailyScheduleAgg.setGames((ArrayList<GameAgg>)gameAgg);
-                    Log.i("DailyScheduleAgg",
-                            "Finished setting DailyScheduleAgg.GameAgg from db");
+                    dailyScheduleAgg = addGameAgg(dailyScheduleAgg, id);
 
                     return dailyScheduleAgg;
                 } else {
-                    Log.i("DailyScheduleAgg",
-                            "DailyScheduleAgg was in db");
-
-                    Log.i("DailyScheduleAgg",
-                            "Start getting DailyScheduleAgg.GameAgg from db");
-                    List<GameAgg> gameAgg = gameAggDao.getGameAggByDailyScheduleId(id);
-                    Log.i("DailyScheduleAgg",
-                            "Finished getting DailyScheduleAgg.GameAgg from db");
-
-                    Log.i("DailyScheduleAgg",
-                            "Start setting DailyScheduleAgg.GameAgg from db");
-                    dailyScheduleAgg.setGames((ArrayList<GameAgg>)gameAgg);
-                    Log.i("DailyScheduleAgg",
-                            "Finished setting DailyScheduleAgg.GameAgg from db");
-
+                    // build dailyScheduleAgg object from db
+                    dailyScheduleAgg = addGameAgg(dailyScheduleAgg, id);
                     return dailyScheduleAgg;
+                }
+            }
+
+            private DailyScheduleAgg addGameAgg(DailyScheduleAgg dailyScheduleAgg, String id) {
+                List<GameAgg> gameAgg = gameAggDao.getGameAggByDailyScheduleId(id);
+                dailyScheduleAgg.setGames((ArrayList<GameAgg>)gameAgg);
+                return dailyScheduleAgg;
+            }
+
+            private void insertDailyScheduleAggIntoDb() throws ParseException, InterruptedException {
+                DailyScheduleAgg dailyScheduleAgg = getDailyScheduleAggFromNetwork();
+                dailyScheduleAggDao.insert(dailyScheduleAgg);
+                for(GameAgg gameAgg : dailyScheduleAgg.getGames()) {
+                    gameAggDao.insert(gameAgg);
                 }
             }
 
