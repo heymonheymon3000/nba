@@ -23,7 +23,7 @@ public class GameAgg implements Parcelable {
     private String id;
 
     @ColumnInfo(index = true, name = NBAContract.GameEntry.COLUMN_DAILY_SCHEDULE_ID)
-    private String dailyScheduleId;
+    private String dailyScheduleDate;
 
     @ColumnInfo(name = NBAContract.GameEntry.COLUMN_STATUS)
     private String status;
@@ -59,7 +59,7 @@ public class GameAgg implements Parcelable {
 
     private GameAgg(Parcel in) {
         id = in.readString();
-        dailyScheduleId = in.readString();
+        dailyScheduleDate = in.readString();
         status = in.readString();
         scheduled = in.readString();
         awayName = in.readString();
@@ -93,7 +93,7 @@ public class GameAgg implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
-        dest.writeString(dailyScheduleId);
+        dest.writeString(dailyScheduleDate);
         dest.writeString(status);
         dest.writeString(scheduled);
         dest.writeString(awayName);
@@ -114,12 +114,12 @@ public class GameAgg implements Parcelable {
         this.id = id;
     }
 
-    public String getDailyScheduleId() {
-        return dailyScheduleId;
+    public String getDailyScheduleDate() {
+        return dailyScheduleDate;
     }
 
-    public void setDailyScheduleId(String dailyScheduleId) {
-        this.dailyScheduleId = dailyScheduleId;
+    public void setDailyScheduleDate(String dailyScheduleDate) {
+        this.dailyScheduleDate = dailyScheduleDate;
     }
 
     public String getStatus() {

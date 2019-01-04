@@ -38,6 +38,7 @@ import nanodegree.android.nba.BuildConfig;
 import nanodegree.android.nba.NBAApplication;
 import nanodegree.android.nba.R;
 import nanodegree.android.nba.persistence.dao.DailyScheduleAggDao;
+import nanodegree.android.nba.persistence.dao.GameAggDao;
 import nanodegree.android.nba.persistence.db.AppDatabase;
 import nanodegree.android.nba.persistence.entity.DailyScheduleAgg;
 import nanodegree.android.nba.persistence.entity.GameAgg;
@@ -91,6 +92,9 @@ public class GameFragment extends Fragment
     private int cardHeightInDp;
     private GameAdapter mGameAdapter;
 
+    DailyScheduleAggDao dailyScheduleAggDao;
+    GameAggDao gameAggDao;
+
     public static GameFragment newInstance(String tabName, Integer tabIndex,
                                            Calendar cal, Boolean loadData,
                                            Boolean filterTeams) {
@@ -132,6 +136,9 @@ public class GameFragment extends Fragment
         tabIndex = getArguments().getInt(TAB_INDEX);
         loadData = getArguments().getBoolean(LOAD_DATA);
         filterTeams = getArguments().getBoolean(FILTER_TEAMS);
+
+        dailyScheduleAggDao = AppDatabase.getInstance(mContext).dailyScheduleAggDao();
+        gameAggDao = AppDatabase.getInstance(mContext).gameAggDao();
     }
 
     @Override
@@ -291,39 +298,17 @@ public class GameFragment extends Fragment
                     Calendar requestedDateCal = Calendar.getInstance();
                     requestedDateCal.set(year, month-1, day);
 
-                    /**
-                     * if the request date is before today, lets get the DailyScheduleAgg
-                     * from the db.
-                     */
                     if (requestedDateCal.before(todayCal)) {
-                        String date = createDailyScheduleAggDate();
-                        DailyScheduleAggDao dailyScheduleAggDao =
-                                AppDatabase.getInstance(mContext).dailyScheduleAggDao();
-                        DailyScheduleAgg dailyScheduleAgg = dailyScheduleAggDao.getDailyScheduleAggWithDate(date);
-                        if(dailyScheduleAgg == null) {
-                            dailyScheduleAgg = getDailyScheduleAggFromNetwork();
-                            dailyScheduleAggDao.insert(dailyScheduleAgg);
-                            dailyScheduleAgg = dailyScheduleAggDao.getDailyScheduleAggWithDate(date);
-                            if(dailyScheduleAgg == null) {
-                                Log.i("dailyScheduleAgg", "dailyScheduleAgg => STILL FUCKING NULL");
-                            } else {
-                                Log.i("dailyScheduleAgg", "dailyScheduleAgg => NOT NULL");
-                                Log.i("dailyScheduleAgg", "ID => "  + dailyScheduleAgg.getId() + " DATE => "  + dailyScheduleAgg.getDate());
-
-                            }
-
-
-
-//                            // create dailyScheduleAgg and store in db
-//                            Log.i("dailyScheduleAgg", "dailyScheduleAgg => NULL");
-                        } else {
-                            // we got what we needed.
-                            Log.i("dailyScheduleAgg", "dailyScheduleAgg => we got what we needed");
-                        }
+                        Log.i("DailyScheduleAgg",
+                                "Request date is before today " +
+                                        "Lets get data from database.");
+                        return getDailyScheduleAggFromDb();
+                    } else {
+                        Log.i("DailyScheduleAgg",
+                                "Request date is either today or a future date. " +
+                                        "Lets get data from network");
+                        return getDailyScheduleAggFromNetwork();
                     }
-
-                    return getDailyScheduleAggFromNetwork();
-
                 } catch (Exception e) {
                     return null;
                 }
@@ -346,6 +331,76 @@ public class GameFragment extends Fragment
                 super.deliverResult(data);
             }
 
+            private DailyScheduleAgg getDailyScheduleAggFromDb()
+                    throws ParseException, InterruptedException {
+                String id = createDailyScheduleAggId();
+
+                DailyScheduleAgg dailyScheduleAgg =
+                        dailyScheduleAggDao.getDailyScheduleAggById(id);
+
+                if(dailyScheduleAgg == null) {
+                    Log.i("DailyScheduleAgg",
+                            "DailyScheduleAgg was not in db");
+
+                    Log.i("DailyScheduleAgg",
+                            "Start getting DailyScheduleAgg from remote host");
+                    dailyScheduleAgg = getDailyScheduleAggFromNetwork();
+                    Log.i("DailyScheduleAgg",
+                            "Finished getting DailyScheduleAgg from remote host");
+
+                    Log.i("DailyScheduleAgg",
+                            "Start inserting DailyScheduleAgg into db");
+                    dailyScheduleAggDao.insert(dailyScheduleAgg);
+                    Log.i("DailyScheduleAgg",
+                            "Finished inserting DailyScheduleAgg into db");
+
+                    for(GameAgg ga : dailyScheduleAgg.getGames()) {
+                        Log.i("DailyScheduleAgg",
+                                "Start inserting GameAgg into db");
+                        gameAggDao.insert(ga);
+                        Log.i("DailyScheduleAgg",
+                                "Finished inserting GameAgg into db");
+                    }
+
+                    Log.i("DailyScheduleAgg",
+                            "Start getting DailyScheduleAgg from db");
+                    dailyScheduleAgg = dailyScheduleAggDao.getDailyScheduleAggById(id);
+                    Log.i("DailyScheduleAgg",
+                            "Finished getting DailyScheduleAgg from db");
+
+                    Log.i("DailyScheduleAgg",
+                            "Start getting DailyScheduleAgg.GameAgg from db");
+                    List<GameAgg> gameAgg = gameAggDao.getGameAggByDailyScheduleId(id);
+                    Log.i("DailyScheduleAgg",
+                            "Finished getting DailyScheduleAgg.GameAgg from db");
+
+                    Log.i("DailyScheduleAgg",
+                            "Start setting DailyScheduleAgg.GameAgg from db");
+                    dailyScheduleAgg.setGames((ArrayList<GameAgg>)gameAgg);
+                    Log.i("DailyScheduleAgg",
+                            "Finished setting DailyScheduleAgg.GameAgg from db");
+
+                    return dailyScheduleAgg;
+                } else {
+                    Log.i("DailyScheduleAgg",
+                            "DailyScheduleAgg was in db");
+
+                    Log.i("DailyScheduleAgg",
+                            "Start getting DailyScheduleAgg.GameAgg from db");
+                    List<GameAgg> gameAgg = gameAggDao.getGameAggByDailyScheduleId(id);
+                    Log.i("DailyScheduleAgg",
+                            "Finished getting DailyScheduleAgg.GameAgg from db");
+
+                    Log.i("DailyScheduleAgg",
+                            "Start setting DailyScheduleAgg.GameAgg from db");
+                    dailyScheduleAgg.setGames((ArrayList<GameAgg>)gameAgg);
+                    Log.i("DailyScheduleAgg",
+                            "Finished setting DailyScheduleAgg.GameAgg from db");
+
+                    return dailyScheduleAgg;
+                }
+            }
+
             private DailyScheduleAgg getDailyScheduleAggFromNetwork()
                     throws ParseException, InterruptedException {
                 try {
@@ -359,19 +414,19 @@ public class GameFragment extends Fragment
                                     year, month, day, mContext.getString(R.string.format),
                                     BuildConfig.NBA_DB_API_KEY).blockingGet();
 
-                    dailyScheduleAgg.setDate(dailySchedule.getDate());
+                    dailyScheduleAgg.setId(dailySchedule.getDate());
 
                     List<Game> games = dailySchedule.getGames();
                     for(Game game : games) {
                         if (filterTeams) {
                             // If the team does NOT match continue and do not create an GameAgg
                             if (isMyTeamPlaying(game)) {
-                                gameAggs.add(createGameAgg(game, dailyScheduleAgg.getDate()));
+                                gameAggs.add(createGameAgg(game, dailyScheduleAgg.getId()));
                             } else {
                                 continue; // skip this game
                             }
                         } else {
-                            gameAggs.add(createGameAgg(game, dailyScheduleAgg.getDate()));
+                            gameAggs.add(createGameAgg(game, dailyScheduleAgg.getId()));
                         }
                     }
 
@@ -419,7 +474,7 @@ public class GameFragment extends Fragment
             throws InterruptedException, ParseException {
         GameAgg gameAgg = new GameAgg();
         gameAgg.setId(game.getId());
-        gameAgg.setDailyScheduleId(date);
+        gameAgg.setDailyScheduleDate(date);
         gameAgg.setStatus(game.getStatus());
         gameAgg.setScheduled(game.getScheduled());
         gameAgg.setBroadcast(game.getBroadcasts().get(0).getNetwork());
@@ -497,13 +552,13 @@ public class GameFragment extends Fragment
         return sb.toString();
     }
 
-    private String createDailyScheduleAggDate() {
-        StringBuilder date = new StringBuilder();
-        date.append(year);
-        date.append("-");
-        date.append(String.format(Locale.ENGLISH, "%02d", month));
-        date.append("-");
-        date.append(String.format(Locale.ENGLISH, "%02d", day));
-        return date.toString();
+    private String createDailyScheduleAggId() {
+        StringBuilder id = new StringBuilder();
+        id.append(year);
+        id.append("-");
+        id.append(String.format(Locale.ENGLISH, "%02d", month));
+        id.append("-");
+        id.append(String.format(Locale.ENGLISH, "%02d", day));
+        return id.toString();
     }
 }

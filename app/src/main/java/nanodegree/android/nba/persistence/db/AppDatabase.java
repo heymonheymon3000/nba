@@ -11,7 +11,6 @@ import nanodegree.android.nba.persistence.dao.GameAggDao;
 import nanodegree.android.nba.persistence.entity.DailyScheduleAgg;
 import nanodegree.android.nba.persistence.entity.GameAgg;
 
-
 @Database(entities = {DailyScheduleAgg.class, GameAgg.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     private volatile static AppDatabase INSTANCE;
@@ -21,7 +20,7 @@ public abstract class AppDatabase extends RoomDatabase {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            AppDatabase.class, "nba_schedule3.db").build();
+                            AppDatabase.class, "nba_schedule7.db").build();
                 }
             }
         }
