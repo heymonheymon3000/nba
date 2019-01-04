@@ -11,12 +11,6 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class Game implements Serializable
 {
-//    private String gameStatus;
-//    private Long awayPoints;
-//    private String awayRecord;
-//    private Long homePoints;
-//    private String homeRecord;
-//    private String timeOnClock;
 
     @SerializedName("id")
     @Expose
@@ -27,6 +21,12 @@ public class Game implements Serializable
     @SerializedName("scheduled")
     @Expose
     private String scheduled;
+    @SerializedName("home_points")
+    @Expose
+    private String homePoints;
+    @SerializedName("away_points")
+    @Expose
+    private String awayPoints;
     @SerializedName("broadcasts")
     @Expose
     private List<Broadcast> broadcasts = new ArrayList<Broadcast>();
@@ -62,6 +62,22 @@ public class Game implements Serializable
 
     public void setScheduled(String scheduled) {
         this.scheduled = scheduled;
+    }
+
+    public String getHomePoints() {
+        return homePoints;
+    }
+
+    public void setHomePoints(String homePoints) {
+        this.homePoints = homePoints;
+    }
+
+    public String getAwayPoints() {
+        return awayPoints;
+    }
+
+    public void setAwayPoints(String awayPoints) {
+        this.awayPoints = awayPoints;
     }
 
     public List<Broadcast> getBroadcasts() {

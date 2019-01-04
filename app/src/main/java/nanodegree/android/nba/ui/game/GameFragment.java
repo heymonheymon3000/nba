@@ -293,22 +293,24 @@ public class GameFragment extends Fragment
             @Override
             public DailyScheduleAgg loadInBackground() {
                 try {
+                    DailyScheduleAgg dailyScheduleAgg = null;
+
                     Calendar todayCal = Calendar.getInstance();
 
                     Calendar requestedDateCal = Calendar.getInstance();
                     requestedDateCal.set(year, month-1, day);
 
                     if (requestedDateCal.before(todayCal)) {
-                        Log.i("DailyScheduleAgg",
-                                "Request date is before today " +
-                                        "Lets get data from database.");
-                        return getDailyScheduleAggFromDb();
+                        dailyScheduleAgg = getDailyScheduleAggFromDb();
                     } else {
-                        Log.i("DailyScheduleAgg",
-                                "Request date is either today or a future date. " +
-                                        "Lets get data from network");
-                        return getDailyScheduleAggFromNetwork();
+                        dailyScheduleAgg = getDailyScheduleAggFromNetwork();
                     }
+
+                    if(filterTeams) {
+                        dailyScheduleAgg = filterMyTeams(dailyScheduleAgg);
+                    }
+
+                    return dailyScheduleAgg;
                 } catch (Exception e) {
                     return null;
                 }
@@ -329,6 +331,20 @@ public class GameFragment extends Fragment
             public void deliverResult(DailyScheduleAgg data) {
                 resultFromDailyScheduleAgg = data;
                 super.deliverResult(data);
+            }
+
+            private DailyScheduleAgg filterMyTeams(DailyScheduleAgg dailyScheduleAgg) {
+                ArrayList<GameAgg> gameAggList = new ArrayList<GameAgg>();
+                for(GameAgg gameAgg : dailyScheduleAgg.getGames()) {
+                    // If the team does NOT match continue and do not add GameAgg to list
+                    if (isMyTeamPlaying(gameAgg)) {
+                        gameAggList.add(gameAgg);
+                    } else {
+                        continue; // skip this gameAgg
+                    }
+                }
+                dailyScheduleAgg.setGames(gameAggList);
+                return dailyScheduleAgg;
             }
 
             private DailyScheduleAgg getDailyScheduleAggFromDb()
@@ -385,16 +401,7 @@ public class GameFragment extends Fragment
 
                     List<Game> games = dailySchedule.getGames();
                     for(Game game : games) {
-                        if (filterTeams) {
-                            // If the team does NOT match continue and do not create an GameAgg
-                            if (isMyTeamPlaying(game)) {
-                                gameAggs.add(createGameAgg(game, dailyScheduleAgg.getId()));
-                            } else {
-                                continue; // skip this game
-                            }
-                        } else {
-                            gameAggs.add(createGameAgg(game, dailyScheduleAgg.getId()));
-                        }
+                        gameAggs.add(createGameAgg(game, dailyScheduleAgg.getId()));
                     }
 
                     dailyScheduleAgg.setGames(gameAggs);
@@ -429,8 +436,8 @@ public class GameFragment extends Fragment
     @Override
     public void onLoaderReset(@NonNull Loader<DailyScheduleAgg> loader) {}
 
-    private Boolean isMyTeamPlaying(Game game) {
-        if(game.getAway().getAlias().equals("LAL") || game.getHome().getAlias().equals("LAL")) {
+    private Boolean isMyTeamPlaying(GameAgg gameAgg) {
+        if(gameAgg.getAwayAlias().equals("LAL") || gameAgg.getHomeAlias().equals("LAL")) {
             return true;
         } else {
             return false;

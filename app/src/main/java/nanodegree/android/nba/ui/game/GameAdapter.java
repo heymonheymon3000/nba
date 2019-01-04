@@ -70,8 +70,8 @@ public class GameAdapter
         final GameAgg game = mGames.get(position);
         setCardViewSize(holder);
 
-        TeamInfo awayTeamInfo = NBAApplication.teamInfoHashMap.get(game.getHomeAlias());
-        TeamInfo homeTeamInfo = NBAApplication.teamInfoHashMap.get(game.getAwayAlias());
+        TeamInfo awayTeamInfo = NBAApplication.teamInfoHashMap.get(game.getAwayAlias());
+        TeamInfo homeTeamInfo = NBAApplication.teamInfoHashMap.get(game.getHomeAlias());
 
         holder.mGameStatusTextView.setText(game.getTimeOnClock());
         holder.mTVNetworkTextView.setText(game.getBroadcast());

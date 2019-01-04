@@ -39,7 +39,6 @@ public class DailyScheduleAgg implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
         dest.writeTypedList(games);
-
     }
 
     public static final Creator<DailyScheduleAgg> CREATOR = new Creator<DailyScheduleAgg>() {
