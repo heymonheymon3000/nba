@@ -10,51 +10,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 public class Standing {
 
-    @SerializedName("league")
-    @Expose
-    private League league;
-    @SerializedName("season")
-    @Expose
-    private Season season;
     @SerializedName("conferences")
     @Expose
     private List<Conference> conferences = null;
 
-    /**
-     * No args constructor for use in serialization
-     * 
-     */
-    public Standing() {
-    }
-
-    /**
-     * 
-     * @param season
-     * @param conferences
-     * @param league
-     */
-    public Standing(League league, Season season, List<Conference> conferences) {
-        super();
-        this.league = league;
-        this.season = season;
-        this.conferences = conferences;
-    }
-
-    public League getLeague() {
-        return league;
-    }
-
-    public void setLeague(League league) {
-        this.league = league;
-    }
-
-    public Season getSeason() {
-        return season;
-    }
-
-    public void setSeason(Season season) {
-        this.season = season;
-    }
+    public Standing() {}
 
     public List<Conference> getConferences() {
         return conferences;
@@ -66,12 +26,12 @@ public class Standing {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this).append("league", league).append("season", season).append("conferences", conferences).toString();
+        return new ToStringBuilder(this).append("conferences", conferences).toString();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(season).append(conferences).append(league).toHashCode();
+        return new HashCodeBuilder().append(conferences).toHashCode();
     }
 
     @Override
@@ -83,7 +43,7 @@ public class Standing {
             return false;
         }
         Standing rhs = ((Standing) other);
-        return new EqualsBuilder().append(season, rhs.season).append(conferences, rhs.conferences).append(league, rhs.league).isEquals();
+        return new EqualsBuilder().append(conferences, rhs.conferences).isEquals();
     }
 
 }
