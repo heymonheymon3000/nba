@@ -10,6 +10,8 @@ import android.support.annotation.NonNull;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Objects;
+
 import nanodegree.android.nba.persistence.db.NBAContract;
 
 @Entity(tableName = NBAContract.GameEntry.TABLE_NAME,
@@ -200,5 +202,29 @@ public class GameAgg implements Parcelable {
 
     public void setBroadcast(String broadcast) {
         this.broadcast = broadcast;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GameAgg gameAgg = (GameAgg) o;
+        return Objects.equals(id, gameAgg.id) &&
+                Objects.equals(dailyScheduleDate, gameAgg.dailyScheduleDate) &&
+                Objects.equals(status, gameAgg.status) &&
+                Objects.equals(scheduled, gameAgg.scheduled) &&
+                Objects.equals(awayName, gameAgg.awayName) &&
+                Objects.equals(awayAlias, gameAgg.awayAlias) &&
+                Objects.equals(awayPoints, gameAgg.awayPoints) &&
+                Objects.equals(homeName, gameAgg.homeName) &&
+                Objects.equals(homeAlias, gameAgg.homeAlias) &&
+                Objects.equals(homePoints, gameAgg.homePoints) &&
+                Objects.equals(timeOnClock, gameAgg.timeOnClock) &&
+                Objects.equals(broadcast, gameAgg.broadcast);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, dailyScheduleDate, status, scheduled, awayName, awayAlias, awayPoints, homeName, homeAlias, homePoints, timeOnClock, broadcast);
     }
 }

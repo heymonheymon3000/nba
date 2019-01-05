@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="4dp">
+
+    <ImageView
+        android:id="@+id/favoriteTeamLogo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingEnd="24dp"
+        android:src="@drawable/los_angeles_lakers_vector"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/favoriteTeamName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Los Angeles Lakers"
+        android:textSize="18dp"
+        app:layout_constraintStart_toEndOf="@id/favoriteTeamLogo"
+        app:layout_constraintTop_toTopOf="@id/favoriteTeamLogo"
+        app:layout_constraintBottom_toBottomOf="@id/favoriteTeamLogo"/>
+
+    <CheckBox
+        android:id="@+id/favoriteTeamSelected"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/favoriteTeamName"
+        app:layout_constraintBottom_toBottomOf="@id/favoriteTeamName"/>
+
+</android.support.constraint.ConstraintLayout>

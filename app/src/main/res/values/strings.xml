@@ -2,6 +2,8 @@
     <string name="date_placeholder">Monday, Nov 26</string>
 
     <string name="app_name">NBA Schedule</string>
+    <string name="favorite_teams">Favorite Teams</string>
+
 
     <string name="back_nav">Back nav button</string>
     <string name="forward_nav">Forward nav button</string>

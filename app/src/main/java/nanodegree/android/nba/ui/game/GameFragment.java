@@ -2,9 +2,11 @@ package nanodegree.android.nba.ui.game;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -38,9 +40,11 @@ import nanodegree.android.nba.BuildConfig;
 import nanodegree.android.nba.NBAApplication;
 import nanodegree.android.nba.R;
 import nanodegree.android.nba.persistence.dao.DailyScheduleAggDao;
+import nanodegree.android.nba.persistence.dao.FavoriteTeamDao;
 import nanodegree.android.nba.persistence.dao.GameAggDao;
 import nanodegree.android.nba.persistence.db.AppDatabase;
 import nanodegree.android.nba.persistence.entity.DailyScheduleAgg;
+import nanodegree.android.nba.persistence.entity.FavoriteTeam;
 import nanodegree.android.nba.persistence.entity.GameAgg;
 import nanodegree.android.nba.rest.ApiUtils;
 import nanodegree.android.nba.rest.response.boxScore.BoxScore;
@@ -86,14 +90,16 @@ public class GameFragment extends Fragment
     private ImageView mForwardNavImageView;
     private LinearLayout linearLayout;
     private TextView noGames;
+    private FloatingActionButton fab;
     private OnFragmentInteractionListener mListener;
 
     private int cardWidthInDp;
     private int cardHeightInDp;
     private GameAdapter mGameAdapter;
 
-    DailyScheduleAggDao dailyScheduleAggDao;
-    GameAggDao gameAggDao;
+    private DailyScheduleAggDao dailyScheduleAggDao;
+    private GameAggDao gameAggDao;
+    private FavoriteTeamDao favoriteTeamDao;
 
     public static GameFragment newInstance(String tabName, Integer tabIndex,
                                            Calendar cal, Boolean loadData,
@@ -139,6 +145,7 @@ public class GameFragment extends Fragment
 
         dailyScheduleAggDao = AppDatabase.getInstance(mContext).dailyScheduleAggDao();
         gameAggDao = AppDatabase.getInstance(mContext).gameAggDao();
+        favoriteTeamDao = AppDatabase.getInstance(mContext).gameFavoriteTeamDao();
     }
 
     @Override
@@ -156,6 +163,7 @@ public class GameFragment extends Fragment
         mForwardNavImageView = rootView.findViewById(R.id.forward_image_view);
         linearLayout = rootView.findViewById(R.id.linearLayout);
         noGames = rootView.findViewById(R.id.no_games);
+        fab = rootView.findViewById(R.id.fab);
 
         setupClickListeners(tabName, tabIndex);
         setupRecyclerView();
@@ -223,6 +231,22 @@ public class GameFragment extends Fragment
                 }
             }
         });
+
+        switch (tabIndex) {
+            case 0:
+                fab.setVisibility(View.GONE);
+                break;
+            case 1:
+                fab.setVisibility(View.VISIBLE);
+                fab.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(getActivity(), MyGameActivity.class);
+                        startActivity(intent);
+                    }
+                });
+                break;
+        }
     }
 
     private void disableView() {
@@ -335,14 +359,18 @@ public class GameFragment extends Fragment
 
             private DailyScheduleAgg filterMyTeams(DailyScheduleAgg dailyScheduleAgg) {
                 ArrayList<GameAgg> gameAggList = new ArrayList<GameAgg>();
-                for(GameAgg gameAgg : dailyScheduleAgg.getGames()) {
-                    // If the team does NOT match continue and do not add GameAgg to list
-                    if (isMyTeamPlaying(gameAgg)) {
-                        gameAggList.add(gameAgg);
-                    } else {
-                        continue; // skip this gameAgg
-                    }
+                List<FavoriteTeam> favoriteTeams = favoriteTeamDao.getAllSelectedFavoriteTeams(true);
+                ArrayList<GameAgg> games = dailyScheduleAgg.getGames();
+
+                for(GameAgg gameAgg : games) {
+                  for(FavoriteTeam favoriteTeam : favoriteTeams) {
+                      if(favoriteTeam.getAlias().equals(gameAgg.getAwayAlias()) ||
+                              favoriteTeam.getAlias().equals(gameAgg.getHomeAlias())) {
+                          gameAggList.add(gameAgg);
+                      }
+                  }
                 }
+
                 dailyScheduleAgg.setGames(gameAggList);
                 return dailyScheduleAgg;
             }
@@ -435,14 +463,6 @@ public class GameFragment extends Fragment
 
     @Override
     public void onLoaderReset(@NonNull Loader<DailyScheduleAgg> loader) {}
-
-    private Boolean isMyTeamPlaying(GameAgg gameAgg) {
-        if(gameAgg.getAwayAlias().equals("LAL") || gameAgg.getHomeAlias().equals("LAL")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     private GameAgg createGameAgg(Game game, String date)
             throws InterruptedException, ParseException {
