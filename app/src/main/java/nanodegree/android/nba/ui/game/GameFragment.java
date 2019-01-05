@@ -281,20 +281,6 @@ public class GameFragment extends Fragment
         mListener.enableTabs(true);
     }
 
-    /**
-     * Snackbar shows observer error
-     */
-    private void showError(Throwable e) {
-//        Log.e(TAG, "showError: " + e.getMessage() + " GAME_FRAGMENT");
-
-//        Snackbar snackbar = Snackbar
-//                .make(coordinatorLayout, e.getMessage(), Snackbar.LENGTH_LONG);
-//        View sbView = snackbar.getView();
-//        TextView textView = sbView.findViewById(android.support.design.R.id.snackbar_text);
-//        textView.setTextColor(Color.YELLOW);
-//        snackbar.show();
-    }
-
     private void getAllGames() {
         if(loadData) {
             Bundle allGamesBundle = new Bundle();
