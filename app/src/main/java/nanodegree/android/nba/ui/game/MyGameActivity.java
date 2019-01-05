@@ -46,7 +46,6 @@ public class MyGameActivity extends AppCompatActivity
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 finish();
             }
         });
@@ -84,7 +83,6 @@ public class MyGameActivity extends AppCompatActivity
             @Override
             public List<FavoriteTeam> loadInBackground() {
                 List<FavoriteTeam> favoriteTeams = favoriteTeamDao.getAllFavoriteTeams();
-                Log.i("FavoriteTeams", "SIZE =>  = " + String.valueOf(favoriteTeams.size()));
                 return favoriteTeams;
             }
 
@@ -112,7 +110,7 @@ public class MyGameActivity extends AppCompatActivity
             favoriteTeamAdaptor.setFavoriteTeams(data);
         } else {
             Toast.makeText(getApplicationContext(),
-                    getApplicationContext().getString(R.string.no_connection),
+                    getApplicationContext().getString(R.string.db_failure),
                     Toast.LENGTH_LONG).show();
         }
     }

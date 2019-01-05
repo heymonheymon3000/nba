@@ -97,7 +97,6 @@ public class GameAdapter
         holder.mHomeTeamLogoTextView.setText(homeTeamInfo.getName());
         holder.mHomeTeamRecordTextView.setText(GameFragment.recordMap.get(game.getHomeAlias()));
         holder.mHomeTeamScoreTextView.setText(game.getHomePoints());
-
     }
 
     private void setCardViewSize(MasterListGameAdapterViewHolder holder) {
