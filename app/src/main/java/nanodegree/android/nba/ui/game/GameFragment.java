@@ -105,6 +105,7 @@ public class GameFragment extends Fragment
                                            Calendar cal, Boolean loadData,
                                            Boolean filterTeams) {
         GameFragment fragment = new GameFragment();
+        fragment.setRetainInstance(true);
 
         Bundle args = new Bundle();
         args.putInt(YEAR, cal.get(Calendar.YEAR));
@@ -250,6 +251,8 @@ public class GameFragment extends Fragment
     }
 
     private void disableView() {
+        fab.setEnabled(false);
+        fab.setClickable(false);
         mBackNavImageView.setClickable(false);
         mBackNavImageView.setClickable(false);
         mBackNavImageView.setImageAlpha(50);
@@ -266,6 +269,8 @@ public class GameFragment extends Fragment
     }
 
     private void enableView() {
+        fab.setEnabled(true);
+        fab.setClickable(true);
         mBackNavImageView.setClickable(true);
         mBackNavImageView.setClickable(true);
         mBackNavImageView.setImageAlpha(255);
@@ -299,7 +304,6 @@ public class GameFragment extends Fragment
     public Loader<DailyScheduleAgg> onCreateLoader(int id, @Nullable Bundle args) {
         return new AsyncTaskLoader<DailyScheduleAgg>(this.getContext()) {
             DailyScheduleAgg resultFromDailyScheduleAgg;
-
             @Override
             public DailyScheduleAgg loadInBackground() {
                 try {

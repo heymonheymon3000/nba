@@ -16,7 +16,7 @@
     <string name="format">.json</string>
     <string name="language_code">en</string>
     <string name="season">REG</string>
-    <string name="no_games">No games are scheduled on this day.</string>
+    <string name="no_games">There are no games.</string>
     <string name="no_connection">Something went wrong, please check your internet connection and try again!</string>
     <string name="db_failure">Something went wrong, please check your db connection and try again!</string>
 

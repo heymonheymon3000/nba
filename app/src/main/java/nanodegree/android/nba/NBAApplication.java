@@ -17,7 +17,6 @@ public class NBAApplication extends Application {
     public static HashMap<String, String> teamLookup = new HashMap<>();
 
     public void onCreate() {
-        super.onCreate();
         final Context context = this;
 
         createTeamInfoMap();
@@ -27,6 +26,8 @@ public class NBAApplication extends Application {
                         .enableDumpapp(new SampleBumperPluginsProvider(context))
                         .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(context))
                         .build());
+
+        super.onCreate();
     }
 
     private static class SampleBumperPluginsProvider implements DumperPluginsProvider {

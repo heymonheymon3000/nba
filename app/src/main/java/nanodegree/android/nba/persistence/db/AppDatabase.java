@@ -25,7 +25,7 @@ public abstract class AppDatabase extends RoomDatabase {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                        AppDatabase.class, "nba_schedule11.db")
+                        AppDatabase.class, "nba_schedule12.db")
                         .addCallback(new Callback() {
                             @Override
                             public void onCreate(@NonNull SupportSQLiteDatabase db) {

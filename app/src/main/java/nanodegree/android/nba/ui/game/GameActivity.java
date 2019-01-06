@@ -1,17 +1,14 @@
 package nanodegree.android.nba.ui.game;
 
+import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.LoaderManager;
-
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.util.Log;
 import android.widget.LinearLayout;
-import java.util.HashMap;
 
 import nanodegree.android.nba.R;
-import nanodegree.android.nba.utils.TeamInfo;
 import nanodegree.android.nba.utils.DisplayDateUtils;
 
 public class GameActivity extends AppCompatActivity
@@ -19,6 +16,7 @@ public class GameActivity extends AppCompatActivity
 
     private TabAdapter adapter;
     private TabLayout tabLayout;
+    private Boolean reloadMyGameFragment = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +56,23 @@ public class GameActivity extends AppCompatActivity
             @Override
             public void onTabReselected(TabLayout.Tab tab) {}
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(tabLayout.getTabAt(1).isSelected() && reloadMyGameFragment) {
+            reloadMyGameFragment = false;
+            updateFragment(1);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(tabLayout.getTabAt(1).isSelected()) {
+            reloadMyGameFragment = true;
+        }
     }
 
     @Override
