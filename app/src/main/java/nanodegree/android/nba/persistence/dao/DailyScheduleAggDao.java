@@ -11,7 +11,7 @@ import nanodegree.android.nba.persistence.entity.DailyScheduleAgg;
 @Dao
 public interface DailyScheduleAggDao {
     @Insert
-    public void insert(DailyScheduleAgg... dailyScheduleAggs);
+    long insert(DailyScheduleAgg dailyScheduleAgg);
 
     @Query("SELECT * FROM " + NBAContract.DailyScheduleEntry.TABLE_NAME + " WHERE "
             + NBAContract.DailyScheduleEntry.COLUMN_ID + " = :id")

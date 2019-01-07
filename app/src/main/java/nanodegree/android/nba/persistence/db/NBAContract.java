@@ -8,8 +8,7 @@ public class NBAContract {
     public static final String AUTHORITY = "nanodegree.android.nba";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
 
-    private NBAContract() {
-    }
+    private NBAContract() {}
 
     public static final class DailyScheduleEntry implements BaseColumns {
         public static final String TABLE_NAME = "daily_schedule_agg";

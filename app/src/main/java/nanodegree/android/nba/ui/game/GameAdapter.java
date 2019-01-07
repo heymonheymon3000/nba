@@ -34,14 +34,12 @@ public class GameAdapter
         extends RecyclerView.Adapter<GameAdapter.MasterListGameAdapterViewHolder> {
 
     private Picasso picassoInstance;
-
     private List<GameAgg> mGames;
     private int cardWidth;
     private int cardHeight;
 
     public GameAdapter(Context context,
                          int cardWidth, int cardHeight) {
-
         picassoInstance =
                 new Picasso.Builder(context.getApplicationContext())
                         .loggingEnabled(true)
