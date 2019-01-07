@@ -1,6 +1,7 @@
 package nanodegree.android.nba.ui.game;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -10,25 +11,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
+import java.util.List;
+
 import nanodegree.android.nba.NBAApplication;
 import nanodegree.android.nba.R;
 import nanodegree.android.nba.persistence.entity.GameAgg;
-import nanodegree.android.nba.rest.response.dailySchedule.Game;
-import nanodegree.android.nba.utils.TeamInfo;
-import nanodegree.android.nba.rest.response.standing.Conference;
-import nanodegree.android.nba.rest.response.standing.Division;
-import nanodegree.android.nba.rest.response.standing.Standing;
-import nanodegree.android.nba.rest.response.standing.Team;
+import nanodegree.android.nba.ui.gameDetail.GameDetailActivity;
 import nanodegree.android.nba.utils.DisplayMetricUtils;
-
-import com.squareup.picasso.Picasso;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Date;
-import java.util.TimeZone;
-import java.util.Locale;
+import nanodegree.android.nba.utils.TeamInfo;
 
 public class GameAdapter
         extends RecyclerView.Adapter<GameAdapter.MasterListGameAdapterViewHolder> {
@@ -37,6 +29,7 @@ public class GameAdapter
     private List<GameAgg> mGames;
     private int cardWidth;
     private int cardHeight;
+    private Context context;
 
     public GameAdapter(Context context,
                          int cardWidth, int cardHeight) {
@@ -44,6 +37,7 @@ public class GameAdapter
                 new Picasso.Builder(context.getApplicationContext())
                         .loggingEnabled(true)
                         .build();
+        this.context = context;
         this.cardWidth = cardWidth;
         this.cardHeight = cardHeight;
     }
@@ -155,6 +149,11 @@ public class GameAdapter
 
         @Override
         public void onClick(View v) {
+            int position = getAdapterPosition();
+            GameAgg gameAgg  = mGames.get(position);
+            Intent intent = new Intent(context, GameDetailActivity.class);
+            intent.putExtra("gameAgg", gameAgg);
+            context.startActivity(intent);
         }
     }
 }

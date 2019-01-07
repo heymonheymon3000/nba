@@ -18,7 +18,8 @@
         <!-- android:name="com.google.android.gms.ads.APPLICATION_ID" -->
         <!-- android:value="ca-app-pub-3940256099942544~3347511713"/> -->
 
-        <activity android:name=".ui.game.GameActivity"
+        <activity
+            android:name=".ui.game.GameActivity"
             android:configChanges="orientation|screenSize|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,9 +28,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.game.MyGameActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden">
-        </activity>
+
+        <activity
+            android:name=".ui.game.MyGameActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+
+        <activity android:name=".ui.gameDetail.GameDetailActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+
     </application>
 
 </manifest>
