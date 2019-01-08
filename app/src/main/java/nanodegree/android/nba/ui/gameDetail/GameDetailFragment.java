@@ -1,7 +1,10 @@
 package nanodegree.android.nba.ui.gameDetail;
 
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,12 +14,10 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import org.w3c.dom.Text;
-
-import nanodegree.android.nba.R;
 import nanodegree.android.nba.NBAApplication;
 import nanodegree.android.nba.R;
 import nanodegree.android.nba.persistence.entity.GameAgg;
+import nanodegree.android.nba.ui.game.TabAdapter;
 import nanodegree.android.nba.utils.DisplayMetricUtils;
 import nanodegree.android.nba.utils.TeamInfo;
 
@@ -31,6 +32,8 @@ public class GameDetailFragment extends Fragment {
     private TextView mGameStatusTextView;
     private TextView mHomeTeamName;
     private TextView mAwayTeamName;
+    private TabAdapter adapter;
+    private TabLayout tabLayout;
 
     public GameDetailFragment() {}
 
@@ -105,6 +108,19 @@ public class GameDetailFragment extends Fragment {
 
         mHomeTeamName.setText(getShortName(gameAgg.getHomeName()));
         mAwayTeamName.setText(getShortName(gameAgg.getAwayName()));
+
+        ViewPager viewPager = rootView.findViewById(R.id.viewPager);
+        tabLayout = rootView.findViewById(R.id.tabLayout);
+
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        adapter = new TabAdapter(fragmentManager);
+        adapter.addFragment(new PlayerDetailFragment(), getShortName(gameAgg.getHomeName()));
+        adapter.addFragment(new PlayerDetailFragment(), getShortName(gameAgg.getAwayName()));
+
+
+        viewPager.setAdapter(adapter);
+        tabLayout.setupWithViewPager(viewPager);
+
 
         return rootView;
     }
