@@ -11,7 +11,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingEnd="24dp"
-        android:src="@drawable/los_angeles_lakers_vector"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
@@ -19,8 +18,7 @@
         android:id="@+id/favoriteTeamName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Los Angeles Lakers"
-        android:textSize="18dp"
+        android:textSize="18sp"
         app:layout_constraintStart_toEndOf="@id/favoriteTeamLogo"
         app:layout_constraintTop_toTopOf="@id/favoriteTeamLogo"
         app:layout_constraintBottom_toBottomOf="@id/favoriteTeamLogo"/>
