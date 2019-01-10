@@ -1,0 +1,15 @@
+{
+  "away" : {
+    "alias" : "BOS",
+    "points" : 0
+  },
+  "clock" : null,
+  "home" : {
+    "alias" : "MIA",
+    "name" : "Miami Heat",
+    "points" : 0
+  },
+  "quarter" : null,
+  "scheduled" : "2019-01-11T00:00:00+00:00",
+  "status" : "scheduled"
+}

@@ -81,6 +81,11 @@ dependencies {
     implementation 'commons-lang:commons-lang:2.4'
     implementation 'me.tatarka:gradle-retrolambda:3.6.1'
     implementation 'jp.wasabeef:blurry:3.0.0'
+
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.6.4'
+
+
     annotationProcessor "android.arch.lifecycle:compiler:1.1.1"
     annotationProcessor "android.arch.persistence.room:compiler:1.1.1"
     annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'

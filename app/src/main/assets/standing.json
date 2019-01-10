@@ -1,0 +1,139 @@
+{
+  "conferences" : [ {
+    "divisions" : [ {
+      "teams" : [ {
+        "losses" : 14,
+        "name" : "Warriors",
+        "wins" : 27
+      }, {
+        "losses" : 16,
+        "name" : "Clippers",
+        "wins" : 24
+      }, {
+        "losses" : 19,
+        "name" : "Lakers",
+        "wins" : 22
+      }, {
+        "losses" : 21,
+        "name" : "Kings",
+        "wins" : 20
+      }, {
+        "losses" : 32,
+        "name" : "Suns",
+        "wins" : 10
+      } ]
+    }, {
+      "teams" : [ {
+        "losses" : 16,
+        "name" : "Rockets",
+        "wins" : 23
+      }, {
+        "losses" : 17,
+        "name" : "Spurs",
+        "wins" : 24
+      }, {
+        "losses" : 22,
+        "name" : "Pelicans",
+        "wins" : 19
+      }, {
+        "losses" : 22,
+        "name" : "Mavericks",
+        "wins" : 18
+      }, {
+        "losses" : 22,
+        "name" : "Grizzlies",
+        "wins" : 18
+      } ]
+    }, {
+      "teams" : [ {
+        "losses" : 12,
+        "name" : "Nuggets",
+        "wins" : 27
+      }, {
+        "losses" : 15,
+        "name" : "Thunder",
+        "wins" : 25
+      }, {
+        "losses" : 17,
+        "name" : "Trail Blazers",
+        "wins" : 24
+      }, {
+        "losses" : 21,
+        "name" : "Jazz",
+        "wins" : 20
+      }, {
+        "losses" : 21,
+        "name" : "Timberwolves",
+        "wins" : 20
+      } ]
+    } ]
+  }, {
+    "divisions" : [ {
+      "teams" : [ {
+        "losses" : 20,
+        "name" : "Heat",
+        "wins" : 19
+      }, {
+        "losses" : 21,
+        "name" : "Hornets",
+        "wins" : 19
+      }, {
+        "losses" : 23,
+        "name" : "Magic",
+        "wins" : 17
+      }, {
+        "losses" : 25,
+        "name" : "Wizards",
+        "wins" : 17
+      }, {
+        "losses" : 28,
+        "name" : "Hawks",
+        "wins" : 12
+      } ]
+    }, {
+      "teams" : [ {
+        "losses" : 11,
+        "name" : "Bucks",
+        "wins" : 28
+      }, {
+        "losses" : 14,
+        "name" : "Pacers",
+        "wins" : 27
+      }, {
+        "losses" : 21,
+        "name" : "Pistons",
+        "wins" : 17
+      }, {
+        "losses" : 30,
+        "name" : "Bulls",
+        "wins" : 10
+      }, {
+        "losses" : 33,
+        "name" : "Cavaliers",
+        "wins" : 8
+      } ]
+    }, {
+      "teams" : [ {
+        "losses" : 12,
+        "name" : "Raptors",
+        "wins" : 31
+      }, {
+        "losses" : 15,
+        "name" : "76ers",
+        "wins" : 27
+      }, {
+        "losses" : 15,
+        "name" : "Celtics",
+        "wins" : 25
+      }, {
+        "losses" : 22,
+        "name" : "Nets",
+        "wins" : 20
+      }, {
+        "losses" : 31,
+        "name" : "Knicks",
+        "wins" : 10
+      } ]
+    } ]
+  } ]
+}

@@ -1,0 +1,15 @@
+{
+  "away" : {
+    "alias" : "OKC",
+    "points" : 0
+  },
+  "clock" : null,
+  "home" : {
+    "alias" : "SAS",
+    "name" : "San Antonio Spurs",
+    "points" : 0
+  },
+  "quarter" : null,
+  "scheduled" : "2019-01-11T02:30:00+00:00",
+  "status" : "scheduled"
+}

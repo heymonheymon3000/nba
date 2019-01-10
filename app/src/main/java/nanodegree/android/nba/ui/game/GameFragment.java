@@ -24,6 +24,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -56,7 +62,6 @@ import nanodegree.android.nba.rest.response.standing.Standing;
 import nanodegree.android.nba.rest.response.standing.Team;
 import nanodegree.android.nba.utils.DisplayDateUtils;
 import nanodegree.android.nba.utils.DisplayMetricUtils;
-
 
 public class GameFragment extends Fragment
     implements LoaderManager.LoaderCallbacks<DailyScheduleAgg> {
@@ -314,11 +319,14 @@ public class GameFragment extends Fragment
                     Calendar requestedDateCal = Calendar.getInstance();
                     requestedDateCal.set(year, month-1, day);
 
-                    if (requestedDateCal.before(todayCal)) {
-                        dailyScheduleAgg = getDailyScheduleAggFromDb();
-                    } else {
-                        dailyScheduleAgg = getDailyScheduleAggFromNetwork();
-                    }
+                    dailyScheduleAgg = new Gson().fromJson(getJsonString(
+                            "dailyScheduleAgg.json"), DailyScheduleAgg.class);
+
+//                    if (requestedDateCal.before(todayCal)) {
+//                        dailyScheduleAgg = getDailyScheduleAggFromDb();
+//                    } else {
+//                        dailyScheduleAgg = getDailyScheduleAggFromNetwork();
+//                    }
 
                     if(filterTeams) {
                         dailyScheduleAgg = filterMyTeams(dailyScheduleAgg);
@@ -467,12 +475,13 @@ public class GameFragment extends Fragment
         gameAgg.setHomeAlias(game.getHome().getAlias());
         gameAgg.setHomeName(game.getHome().getName());
 
-        Thread.sleep(delay * 1000);
-
-        BoxScore boxScore = ApiUtils.getGameService()
-                .getBoxScore("en", gameAgg.getId(),
-                        mContext.getString(R.string.format),
-                        BuildConfig.NBA_DB_API_KEY).blockingGet();
+//        Thread.sleep(delay * 1000);
+        BoxScore boxScore = new Gson().fromJson(getJsonString(
+                "boxScore_"+gameAgg.getId()+".json"), BoxScore.class);
+//        BoxScore boxScore = ApiUtils.getGameService()
+//                .getBoxScore("en", gameAgg.getId(),
+//                        mContext.getString(R.string.format),
+//                        BuildConfig.NBA_DB_API_KEY).blockingGet();
 
         if(gameAgg.getStatus().equals(mContext.getString(R.string.scheduled))) {
             gameAgg.setTimeOnClock(getGameStartTime(game));
@@ -487,13 +496,14 @@ public class GameFragment extends Fragment
         }
 
         if(recordMap.isEmpty()) {
-            Thread.sleep(delay * 1000);
-
-            Standing standing =
-                    ApiUtils.getGameService().getStanding(mContext.getString(R.string.language_code),
-                    2018,
-                    mContext.getString(R.string.season) ,mContext.getString(R.string.format),
-                    BuildConfig.NBA_DB_API_KEY).blockingGet();
+//            Thread.sleep(delay * 1000);
+            Standing standing = new Gson().fromJson(getJsonString(
+                    "standing.json"), Standing.class);
+//            Standing standing =
+//                    ApiUtils.getGameService().getStanding(mContext.getString(R.string.language_code),
+//                    2018,
+//                    mContext.getString(R.string.season) ,mContext.getString(R.string.format),
+//                    BuildConfig.NBA_DB_API_KEY).blockingGet();
 
             for(Conference conference : standing.getConferences()) {
                 for(Division division : conference.getDivisions()) {
@@ -545,4 +555,20 @@ public class GameFragment extends Fragment
         id.append(String.format(Locale.ENGLISH, "%02d", day));
         return id.toString();
     }
+
+    private String getJsonString(String fileName) {
+        String json = null;
+        try {
+            InputStream is = getContext().getAssets().open(fileName);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return json;
+    }
+
 }
