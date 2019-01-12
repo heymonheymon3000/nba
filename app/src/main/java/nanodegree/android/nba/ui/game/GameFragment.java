@@ -48,10 +48,13 @@ import nanodegree.android.nba.R;
 import nanodegree.android.nba.persistence.dao.DailyScheduleAggDao;
 import nanodegree.android.nba.persistence.dao.FavoriteTeamDao;
 import nanodegree.android.nba.persistence.dao.GameAggDao;
+import nanodegree.android.nba.persistence.dao.LeaderBoxScoreDao;
 import nanodegree.android.nba.persistence.db.AppDatabase;
+import nanodegree.android.nba.persistence.db.NBAContract;
 import nanodegree.android.nba.persistence.entity.DailyScheduleAgg;
 import nanodegree.android.nba.persistence.entity.FavoriteTeam;
 import nanodegree.android.nba.persistence.entity.GameAgg;
+import nanodegree.android.nba.persistence.entity.LeaderBoxScore;
 import nanodegree.android.nba.rest.ApiUtils;
 import nanodegree.android.nba.rest.response.boxScore.BoxScore;
 import nanodegree.android.nba.rest.response.dailySchedule.DailySchedule;
@@ -105,6 +108,7 @@ public class GameFragment extends Fragment
     private DailyScheduleAggDao dailyScheduleAggDao;
     private GameAggDao gameAggDao;
     private FavoriteTeamDao favoriteTeamDao;
+    private LeaderBoxScoreDao leaderBoxScoreDao;
 
     public static GameFragment newInstance(String tabName, Integer tabIndex,
                                            Calendar cal, Boolean loadData,
@@ -152,6 +156,7 @@ public class GameFragment extends Fragment
         dailyScheduleAggDao = AppDatabase.getInstance(mContext).dailyScheduleAggDao();
         gameAggDao = AppDatabase.getInstance(mContext).gameAggDao();
         favoriteTeamDao = AppDatabase.getInstance(mContext).gameFavoriteTeamDao();
+        leaderBoxScoreDao = AppDatabase.getInstance(mContext).leaderBoxScoreDao();
     }
 
     @Override
@@ -319,14 +324,14 @@ public class GameFragment extends Fragment
                     Calendar requestedDateCal = Calendar.getInstance();
                     requestedDateCal.set(year, month-1, day);
 
-                    dailyScheduleAgg = new Gson().fromJson(getJsonString(
-                            "dailyScheduleAgg.json"), DailyScheduleAgg.class);
+//                    dailyScheduleAgg = new Gson().fromJson(getJsonString(
+//                            "dailyScheduleAgg.json"), DailyScheduleAgg.class);
 
-//                    if (requestedDateCal.before(todayCal)) {
-//                        dailyScheduleAgg = getDailyScheduleAggFromDb();
-//                    } else {
-//                        dailyScheduleAgg = getDailyScheduleAggFromNetwork();
-//                    }
+                    if (requestedDateCal.before(todayCal)) {
+                        dailyScheduleAgg = getDailyScheduleAggFromDb();
+                    } else {
+                        dailyScheduleAgg = getDailyScheduleAggFromNetwork();
+                    }
 
                     if(filterTeams) {
                         dailyScheduleAgg = filterMyTeams(dailyScheduleAgg);
@@ -398,6 +403,21 @@ public class GameFragment extends Fragment
 
             private DailyScheduleAgg addGameAgg(DailyScheduleAgg dailyScheduleAgg, String id) {
                 List<GameAgg> gameAgg = gameAggDao.getGameAggByDailyScheduleId(id);
+                for(GameAgg game : gameAgg) {
+                    game.setAwayLeaderPoints(leaderBoxScoreDao.getLeaderBoxScore(
+                            game.getId(), NBAContract.AWAY, NBAContract.POINTS));
+                    game.setAwayLeaderAssists(leaderBoxScoreDao.getLeaderBoxScore(
+                            game.getId(), NBAContract.AWAY, NBAContract.ASSISTS));
+                    game.setAwayLeaderRebounds(leaderBoxScoreDao.getLeaderBoxScore(
+                            game.getId(), NBAContract.AWAY, NBAContract.REBOUNDS));
+                    game.setHomeLeaderPoints(leaderBoxScoreDao.getLeaderBoxScore(
+                            game.getId(), NBAContract.HOME, NBAContract.POINTS));
+                    game.setHomeLeaderAssists(leaderBoxScoreDao.getLeaderBoxScore(
+                            game.getId(), NBAContract.HOME, NBAContract.ASSISTS));
+                    game.setHomeLeaderRebounds(leaderBoxScoreDao.getLeaderBoxScore(
+                            game.getId(), NBAContract.HOME, NBAContract.REBOUNDS));
+                }
+
                 dailyScheduleAgg.setGames((ArrayList<GameAgg>)gameAgg);
                 return dailyScheduleAgg;
             }
@@ -405,8 +425,15 @@ public class GameFragment extends Fragment
             private void insertDailyScheduleAggIntoDb() throws ParseException, InterruptedException {
                 DailyScheduleAgg dailyScheduleAgg = getDailyScheduleAggFromNetwork();
                 dailyScheduleAggDao.insert(dailyScheduleAgg);
-                for(GameAgg gameAgg : dailyScheduleAgg.getGames()) {
-                    gameAggDao.insert(gameAgg);
+                ArrayList<GameAgg> games = dailyScheduleAgg.getGames();
+                for(GameAgg game : games) {
+                    gameAggDao.insert(game);
+                    leaderBoxScoreDao.insert(game.getAwayLeaderAssists());
+                    leaderBoxScoreDao.insert(game.getAwayLeaderRebounds());
+                    leaderBoxScoreDao.insert(game.getAwayLeaderPoints());
+                    leaderBoxScoreDao.insert(game.getHomeLeaderAssists());
+                    leaderBoxScoreDao.insert(game.getHomeLeaderRebounds());
+                    leaderBoxScoreDao.insert(game.getHomeLeaderPoints());
                 }
             }
 
@@ -475,13 +502,13 @@ public class GameFragment extends Fragment
         gameAgg.setHomeAlias(game.getHome().getAlias());
         gameAgg.setHomeName(game.getHome().getName());
 
-//        Thread.sleep(delay * 1000);
-        BoxScore boxScore = new Gson().fromJson(getJsonString(
-                "boxScore_"+gameAgg.getId()+".json"), BoxScore.class);
-//        BoxScore boxScore = ApiUtils.getGameService()
-//                .getBoxScore("en", gameAgg.getId(),
-//                        mContext.getString(R.string.format),
-//                        BuildConfig.NBA_DB_API_KEY).blockingGet();
+        Thread.sleep(delay * 1000);
+//        BoxScore boxScore = new Gson().fromJson(getJsonString(
+//                "boxScore_"+gameAgg.getId()+".json"), BoxScore.class);
+        BoxScore boxScore = ApiUtils.getGameService()
+                .getBoxScore("en", gameAgg.getId(),
+                        mContext.getString(R.string.format),
+                        BuildConfig.NBA_DB_API_KEY).blockingGet();
 
         if(gameAgg.getStatus().equals(mContext.getString(R.string.scheduled))) {
             gameAgg.setTimeOnClock(getGameStartTime(game));
@@ -493,17 +520,18 @@ public class GameFragment extends Fragment
             gameAgg.setTimeOnClock(mContext.getString(R.string.finish));
             gameAgg.setAwayPoints(String.valueOf(boxScore.getAway().getPoints()));
             gameAgg.setHomePoints(String.valueOf(boxScore.getHome().getPoints()));
+            addLeaderBoxScoreStats(gameAgg, boxScore);
         }
 
         if(recordMap.isEmpty()) {
-//            Thread.sleep(delay * 1000);
-            Standing standing = new Gson().fromJson(getJsonString(
-                    "standing.json"), Standing.class);
-//            Standing standing =
-//                    ApiUtils.getGameService().getStanding(mContext.getString(R.string.language_code),
-//                    2018,
-//                    mContext.getString(R.string.season) ,mContext.getString(R.string.format),
-//                    BuildConfig.NBA_DB_API_KEY).blockingGet();
+            Thread.sleep(delay * 1000);
+//            Standing standing = new Gson().fromJson(getJsonString(
+//                    "standing.json"), Standing.class);
+            Standing standing =
+                    ApiUtils.getGameService().getStanding(mContext.getString(R.string.language_code),
+                    2018,
+                    mContext.getString(R.string.season) ,mContext.getString(R.string.format),
+                    BuildConfig.NBA_DB_API_KEY).blockingGet();
 
             for(Conference conference : standing.getConferences()) {
                 for(Division division : conference.getDivisions()) {
@@ -571,4 +599,138 @@ public class GameFragment extends Fragment
         return json;
     }
 
+    private void insertLeaderBoxScoreStats(GameAgg game, BoxScore boxScore) {
+        // Away Team Assist
+        // Assist
+        leaderBoxScoreDao.insert(
+                new LeaderBoxScore(game.getId(),
+                        NBAContract.AWAY, NBAContract.ASSISTS,
+                        boxScore.getAway().getLeaders().getAssists().get(0).getFullName(),
+                        boxScore.getAway().getLeaders().getAssists().get(0).getStatistics().getMinutes(),
+                        String.valueOf(boxScore.getAway().getLeaders().getAssists().get(0).getStatistics().getPoints()),
+                        String.valueOf(boxScore.getAway().getLeaders().getAssists().get(0).getStatistics().getRebounds()),
+                        String.valueOf(boxScore.getAway().getLeaders().getAssists().get(0).getStatistics().getAssists()))
+        );
+
+        // Rebounds
+        leaderBoxScoreDao.insert(
+                new LeaderBoxScore(game.getId(),
+                        NBAContract.AWAY, NBAContract.REBOUNDS,
+                        boxScore.getAway().getLeaders().getRebounds().get(0).getFullName(),
+                        boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getMinutes(),
+                        String.valueOf(boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getAssists()),
+                        String.valueOf(boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getRebounds()),
+                        String.valueOf(boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getPoints()))
+        );
+        // Points
+        leaderBoxScoreDao.insert(
+                new LeaderBoxScore(game.getId(),
+                        NBAContract.AWAY, NBAContract.POINTS,
+                        boxScore.getAway().getLeaders().getRebounds().get(0).getFullName(),
+                        boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getMinutes(),
+                        String.valueOf(boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getAssists()),
+                        String.valueOf(boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getRebounds()),
+                        String.valueOf(boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getPoints()))
+        );
+
+        // Home Team Assist
+        // Assist
+        leaderBoxScoreDao.insert(
+                new LeaderBoxScore(game.getId(),
+                        NBAContract.HOME, NBAContract.ASSISTS,
+                        boxScore.getHome().getLeaders().getAssists().get(0).getFullName(),
+                        boxScore.getHome().getLeaders().getAssists().get(0).getStatistics().getMinutes(),
+                        String.valueOf(boxScore.getHome().getLeaders().getAssists().get(0).getStatistics().getPoints()),
+                        String.valueOf(boxScore.getHome().getLeaders().getAssists().get(0).getStatistics().getRebounds()),
+                        String.valueOf(boxScore.getHome().getLeaders().getAssists().get(0).getStatistics().getAssists()))
+        );
+
+        // Rebounds
+        leaderBoxScoreDao.insert(
+                new LeaderBoxScore(game.getId(),
+                        NBAContract.HOME, NBAContract.REBOUNDS,
+                        boxScore.getHome().getLeaders().getRebounds().get(0).getFullName(),
+                        boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getMinutes(),
+                        String.valueOf(boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getAssists()),
+                        String.valueOf(boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getRebounds()),
+                        String.valueOf(boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getPoints()))
+        );
+
+        // Points
+        leaderBoxScoreDao.insert(
+                new LeaderBoxScore(game.getId(),
+                        NBAContract.HOME, NBAContract.POINTS,
+                        boxScore.getHome().getLeaders().getRebounds().get(0).getFullName(),
+                        boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getMinutes(),
+                        String.valueOf(boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getAssists()),
+                        String.valueOf(boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getRebounds()),
+                        String.valueOf(boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getPoints()))
+        );
+    }
+
+    private void addLeaderBoxScoreStats(GameAgg game, BoxScore boxScore) {
+        // Away Team Assist
+        // Assist
+        game.setAwayLeaderAssists(
+            new LeaderBoxScore(game.getId(),
+                NBAContract.AWAY, NBAContract.ASSISTS,
+                boxScore.getAway().getLeaders().getAssists().get(0).getFullName(),
+                boxScore.getAway().getLeaders().getAssists().get(0).getStatistics().getMinutes(),
+                String.valueOf(boxScore.getAway().getLeaders().getAssists().get(0).getStatistics().getPoints()),
+                String.valueOf(boxScore.getAway().getLeaders().getAssists().get(0).getStatistics().getRebounds()),
+                String.valueOf(boxScore.getAway().getLeaders().getAssists().get(0).getStatistics().getAssists())));
+
+        // Rebounds
+        game.setAwayLeaderRebounds(
+            new LeaderBoxScore(game.getId(),
+                NBAContract.AWAY, NBAContract.REBOUNDS,
+                boxScore.getAway().getLeaders().getRebounds().get(0).getFullName(),
+                boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getMinutes(),
+                String.valueOf(boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getAssists()),
+                String.valueOf(boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getRebounds()),
+                String.valueOf(boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getPoints())));
+
+        // Points
+        game.setAwayLeaderPoints(
+            new LeaderBoxScore(game.getId(),
+                NBAContract.AWAY, NBAContract.POINTS,
+                boxScore.getAway().getLeaders().getRebounds().get(0).getFullName(),
+                boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getMinutes(),
+                String.valueOf(boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getAssists()),
+                String.valueOf(boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getRebounds()),
+                String.valueOf(boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getPoints())));
+
+        // Home Team Assist
+        // Assist
+        game.setHomeLeaderAssists(
+            new LeaderBoxScore(game.getId(),
+                NBAContract.HOME, NBAContract.ASSISTS,
+                boxScore.getHome().getLeaders().getAssists().get(0).getFullName(),
+                boxScore.getHome().getLeaders().getAssists().get(0).getStatistics().getMinutes(),
+                String.valueOf(boxScore.getHome().getLeaders().getAssists().get(0).getStatistics().getPoints()),
+                String.valueOf(boxScore.getHome().getLeaders().getAssists().get(0).getStatistics().getRebounds()),
+                String.valueOf(boxScore.getHome().getLeaders().getAssists().get(0).getStatistics().getAssists())));
+
+        // Rebounds
+        game.setHomeLeaderRebounds(
+            new LeaderBoxScore(game.getId(),
+                NBAContract.HOME, NBAContract.REBOUNDS,
+                boxScore.getHome().getLeaders().getRebounds().get(0).getFullName(),
+                boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getMinutes(),
+                String.valueOf(boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getAssists()),
+                String.valueOf(boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getRebounds()),
+                String.valueOf(boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getPoints()))
+        );
+
+        // Points
+        game.setHomeLeaderPoints(
+            new LeaderBoxScore(game.getId(),
+                NBAContract.HOME, NBAContract.POINTS,
+                boxScore.getHome().getLeaders().getRebounds().get(0).getFullName(),
+                boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getMinutes(),
+                String.valueOf(boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getAssists()),
+                String.valueOf(boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getRebounds()),
+                String.valueOf(boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getPoints()))
+        );
+    }
 }

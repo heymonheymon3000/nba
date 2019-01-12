@@ -15,7 +15,7 @@ public class GameDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_detail);
 
-        GameAgg gameAgg = (GameAgg) getIntent().getParcelableExtra(GameDetailFragment.GAME_AGG_KEY);
+        GameAgg gameAgg = getIntent().getParcelableExtra(GameDetailFragment.GAME_AGG_KEY);
         if (gameAgg != null) {
             GameDetailFragment gameDetailFragment = GameDetailFragment.newInstance(gameAgg);
             FragmentManager fragmentManager = getSupportFragmentManager();

@@ -17,6 +17,9 @@ public class Away implements Serializable
     @SerializedName("points")
     @Expose
     private Long points;
+    @SerializedName("leaders")
+    @Expose
+    private Leaders leaders;
     private final static long serialVersionUID = 463820561379358009L;
 
 
@@ -38,9 +41,17 @@ public class Away implements Serializable
         this.points = points;
     }
 
+    public Leaders getLeaders() {
+        return leaders;
+    }
+
+    public void setLeaders(Leaders leaders) {
+        this.leaders = leaders;
+    }
+
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(alias).append(points).toHashCode();
+        return new HashCodeBuilder().append(alias).append(points).append(leaders).toHashCode();
     }
 
     @Override
@@ -52,7 +63,7 @@ public class Away implements Serializable
             return false;
         }
         Away rhs = ((Away) other);
-        return new EqualsBuilder().append(alias, rhs.alias).append(points, rhs.points).isEquals();
+        return new EqualsBuilder().append(alias, rhs.alias).append(points, rhs.points).append(leaders, rhs.leaders).isEquals();
     }
 
 }

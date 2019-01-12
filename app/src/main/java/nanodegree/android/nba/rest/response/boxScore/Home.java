@@ -21,6 +21,9 @@ public class Home implements Serializable
     @SerializedName("points")
     @Expose
     private Long points;
+    @SerializedName("leaders")
+    @Expose
+    private Leaders leaders;
     private final static long serialVersionUID = 659670511913634443L;
 
     public Home() {}
@@ -49,9 +52,17 @@ public class Home implements Serializable
         this.points = points;
     }
 
+    public Leaders getLeaders() {
+        return leaders;
+    }
+
+    public void setLeaders(Leaders leaders) {
+        this.leaders = leaders;
+    }
+
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(alias).append(name).append(points).toHashCode();
+        return new HashCodeBuilder().append(alias).append(name).append(points).append(leaders).toHashCode();
     }
 
     @Override
@@ -63,7 +74,7 @@ public class Home implements Serializable
             return false;
         }
         Home rhs = ((Home) other);
-        return new EqualsBuilder().append(alias, rhs.alias).append(name, rhs.name).append(points, rhs.points).isEquals();
+        return new EqualsBuilder().append(alias, rhs.alias).append(name, rhs.name).append(points, rhs.points).append(leaders, rhs.leaders).isEquals();
     }
 
 }

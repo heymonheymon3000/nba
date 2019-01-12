@@ -3,13 +3,13 @@ package nanodegree.android.nba.persistence.entity;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
-
-import android.support.annotation.NonNull;
-
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 import nanodegree.android.nba.persistence.db.NBAContract;
@@ -57,9 +57,33 @@ public class GameAgg implements Parcelable {
     @ColumnInfo(name = NBAContract.GameEntry.COLUMN_BROADCAST)
     private String broadcast;
 
+    @Ignore
+    private LeaderBoxScore homeLeaderAssists = null;
+
+    @Ignore
+    private LeaderBoxScore homeLeaderRebounds = null;
+
+    @Ignore
+    private LeaderBoxScore homeLeaderPoints = null;
+
+    @Ignore
+    private LeaderBoxScore awayLeaderAssists = null;
+
+    @Ignore
+    private LeaderBoxScore awayLeaderRebounds = null;
+
+    @Ignore
+    private LeaderBoxScore awayLeaderPoints = null;
+
     public GameAgg() {}
 
     private GameAgg(Parcel in) {
+        homeLeaderAssists = in.readParcelable(LeaderBoxScore.class.getClassLoader());
+        homeLeaderRebounds =  in.readParcelable(LeaderBoxScore.class.getClassLoader());
+        homeLeaderPoints = in.readParcelable(LeaderBoxScore.class.getClassLoader());
+        awayLeaderAssists = in.readParcelable(LeaderBoxScore.class.getClassLoader());
+        awayLeaderRebounds = in.readParcelable(LeaderBoxScore.class.getClassLoader());
+        awayLeaderPoints = in.readParcelable(LeaderBoxScore.class.getClassLoader());
         id = in.readString();
         dailyScheduleDate = in.readString();
         status = in.readString();
@@ -94,6 +118,12 @@ public class GameAgg implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(homeLeaderAssists, flags);
+        dest.writeParcelable(homeLeaderRebounds, flags);
+        dest.writeParcelable(homeLeaderPoints, flags);
+        dest.writeParcelable(awayLeaderAssists, flags);
+        dest.writeParcelable(awayLeaderRebounds, flags);
+        dest.writeParcelable(awayLeaderPoints, flags);
         dest.writeString(id);
         dest.writeString(dailyScheduleDate);
         dest.writeString(status);
@@ -202,6 +232,54 @@ public class GameAgg implements Parcelable {
 
     public void setBroadcast(String broadcast) {
         this.broadcast = broadcast;
+    }
+
+    public LeaderBoxScore getHomeLeaderAssists() {
+        return homeLeaderAssists;
+    }
+
+    public void setHomeLeaderAssists(LeaderBoxScore homeLeaderAssists) {
+        this.homeLeaderAssists = homeLeaderAssists;
+    }
+
+    public LeaderBoxScore getHomeLeaderRebounds() {
+        return homeLeaderRebounds;
+    }
+
+    public void setHomeLeaderRebounds(LeaderBoxScore homeLeaderRebounds) {
+        this.homeLeaderRebounds = homeLeaderRebounds;
+    }
+
+    public LeaderBoxScore getHomeLeaderPoints() {
+        return homeLeaderPoints;
+    }
+
+    public void setHomeLeaderPoints(LeaderBoxScore homeLeaderPoints) {
+        this.homeLeaderPoints = homeLeaderPoints;
+    }
+
+    public LeaderBoxScore getAwayLeaderAssists() {
+        return awayLeaderAssists;
+    }
+
+    public void setAwayLeaderAssists(LeaderBoxScore awayLeaderAssists) {
+        this.awayLeaderAssists = awayLeaderAssists;
+    }
+
+    public LeaderBoxScore getAwayLeaderRebounds() {
+        return awayLeaderRebounds;
+    }
+
+    public void setAwayLeaderRebounds(LeaderBoxScore awayLeaderRebounds) {
+        this.awayLeaderRebounds = awayLeaderRebounds;
+    }
+
+    public LeaderBoxScore getAwayLeaderPoints() {
+        return awayLeaderPoints;
+    }
+
+    public void setAwayLeaderPoints(LeaderBoxScore awayLeaderPoints) {
+        this.awayLeaderPoints = awayLeaderPoints;
     }
 
     @Override

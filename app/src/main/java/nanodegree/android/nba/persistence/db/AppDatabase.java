@@ -12,11 +12,14 @@ import java.util.concurrent.Executors;
 import nanodegree.android.nba.persistence.dao.DailyScheduleAggDao;
 import nanodegree.android.nba.persistence.dao.FavoriteTeamDao;
 import nanodegree.android.nba.persistence.dao.GameAggDao;
+import nanodegree.android.nba.persistence.dao.LeaderBoxScoreDao;
 import nanodegree.android.nba.persistence.entity.DailyScheduleAgg;
 import nanodegree.android.nba.persistence.entity.FavoriteTeam;
 import nanodegree.android.nba.persistence.entity.GameAgg;
+import nanodegree.android.nba.persistence.entity.LeaderBoxScore;
 
-@Database(entities = {DailyScheduleAgg.class, GameAgg.class, FavoriteTeam.class}, version = 1, exportSchema = false)
+@Database(entities = {DailyScheduleAgg.class, GameAgg.class,
+        FavoriteTeam.class, LeaderBoxScore.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     private volatile static AppDatabase INSTANCE;
 
@@ -25,7 +28,7 @@ public abstract class AppDatabase extends RoomDatabase {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                        AppDatabase.class, "nba_schedule12.db")
+                        AppDatabase.class, "nba_schedule22.db")
                         .addCallback(new Callback() {
                             @Override
                             public void onCreate(@NonNull SupportSQLiteDatabase db) {
@@ -50,4 +53,5 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract DailyScheduleAggDao dailyScheduleAggDao();
     public abstract GameAggDao gameAggDao();
     public abstract FavoriteTeamDao gameFavoriteTeamDao();
+    public abstract LeaderBoxScoreDao leaderBoxScoreDao();
 }

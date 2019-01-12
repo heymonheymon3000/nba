@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -114,13 +115,29 @@ public class GameDetailFragment extends Fragment {
 
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         adapter = new TabAdapter(fragmentManager);
-        adapter.addFragment(new PlayerDetailFragment(), getShortName(gameAgg.getHomeName()));
-        adapter.addFragment(new PlayerDetailFragment(), getShortName(gameAgg.getAwayName()));
 
+        if(gameAgg.getStatus().equals("closed")) {
+            adapter.addFragment(PlayerDetailFragment.newInstance(
+                    gameAgg.getHomeLeaderRebounds(),
+                    gameAgg.getHomeLeaderAssists(),
+                    gameAgg.getHomeLeaderPoints()),
+                    getShortName(gameAgg.getHomeName()));
+
+            adapter.addFragment(PlayerDetailFragment.newInstance(
+                    gameAgg.getAwayLeaderRebounds(),
+                    gameAgg.getAwayLeaderAssists(),
+                    gameAgg.getAwayLeaderPoints()),
+                    getShortName(gameAgg.getAwayName()));
+        } else {
+            adapter.addFragment(new PlayerDetailFragment(),
+                    getShortName(gameAgg.getHomeName()));
+
+            adapter.addFragment(new PlayerDetailFragment(),
+                    getShortName(gameAgg.getAwayName()));
+        }
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
-
 
         return rootView;
     }
@@ -128,6 +145,5 @@ public class GameDetailFragment extends Fragment {
     private String getShortName(String name) {
         String[] result = name.split(" ");
         return result[result.length-1];
-
     }
 }

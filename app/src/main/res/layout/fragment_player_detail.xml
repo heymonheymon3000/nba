@@ -1,10 +1,66 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Fragment"/>
+    <nanodegree.android.nba.ui.gameDetail.CustomTableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TableRow>
+            <TextView
+                android:layout_width="170dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:text="Player" />
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:text="MIN" />
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:text="PTS" />
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:text="REB" />
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:text="AST"/>
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:text="Player" />
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:text="MIN" />
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:text="PTS" />
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:text="REB" />
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:text="AST"/>
+        </TableRow>
+
+    </nanodegree.android.nba.ui.gameDetail.CustomTableLayout>
 </LinearLayout>

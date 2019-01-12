@@ -1,6 +1,5 @@
 package nanodegree.android.nba.ui.gameDetail;
 
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,45 +8,25 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import nanodegree.android.nba.R;
+import nanodegree.android.nba.persistence.db.NBAContract;
+import nanodegree.android.nba.persistence.entity.LeaderBoxScore;
+import nanodegree.android.nba.ui.game.OnFragmentInteractionListener;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link PlayerDetailFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link PlayerDetailFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class PlayerDetailFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private LeaderBoxScore rebounds;
+    private LeaderBoxScore assists;
+    private LeaderBoxScore points;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    public PlayerDetailFragment() {}
 
-    private OnFragmentInteractionListener mListener;
-
-    public PlayerDetailFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PlayerDetailFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static PlayerDetailFragment newInstance(String param1, String param2) {
+    public static PlayerDetailFragment newInstance(LeaderBoxScore rebounds,
+                                                   LeaderBoxScore assists,
+                                                   LeaderBoxScore points) {
         PlayerDetailFragment fragment = new PlayerDetailFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putParcelable(NBAContract.REBOUNDS, rebounds);
+        args.putParcelable(NBAContract.ASSISTS, assists);
+        args.putParcelable(NBAContract.POINTS, points);
         fragment.setArguments(args);
         return fragment;
     }
@@ -56,54 +35,19 @@ public class PlayerDetailFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            rebounds = getArguments().getParcelable(NBAContract.REBOUNDS);
+            assists = getArguments().getParcelable(NBAContract.ASSISTS);
+            points = getArguments().getParcelable(NBAContract.POINTS);
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_player_detail, container, false);
-    }
+        View rootView = inflater.inflate(R.layout.fragment_player_detail, container, false);
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
 
-//    @Override
-//    public void onAttach(Context context) {
-//        super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
-//    }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        return rootView;
     }
 }
