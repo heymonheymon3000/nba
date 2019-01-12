@@ -19,6 +19,7 @@
     <string name="no_games">There are no games.</string>
     <string name="no_connection">Something went wrong, please check your internet connection and try again!</string>
     <string name="db_failure">Something went wrong, please check your db connection and try again!</string>
+    <string name="game_not_started">This game has not started yet.</string>
 
 
     <string name="scheduled">scheduled</string>

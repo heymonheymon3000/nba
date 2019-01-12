@@ -116,7 +116,8 @@ public class GameDetailFragment extends Fragment {
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         adapter = new TabAdapter(fragmentManager);
 
-        if(gameAgg.getStatus().equals("closed")) {
+        if(gameAgg.getStatus().equals(getContext().getString(R.string.closed)) ||
+                gameAgg.getStatus().equals(getContext().getString(R.string.inprogress))) {
             adapter.addFragment(PlayerDetailFragment.newInstance(
                     gameAgg.getHomeLeaderRebounds(),
                     gameAgg.getHomeLeaderAssists(),

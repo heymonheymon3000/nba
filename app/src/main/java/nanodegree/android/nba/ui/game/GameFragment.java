@@ -516,6 +516,7 @@ public class GameFragment extends Fragment
             gameAgg.setTimeOnClock(getClockTime(boxScore));
             gameAgg.setAwayPoints(String.valueOf(boxScore.getAway().getPoints()));
             gameAgg.setHomePoints(String.valueOf(boxScore.getHome().getPoints()));
+            addLeaderBoxScoreStats(gameAgg, boxScore);
         } else if(gameAgg.getStatus().equals(mContext.getString(R.string.closed))) {
             gameAgg.setTimeOnClock(mContext.getString(R.string.finish));
             gameAgg.setAwayPoints(String.valueOf(boxScore.getAway().getPoints()));

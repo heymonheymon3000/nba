@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -151,9 +152,16 @@ public class GameAdapter
         public void onClick(View v) {
             int position = getAdapterPosition();
             GameAgg gameAgg  = mGames.get(position);
-            Intent intent = new Intent(context, GameDetailActivity.class);
-            intent.putExtra("gameAgg", gameAgg);
-            context.startActivity(intent);
+            if(gameAgg.getStatus().equals(context.getString(R.string.closed)) ||
+                    gameAgg.getStatus().equals(context.getString(R.string.inprogress))) {
+                Intent intent = new Intent(context, GameDetailActivity.class);
+                intent.putExtra("gameAgg", gameAgg);
+                context.startActivity(intent);
+            } else {
+                Toast.makeText(context,
+                        context.getString(R.string.game_not_started),
+                        Toast.LENGTH_LONG).show();
+            }
         }
     }
 }
