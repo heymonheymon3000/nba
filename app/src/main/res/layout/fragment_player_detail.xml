@@ -12,54 +12,135 @@
                 android:layout_width="170dp"
                 android:layout_height="wrap_content"
                 android:paddingStart="4dp"
-                android:text="Player" />
+                android:paddingEnd="4dp"
+                android:textColor="@color/black"
+                android:text="@string/player" />
             <TextView
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:paddingStart="4dp"
-                android:text="MIN" />
+                android:paddingEnd="4dp"
+                android:textColor="@color/black"
+                android:text="@string/minutes" />
             <TextView
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:paddingStart="4dp"
-                android:text="PTS" />
+                android:paddingEnd="4dp"
+                android:textColor="@color/black"
+                android:text="@string/points" />
             <TextView
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:paddingStart="4dp"
-                android:text="REB" />
+                android:paddingEnd="4dp"
+                android:textColor="@color/black"
+                android:text="@string/rebounds" />
             <TextView
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:paddingStart="4dp"
-                android:text="AST"/>
+                android:paddingEnd="4dp"
+                android:textColor="@color/black"
+                android:text="@string/assists"/>
         </TableRow>
-        <TableRow>
+        <TableRow
+            android:background="@color/greylt">
             <TextView
+                android:id="@+id/player_points_name_tv"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:paddingStart="4dp"
-                android:text="Player" />
+                android:paddingEnd="4dp" />
             <TextView
+                android:id="@+id/player_points_min_tv"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:paddingStart="4dp"
-                android:text="MIN" />
+                android:paddingEnd="4dp" />
             <TextView
+                android:id="@+id/player_points_pt_tv"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:paddingStart="4dp"
-                android:text="PTS" />
+                android:paddingEnd="4dp" />
             <TextView
+                android:id="@+id/player_points_reb_tv"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:paddingStart="4dp"
-                android:text="REB" />
+                android:paddingEnd="4dp" />
             <TextView
+                android:id="@+id/player_points_assist_tv"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:paddingStart="4dp"
-                android:text="AST"/>
+                android:paddingEnd="4dp" />
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:id="@+id/player_rebounds_name_tv"
+                android:layout_width="170dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp" />
+            <TextView
+                android:id="@+id/player_rebounds_min_tv"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp" />
+            <TextView
+                android:id="@+id/player_rebounds_pt_tv"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp" />
+            <TextView
+                android:id="@+id/player_rebounds_reb_tv"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp" />
+            <TextView
+                android:id="@+id/player_rebounds_assist_tv"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp" />
+        </TableRow>
+        <TableRow
+            android:background="@color/greylt">
+            <TextView
+                android:id="@+id/player_assists_name_tv"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp" />
+            <TextView
+                android:id="@+id/player_assists_min_tv"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp" />
+            <TextView
+                android:id="@+id/player_assists_pt_tv"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp" />
+            <TextView
+                android:id="@+id/player_assists_reb_tv"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp" />
+            <TextView
+                android:id="@+id/player_assists_assist_tv"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp" />
         </TableRow>
 
     </nanodegree.android.nba.ui.gameDetail.CustomTableLayout>

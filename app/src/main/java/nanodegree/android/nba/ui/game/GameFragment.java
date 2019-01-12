@@ -686,19 +686,19 @@ public class GameFragment extends Fragment
                 NBAContract.AWAY, NBAContract.REBOUNDS,
                 boxScore.getAway().getLeaders().getRebounds().get(0).getFullName(),
                 boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getMinutes(),
-                String.valueOf(boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getAssists()),
+                String.valueOf(boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getPoints()),
                 String.valueOf(boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getRebounds()),
-                String.valueOf(boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getPoints())));
+                String.valueOf(boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getAssists())));
 
         // Points
         game.setAwayLeaderPoints(
             new LeaderBoxScore(game.getId(),
                 NBAContract.AWAY, NBAContract.POINTS,
-                boxScore.getAway().getLeaders().getRebounds().get(0).getFullName(),
-                boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getMinutes(),
-                String.valueOf(boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getAssists()),
-                String.valueOf(boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getRebounds()),
-                String.valueOf(boxScore.getAway().getLeaders().getRebounds().get(0).getStatistics().getPoints())));
+                boxScore.getAway().getLeaders().getPoints().get(0).getFullName(),
+                boxScore.getAway().getLeaders().getPoints().get(0).getStatistics().getMinutes(),
+                String.valueOf(boxScore.getAway().getLeaders().getPoints().get(0).getStatistics().getPoints()),
+                String.valueOf(boxScore.getAway().getLeaders().getPoints().get(0).getStatistics().getRebounds()),
+                String.valueOf(boxScore.getAway().getLeaders().getPoints().get(0).getStatistics().getAssists())));
 
         // Home Team Assist
         // Assist
@@ -717,20 +717,20 @@ public class GameFragment extends Fragment
                 NBAContract.HOME, NBAContract.REBOUNDS,
                 boxScore.getHome().getLeaders().getRebounds().get(0).getFullName(),
                 boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getMinutes(),
-                String.valueOf(boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getAssists()),
+                String.valueOf(boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getPoints()),
                 String.valueOf(boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getRebounds()),
-                String.valueOf(boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getPoints()))
+                String.valueOf(boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getAssists()))
         );
 
         // Points
         game.setHomeLeaderPoints(
             new LeaderBoxScore(game.getId(),
                 NBAContract.HOME, NBAContract.POINTS,
-                boxScore.getHome().getLeaders().getRebounds().get(0).getFullName(),
-                boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getMinutes(),
-                String.valueOf(boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getAssists()),
-                String.valueOf(boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getRebounds()),
-                String.valueOf(boxScore.getHome().getLeaders().getRebounds().get(0).getStatistics().getPoints()))
+                boxScore.getHome().getLeaders().getPoints().get(0).getFullName(),
+                boxScore.getHome().getLeaders().getPoints().get(0).getStatistics().getMinutes(),
+                String.valueOf(boxScore.getHome().getLeaders().getPoints().get(0).getStatistics().getPoints()),
+                String.valueOf(boxScore.getHome().getLeaders().getPoints().get(0).getStatistics().getRebounds()),
+                String.valueOf(boxScore.getHome().getLeaders().getPoints().get(0).getStatistics().getAssists()))
         );
     }
 }
