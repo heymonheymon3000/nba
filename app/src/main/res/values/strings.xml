@@ -4,7 +4,6 @@
     <string name="app_name">NBA Schedule</string>
     <string name="favorite_teams">Favorite Teams</string>
 
-
     <string name="back_nav">Back nav button</string>
     <string name="forward_nav">Forward nav button</string>
 
@@ -21,7 +20,6 @@
     <string name="db_failure">Something went wrong, please check your db connection and try again!</string>
     <string name="game_not_started">This game has not started yet.</string>
 
-
     <string name="scheduled">scheduled</string>
     <string name="inprogress">inprogress</string>
     <string name="closed">closed</string>
@@ -32,7 +30,7 @@
     <string name="et">ET</string>
     <string name="display_date_pattern">h:mm a</string>
 
-    <string name="player">Player</string>
+    <string name="player">PLAYER</string>
     <string name="minutes">MIN</string>
     <string name="points">PTS</string>
     <string name="rebounds">REBS</string>

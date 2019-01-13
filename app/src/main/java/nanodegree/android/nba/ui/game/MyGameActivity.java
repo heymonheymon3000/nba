@@ -39,7 +39,7 @@ public class MyGameActivity extends AppCompatActivity
         favoriteTeamDao = AppDatabase.getInstance(
                 getApplicationContext()).gameFavoriteTeamDao();
 
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar mToolbar = findViewById(R.id.toolbar);
         mToolbar.setTitle(getString(R.string.favorite_teams));
         mToolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -49,7 +49,7 @@ public class MyGameActivity extends AppCompatActivity
             }
         });
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.rv_fav_teams);
+        mRecyclerView = findViewById(R.id.rv_fav_teams);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);

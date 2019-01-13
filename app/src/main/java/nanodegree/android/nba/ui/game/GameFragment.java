@@ -563,7 +563,7 @@ public class GameFragment extends Fragment
                 new SimpleDateFormat(mContext.getString(
                         R.string.display_date_pattern), Locale.ENGLISH);
         d.setTimeZone(TimeZone.getTimeZone(mContext.getString(R.string.est)));
-        return d.format(date) + " " + mContext.getString(R.string.est);
+        return d.format(date) + " " + mContext.getString(R.string.et);
     }
 
     private String getClockTime(BoxScore boxScore) {

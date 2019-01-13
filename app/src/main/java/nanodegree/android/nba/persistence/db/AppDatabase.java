@@ -21,6 +21,7 @@ import nanodegree.android.nba.persistence.entity.LeaderBoxScore;
 @Database(entities = {DailyScheduleAgg.class, GameAgg.class,
         FavoriteTeam.class, LeaderBoxScore.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
+    private final static String DB_NAME = "nba_schedule23.db";
     private volatile static AppDatabase INSTANCE;
 
     public static AppDatabase getInstance(Context context) {
@@ -28,7 +29,7 @@ public abstract class AppDatabase extends RoomDatabase {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                        AppDatabase.class, "nba_schedule23.db")
+                        AppDatabase.class, DB_NAME)
                         .addCallback(new Callback() {
                             @Override
                             public void onCreate(@NonNull SupportSQLiteDatabase db) {
@@ -41,8 +42,8 @@ public abstract class AppDatabase extends RoomDatabase {
                                     }
                                 });
                             }
-                        })
-                        .build();
+                        }
+                    ).build();
                 }
             }
         }
