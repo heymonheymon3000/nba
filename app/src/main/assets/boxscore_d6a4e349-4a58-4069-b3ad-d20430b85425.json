@@ -1,0 +1,79 @@
+{
+  "away" : {
+    "alias" : "BOS",
+    "leaders" : {
+      "assists" : [ {
+        "fullName" : "Kyrie Irving",
+        "id" : "dd146010-902b-4ad7-b98c-650d0363a2f0",
+        "statistics" : {
+          "assists" : 6,
+          "minutes" : "32:53",
+          "points" : 25,
+          "rebounds" : 5
+        }
+      } ],
+      "points" : [ {
+        "fullName" : "Kyrie Irving",
+        "id" : "dd146010-902b-4ad7-b98c-650d0363a2f0",
+        "statistics" : {
+          "assists" : 6,
+          "minutes" : "32:53",
+          "points" : 25,
+          "rebounds" : 5
+        }
+      } ],
+      "rebounds" : [ {
+        "fullName" : "Al Horford",
+        "id" : "cf3a87ec-c2f7-42e8-9698-6f8b2ba916a9",
+        "statistics" : {
+          "assists" : 4,
+          "minutes" : "30:13",
+          "points" : 10,
+          "rebounds" : 11
+        }
+      } ]
+    },
+    "points" : 103
+  },
+  "clock" : "00:00",
+  "home" : {
+    "alias" : "ORL",
+    "leaders" : {
+      "assists" : [ {
+        "fullName" : "Nikola Vucevic",
+        "id" : "7366b2b7-5959-4dd9-9204-760e861b3119",
+        "statistics" : {
+          "assists" : 5,
+          "minutes" : "30:29",
+          "points" : 16,
+          "rebounds" : 13
+        }
+      } ],
+      "points" : [ {
+        "fullName" : "Aaron Gordon",
+        "id" : "20f85838-0bd5-4c1f-ab85-a308bafaf5bc",
+        "statistics" : {
+          "assists" : 2,
+          "minutes" : "37:00",
+          "points" : 28,
+          "rebounds" : 12
+        }
+      } ],
+      "rebounds" : [ {
+        "fullName" : "Nikola Vucevic",
+        "id" : "7366b2b7-5959-4dd9-9204-760e861b3119",
+        "statistics" : {
+          "assists" : 5,
+          "minutes" : "30:29",
+          "points" : 16,
+          "rebounds" : 13
+        }
+      } ]
+    },
+    "name" : "Magic",
+    "points" : 105
+  },
+  "quarter" : 4,
+  "scheduled" : "2019-01-13T00:00:00+00:00",
+  "status" : "closed"
+}

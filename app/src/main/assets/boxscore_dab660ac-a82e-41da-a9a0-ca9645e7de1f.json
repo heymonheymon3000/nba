@@ -1,0 +1,79 @@
+{
+  "away" : {
+    "alias" : "NOP",
+    "leaders" : {
+      "assists" : [ {
+        "fullName" : "Jrue Holiday",
+        "id" : "65700e81-3aa0-49a9-8a94-004f2cfb64e5",
+        "statistics" : {
+          "assists" : 7,
+          "minutes" : "39:53",
+          "points" : 25,
+          "rebounds" : 6
+        }
+      } ],
+      "points" : [ {
+        "fullName" : "Anthony Davis",
+        "id" : "ea8826b8-1f76-4eab-b61e-ffcb176880f3",
+        "statistics" : {
+          "assists" : 2,
+          "minutes" : "36:09",
+          "points" : 30,
+          "rebounds" : 14
+        }
+      } ],
+      "rebounds" : [ {
+        "fullName" : "Anthony Davis",
+        "id" : "ea8826b8-1f76-4eab-b61e-ffcb176880f3",
+        "statistics" : {
+          "assists" : 2,
+          "minutes" : "36:09",
+          "points" : 30,
+          "rebounds" : 14
+        }
+      } ]
+    },
+    "points" : 106
+  },
+  "clock" : "00:00",
+  "home" : {
+    "alias" : "MIN",
+    "leaders" : {
+      "assists" : [ {
+        "fullName" : "Jeff Teague",
+        "id" : "9cf99a61-6b51-4aed-8940-0480dc512b36",
+        "statistics" : {
+          "assists" : 10,
+          "minutes" : "21:40",
+          "points" : 2,
+          "rebounds" : 1
+        }
+      } ],
+      "points" : [ {
+        "fullName" : "Karl-Anthony Towns",
+        "id" : "ab532a66-9314-4d57-ade7-bb54a70c65ad",
+        "statistics" : {
+          "assists" : 3,
+          "minutes" : "37:14",
+          "points" : 27,
+          "rebounds" : 27
+        }
+      } ],
+      "rebounds" : [ {
+        "fullName" : "Karl-Anthony Towns",
+        "id" : "ab532a66-9314-4d57-ade7-bb54a70c65ad",
+        "statistics" : {
+          "assists" : 3,
+          "minutes" : "37:14",
+          "points" : 27,
+          "rebounds" : 27
+        }
+      } ]
+    },
+    "name" : "Timberwolves",
+    "points" : 110
+  },
+  "quarter" : 4,
+  "scheduled" : "2019-01-13T01:00:00+00:00",
+  "status" : "closed"
+}

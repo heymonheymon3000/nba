@@ -1,0 +1,79 @@
+{
+  "away" : {
+    "alias" : "CHA",
+    "leaders" : {
+      "assists" : [ {
+        "fullName" : "Nicolas Batum",
+        "id" : "a89ac040-715d-4057-8fc0-9d71ad06fa0a",
+        "statistics" : {
+          "assists" : 5,
+          "minutes" : "27:20",
+          "points" : 13,
+          "rebounds" : 9
+        }
+      } ],
+      "points" : [ {
+        "fullName" : "Kemba Walker",
+        "id" : "a35ee8ed-f1db-4f7e-bb17-f823e8ee0b38",
+        "statistics" : {
+          "assists" : 4,
+          "minutes" : "33:47",
+          "points" : 31,
+          "rebounds" : 1
+        }
+      } ],
+      "rebounds" : [ {
+        "fullName" : "Bismack Biyombo",
+        "id" : "8e3cbaa3-e30a-4cf8-aa7a-1b57f15f0f98",
+        "statistics" : {
+          "assists" : 1,
+          "minutes" : "24:54",
+          "points" : 4,
+          "rebounds" : 10
+        }
+      } ]
+    },
+    "points" : 97
+  },
+  "clock" : "00:00",
+  "home" : {
+    "alias" : "SAC",
+    "leaders" : {
+      "assists" : [ {
+        "fullName" : "De'Aaron Fox",
+        "id" : "cfc1e41b-74ab-45ee-8132-aaf9ca7f8163",
+        "statistics" : {
+          "assists" : 4,
+          "minutes" : "30:28",
+          "points" : 21,
+          "rebounds" : 7
+        }
+      } ],
+      "points" : [ {
+        "fullName" : "Bogdan Bogdanovic",
+        "id" : "b4282659-dd1a-4042-a075-7df4890858e7",
+        "statistics" : {
+          "assists" : 2,
+          "minutes" : "29:07",
+          "points" : 22,
+          "rebounds" : 6
+        }
+      } ],
+      "rebounds" : [ {
+        "fullName" : "Willie Cauley-Stein",
+        "id" : "20ca6325-14b7-49de-9f4c-6a5f45b4d039",
+        "statistics" : {
+          "assists" : 4,
+          "minutes" : "31:45",
+          "points" : 12,
+          "rebounds" : 12
+        }
+      } ]
+    },
+    "name" : "Kings",
+    "points" : 104
+  },
+  "quarter" : 4,
+  "scheduled" : "2019-01-13T03:00:00+00:00",
+  "status" : "closed"
+}

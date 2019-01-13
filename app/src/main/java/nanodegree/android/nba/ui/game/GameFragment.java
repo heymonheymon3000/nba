@@ -324,14 +324,30 @@ public class GameFragment extends Fragment
                     Calendar requestedDateCal = Calendar.getInstance();
                     requestedDateCal.set(year, month-1, day);
 
-//                    dailyScheduleAgg = new Gson().fromJson(getJsonString(
-//                            "dailyScheduleAgg.json"), DailyScheduleAgg.class);
+                    dailyScheduleAgg = new Gson().fromJson(getJsonString(
+                            "dailyScheduleAgg.json"), DailyScheduleAgg.class);
 
-                    if (requestedDateCal.before(todayCal)) {
-                        dailyScheduleAgg = getDailyScheduleAggFromDb();
-                    } else {
-                        dailyScheduleAgg = getDailyScheduleAggFromNetwork();
-                    }
+//                    if (requestedDateCal.before(todayCal)) {
+//                        dailyScheduleAgg = getDailyScheduleAggFromDb();
+//                    } else {
+//                        dailyScheduleAgg = getDailyScheduleAggFromNetwork();
+//                    }
+
+                    final DailyScheduleAgg d = dailyScheduleAgg;
+
+//                    (new Thread() { public void run() {
+//                        ObjectMapper mapper = new ObjectMapper();
+//                        //Object to JSON in String
+//                        try {
+//                            String jsonInString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(d);
+//                            logLargeString(jsonInString);
+//
+//                        } catch (JsonProcessingException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }}).start();
+
+
 
                     if(filterTeams) {
                         dailyScheduleAgg = filterMyTeams(dailyScheduleAgg);
@@ -342,6 +358,16 @@ public class GameFragment extends Fragment
                     return null;
                 }
             }
+
+//            public void logLargeString(String str) {
+//                if(str.length() > 3000) {
+//                    Log.i("dailyScheduleAgg.json", str.substring(0, 3000));
+//                    logLargeString(str.substring(3000));
+//                } else {
+//                    Log.i("dailyScheduleAgg.json", str); // continuation
+//                }
+//            }
+
 
             @Override
             protected void onStartLoading() {
@@ -502,13 +528,23 @@ public class GameFragment extends Fragment
         gameAgg.setHomeAlias(game.getHome().getAlias());
         gameAgg.setHomeName(game.getHome().getName());
 
-        Thread.sleep(delay * 1000);
-//        BoxScore boxScore = new Gson().fromJson(getJsonString(
-//                "boxScore_"+gameAgg.getId()+".json"), BoxScore.class);
-        BoxScore boxScore = ApiUtils.getGameService()
-                .getBoxScore("en", gameAgg.getId(),
-                        mContext.getString(R.string.format),
-                        BuildConfig.NBA_DB_API_KEY).blockingGet();
+//        Thread.sleep(delay * 1000);
+        BoxScore boxScore = new Gson().fromJson(getJsonString(
+                "boxScore_"+gameAgg.getId()+".json"), BoxScore.class);
+//        BoxScore boxScore = ApiUtils.getGameService()
+//                .getBoxScore("en", gameAgg.getId(),
+//                        mContext.getString(R.string.format),
+//                        BuildConfig.NBA_DB_API_KEY).blockingGet();
+
+//        ObjectMapper mapper = new ObjectMapper();
+//        //Object to JSON in String
+//        try {
+//            String jsonInString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(boxScore);
+//            Log.i("BOX_SCORE ", "boxscore_"+gameAgg.getId()+" ==> " + jsonInString);
+//
+//        } catch (JsonProcessingException e) {
+//            e.printStackTrace();
+//        }
 
         if(gameAgg.getStatus().equals(mContext.getString(R.string.scheduled))) {
             gameAgg.setTimeOnClock(getGameStartTime(game));
@@ -525,14 +561,14 @@ public class GameFragment extends Fragment
         }
 
         if(recordMap.isEmpty()) {
-            Thread.sleep(delay * 1000);
-//            Standing standing = new Gson().fromJson(getJsonString(
-//                    "standing.json"), Standing.class);
-            Standing standing =
-                    ApiUtils.getGameService().getStanding(mContext.getString(R.string.language_code),
-                    2018,
-                    mContext.getString(R.string.season) ,mContext.getString(R.string.format),
-                    BuildConfig.NBA_DB_API_KEY).blockingGet();
+//            Thread.sleep(delay * 1000);
+            Standing standing = new Gson().fromJson(getJsonString(
+                    "standing.json"), Standing.class);
+//            Standing standing =
+//                    ApiUtils.getGameService().getStanding(mContext.getString(R.string.language_code),
+//                    2018,
+//                    mContext.getString(R.string.season) ,mContext.getString(R.string.format),
+//                    BuildConfig.NBA_DB_API_KEY).blockingGet();
 
             for(Conference conference : standing.getConferences()) {
                 for(Division division : conference.getDivisions()) {

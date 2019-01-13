@@ -1,0 +1,79 @@
+{
+  "away" : {
+    "alias" : "CHI",
+    "leaders" : {
+      "assists" : [ {
+        "fullName" : "Kris Dunn",
+        "id" : "56c796d6-74d3-4881-9166-7f528e2b67f6",
+        "statistics" : {
+          "assists" : 8,
+          "minutes" : "30:22",
+          "points" : 10,
+          "rebounds" : 5
+        }
+      } ],
+      "points" : [ {
+        "fullName" : "Zach LaVine",
+        "id" : "db72e294-1c54-454a-96b9-0b4fd2f38112",
+        "statistics" : {
+          "assists" : 1,
+          "minutes" : "29:20",
+          "points" : 21,
+          "rebounds" : 3
+        }
+      } ],
+      "rebounds" : [ {
+        "fullName" : "Wendell Carter Jr.",
+        "id" : "744d5db7-b0be-474a-a58b-6ddf7ae35567",
+        "statistics" : {
+          "assists" : 2,
+          "minutes" : "29:50",
+          "points" : 7,
+          "rebounds" : 9
+        }
+      } ]
+    },
+    "points" : 102
+  },
+  "clock" : "00:00",
+  "home" : {
+    "alias" : "UTA",
+    "leaders" : {
+      "assists" : [ {
+        "fullName" : "Rudy Gobert",
+        "id" : "37fbc3a5-0d10-4e22-803b-baa2ea0cdb12",
+        "statistics" : {
+          "assists" : 8,
+          "minutes" : "39:39",
+          "points" : 15,
+          "rebounds" : 16
+        }
+      } ],
+      "points" : [ {
+        "fullName" : "Donovan Mitchell",
+        "id" : "b6dde96e-3748-4cbe-86d2-798d5dffb3c0",
+        "statistics" : {
+          "assists" : 6,
+          "minutes" : "37:35",
+          "points" : 34,
+          "rebounds" : 6
+        }
+      } ],
+      "rebounds" : [ {
+        "fullName" : "Rudy Gobert",
+        "id" : "37fbc3a5-0d10-4e22-803b-baa2ea0cdb12",
+        "statistics" : {
+          "assists" : 8,
+          "minutes" : "39:39",
+          "points" : 15,
+          "rebounds" : 16
+        }
+      } ]
+    },
+    "name" : "Jazz",
+    "points" : 110
+  },
+  "quarter" : 4,
+  "scheduled" : "2019-01-13T03:00:00+00:00",
+  "status" : "closed"
+}

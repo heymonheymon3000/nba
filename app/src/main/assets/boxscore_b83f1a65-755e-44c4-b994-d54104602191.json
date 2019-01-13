@@ -1,0 +1,79 @@
+{
+  "away" : {
+    "alias" : "MEM",
+    "leaders" : {
+      "assists" : [ {
+        "fullName" : "Mike Conley",
+        "id" : "460b7264-b98f-483e-b841-59a18c2e4d67",
+        "statistics" : {
+          "assists" : 7,
+          "minutes" : "34:52",
+          "points" : 22,
+          "rebounds" : 2
+        }
+      } ],
+      "points" : [ {
+        "fullName" : "JaMychal Green",
+        "id" : "2bd97a34-ced9-4413-bfaa-94dbafaa0fdd",
+        "statistics" : {
+          "assists" : 0,
+          "minutes" : "22:26",
+          "points" : 24,
+          "rebounds" : 11
+        }
+      } ],
+      "rebounds" : [ {
+        "fullName" : "JaMychal Green",
+        "id" : "2bd97a34-ced9-4413-bfaa-94dbafaa0fdd",
+        "statistics" : {
+          "assists" : 0,
+          "minutes" : "22:26",
+          "points" : 24,
+          "rebounds" : 11
+        }
+      } ]
+    },
+    "points" : 108
+  },
+  "clock" : "00:00",
+  "home" : {
+    "alias" : "MIA",
+    "leaders" : {
+      "assists" : [ {
+        "fullName" : "Josh Richardson",
+        "id" : "ef11cca9-6605-44e8-943e-193c7b821465",
+        "statistics" : {
+          "assists" : 9,
+          "minutes" : "35:34",
+          "points" : 14,
+          "rebounds" : 6
+        }
+      } ],
+      "points" : [ {
+        "fullName" : "Justise Winslow",
+        "id" : "0e6ddc9f-4a7b-4d48-8033-998103edfb32",
+        "statistics" : {
+          "assists" : 4,
+          "minutes" : "33:39",
+          "points" : 26,
+          "rebounds" : 7
+        }
+      } ],
+      "rebounds" : [ {
+        "fullName" : "Bam Adebayo",
+        "id" : "11c303dc-540c-4090-8e0c-76c2fb2c125a",
+        "statistics" : {
+          "assists" : 2,
+          "minutes" : "37:58",
+          "points" : 11,
+          "rebounds" : 10
+        }
+      } ]
+    },
+    "name" : "Heat",
+    "points" : 112
+  },
+  "quarter" : 4,
+  "scheduled" : "2019-01-12T22:00:00+00:00",
+  "status" : "closed"
+}

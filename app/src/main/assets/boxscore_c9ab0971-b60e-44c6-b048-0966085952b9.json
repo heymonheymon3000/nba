@@ -1,0 +1,79 @@
+{
+  "away" : {
+    "alias" : "DET",
+    "leaders" : {
+      "assists" : [ {
+        "fullName" : "Blake Griffin",
+        "id" : "18358040-89d8-4e25-a6a6-9e209c26fb3a",
+        "statistics" : {
+          "assists" : 5,
+          "minutes" : "40:04",
+          "points" : 44,
+          "rebounds" : 8
+        }
+      } ],
+      "points" : [ {
+        "fullName" : "Blake Griffin",
+        "id" : "18358040-89d8-4e25-a6a6-9e209c26fb3a",
+        "statistics" : {
+          "assists" : 5,
+          "minutes" : "40:04",
+          "points" : 44,
+          "rebounds" : 8
+        }
+      } ],
+      "rebounds" : [ {
+        "fullName" : "Andre Drummond",
+        "id" : "440b769d-2b8b-477f-80d7-cb21d83c0d52",
+        "statistics" : {
+          "assists" : 0,
+          "minutes" : "41:39",
+          "points" : 20,
+          "rebounds" : 21
+        }
+      } ]
+    },
+    "points" : 109
+  },
+  "clock" : "00:00",
+  "home" : {
+    "alias" : "LAC",
+    "leaders" : {
+      "assists" : [ {
+        "fullName" : "Montrezl Harrell",
+        "id" : "869c305c-3e1f-49e5-a59b-5f1e03d198f8",
+        "statistics" : {
+          "assists" : 6,
+          "minutes" : "33:44",
+          "points" : 21,
+          "rebounds" : 9
+        }
+      } ],
+      "points" : [ {
+        "fullName" : "Danilo Gallinari",
+        "id" : "47cd6421-0ce1-431e-9b9c-a8d9bfd0eb04",
+        "statistics" : {
+          "assists" : 2,
+          "minutes" : "37:40",
+          "points" : 23,
+          "rebounds" : 6
+        }
+      } ],
+      "rebounds" : [ {
+        "fullName" : "Tobias Harris",
+        "id" : "82f09975-6a8d-42e4-b42c-a52b9349ed50",
+        "statistics" : {
+          "assists" : 2,
+          "minutes" : "36:49",
+          "points" : 11,
+          "rebounds" : 10
+        }
+      } ]
+    },
+    "name" : "Clippers",
+    "points" : 104
+  },
+  "quarter" : 4,
+  "scheduled" : "2019-01-12T20:30:00+00:00",
+  "status" : "closed"
+}

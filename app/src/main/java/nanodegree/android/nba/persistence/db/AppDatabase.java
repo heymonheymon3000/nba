@@ -21,7 +21,7 @@ import nanodegree.android.nba.persistence.entity.LeaderBoxScore;
 @Database(entities = {DailyScheduleAgg.class, GameAgg.class,
         FavoriteTeam.class, LeaderBoxScore.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
-    private final static String DB_NAME = "nba_schedule23.db";
+    private final static String DB_NAME = "nba_schedule36.db";
     private volatile static AppDatabase INSTANCE;
 
     public static AppDatabase getInstance(Context context) {

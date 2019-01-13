@@ -1,0 +1,79 @@
+{
+  "away" : {
+    "alias" : "SAS",
+    "leaders" : {
+      "assists" : [ {
+        "fullName" : "Derrick White",
+        "id" : "9bcd5cff-4a1c-4454-89b6-a5899b0c6bcc",
+        "statistics" : {
+          "assists" : 4,
+          "minutes" : "31:18",
+          "points" : 8,
+          "rebounds" : 7
+        }
+      } ],
+      "points" : [ {
+        "fullName" : "Marco Belinelli",
+        "id" : "385f6a05-7dfb-4fc8-afed-b6a4f141100c",
+        "statistics" : {
+          "assists" : 1,
+          "minutes" : "22:22",
+          "points" : 24,
+          "rebounds" : 0
+        }
+      } ],
+      "rebounds" : [ {
+        "fullName" : "Jakob Poeltl",
+        "id" : "e1b3d3d5-b4b1-481a-b5b9-efe4231f48bf",
+        "statistics" : {
+          "assists" : 1,
+          "minutes" : "18:33",
+          "points" : 6,
+          "rebounds" : 10
+        }
+      } ]
+    },
+    "points" : 112
+  },
+  "clock" : "00:00",
+  "home" : {
+    "alias" : "OKC",
+    "leaders" : {
+      "assists" : [ {
+        "fullName" : "Russell Westbrook",
+        "id" : "74a45eed-f2b0-4886-ae71-d04cf7d59528",
+        "statistics" : {
+          "assists" : 7,
+          "minutes" : "32:44",
+          "points" : 24,
+          "rebounds" : 10
+        }
+      } ],
+      "points" : [ {
+        "fullName" : "Russell Westbrook",
+        "id" : "74a45eed-f2b0-4886-ae71-d04cf7d59528",
+        "statistics" : {
+          "assists" : 7,
+          "minutes" : "32:44",
+          "points" : 24,
+          "rebounds" : 10
+        }
+      } ],
+      "rebounds" : [ {
+        "fullName" : "Paul George",
+        "id" : "db09f372-9a17-4889-add7-bf8a75ab6da6",
+        "statistics" : {
+          "assists" : 4,
+          "minutes" : "34:18",
+          "points" : 18,
+          "rebounds" : 11
+        }
+      } ]
+    },
+    "name" : "Thunder",
+    "points" : 122
+  },
+  "quarter" : 4,
+  "scheduled" : "2019-01-13T01:00:00+00:00",
+  "status" : "closed"
+}
