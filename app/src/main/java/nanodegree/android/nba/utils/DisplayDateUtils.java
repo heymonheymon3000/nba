@@ -29,6 +29,10 @@ public final class DisplayDateUtils {
         }
     }
 
+    public static String getTodayDate() {
+        return dateFormat.format(Calendar.getInstance().getTime());
+    }
+
     public static String getTomorrowDate(String gameType) {
         if(gameType.equals(GAME)) {
             gameCal.add(Calendar.DATE, 1);
@@ -47,6 +51,10 @@ public final class DisplayDateUtils {
             myGameCal.add(Calendar.DATE, -1);
             return dateFormat.format(myGameCal.getTime());
         }
+    }
+
+    public static String convertDate(Calendar cal) {
+        return dateFormat.format(cal.getTime());
     }
 
     /**

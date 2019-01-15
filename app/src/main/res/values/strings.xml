@@ -35,6 +35,8 @@
     <string name="points">PTS</string>
     <string name="rebounds">REBS</string>
     <string name="assists">AST</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 
 
 </resources>
