@@ -2,6 +2,7 @@ package nanodegree.android.nba.widget;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -84,6 +85,8 @@ class GridRemoteViewsFactory
         views.setTextViewText(R.id.away_team_logo_text_view,
                 Utils.getShortName(games.get(position).getAway().getName()));
 
+        Intent fillInIntent = new Intent();
+        views.setOnClickFillInIntent(R.id.nba_schedule_widget, fillInIntent);
 
         return views;
     }

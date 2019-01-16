@@ -37,9 +37,9 @@ public class NBAScheduleWidgetProvider extends AppWidgetProvider {
         views.setRemoteAdapter(R.id.widget_grid_view, intent);
 
         Intent appIntent = new Intent(context, GameActivity.class);
-        PendingIntent pendingIntent =
+        PendingIntent appPendingIntent =
                 PendingIntent.getActivity(context, 0, appIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        views.setOnClickPendingIntent(R.id.nba_schedule_widget, pendingIntent);
+        views.setPendingIntentTemplate(R.id.widget_grid_view, appPendingIntent);
 
         views.setEmptyView(R.id.widget_grid_view, R.id.no_games);
 

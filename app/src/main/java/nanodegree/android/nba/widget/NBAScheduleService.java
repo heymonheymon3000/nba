@@ -5,8 +5,7 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.Nullable;
-import android.util.Log;
+import android.widget.Toast;
 
 import java.util.Calendar;
 
@@ -18,6 +17,7 @@ import nanodegree.android.nba.rest.response.dailySchedule.DailySchedule;
 public class NBAScheduleService extends IntentService {
     public static final String ACTION_UPDATE_NBA_SCHEDULE_WIDGETS =
             "nanodegree.android.nba.widget.action.update.nba.schedule.widgets";
+
     public NBAScheduleService() {
         super("NBAScheduleService");
     }
@@ -43,17 +43,19 @@ public class NBAScheduleService extends IntentService {
         Integer year = todayCal.get(Calendar.YEAR);
         Integer month = todayCal.get(Calendar.MONTH)+1;
         Integer day = todayCal.get(Calendar.DATE);
+        DailySchedule dailySchedule = null;
 
         try {
             Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            dailySchedule = ApiUtils.getGameService()
+                    .getGameScheduleByDate("en",
+                            year, month, day, ".json",
+                            BuildConfig.NBA_DB_API_KEY).blockingGet();
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(),
+                    getApplicationContext().getString(R.string.no_connection),
+                    Toast.LENGTH_LONG).show();
         }
-
-        DailySchedule dailySchedule = ApiUtils.getGameService()
-            .getGameScheduleByDate("en",
-                    year, month, day, ".json",
-                BuildConfig.NBA_DB_API_KEY).blockingGet();
 
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
 
