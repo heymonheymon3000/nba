@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.view.View;
 import android.widget.RemoteViews;
 
 import java.util.List;
@@ -39,6 +40,8 @@ public class NBAScheduleWidgetProvider extends AppWidgetProvider {
         PendingIntent pendingIntent =
                 PendingIntent.getActivity(context, 0, appIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         views.setOnClickPendingIntent(R.id.nba_schedule_widget, pendingIntent);
+
+        views.setEmptyView(R.id.widget_grid_view, R.id.no_games);
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);

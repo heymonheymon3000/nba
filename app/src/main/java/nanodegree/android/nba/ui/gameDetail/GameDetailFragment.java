@@ -6,7 +6,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +20,7 @@ import nanodegree.android.nba.persistence.entity.GameAgg;
 import nanodegree.android.nba.ui.game.TabAdapter;
 import nanodegree.android.nba.utils.DisplayMetricUtils;
 import nanodegree.android.nba.utils.TeamInfo;
+import nanodegree.android.nba.utils.Utils;
 
 public class GameDetailFragment extends Fragment {
     public final static String GAME_AGG_KEY = "gameAgg";
@@ -107,8 +107,8 @@ public class GameDetailFragment extends Fragment {
 
         mGameStatusTextView.setText(gameAgg.getTimeOnClock());
 
-        mHomeTeamName.setText(getShortName(gameAgg.getHomeName()));
-        mAwayTeamName.setText(getShortName(gameAgg.getAwayName()));
+        mHomeTeamName.setText(Utils.getShortName(gameAgg.getHomeName()));
+        mAwayTeamName.setText(Utils.getShortName(gameAgg.getAwayName()));
 
         ViewPager viewPager = rootView.findViewById(R.id.viewPager);
         tabLayout = rootView.findViewById(R.id.tabLayout);
@@ -122,29 +122,24 @@ public class GameDetailFragment extends Fragment {
                     gameAgg.getHomeLeaderRebounds(),
                     gameAgg.getHomeLeaderAssists(),
                     gameAgg.getHomeLeaderPoints()),
-                    getShortName(gameAgg.getHomeName()));
+                    Utils.getShortName(gameAgg.getHomeName()));
 
             adapter.addFragment(PlayerDetailFragment.newInstance(
                     gameAgg.getAwayLeaderRebounds(),
                     gameAgg.getAwayLeaderAssists(),
                     gameAgg.getAwayLeaderPoints()),
-                    getShortName(gameAgg.getAwayName()));
+                    Utils.getShortName(gameAgg.getAwayName()));
         } else {
             adapter.addFragment(new PlayerDetailFragment(),
-                    getShortName(gameAgg.getHomeName()));
+                    Utils.getShortName(gameAgg.getHomeName()));
 
             adapter.addFragment(new PlayerDetailFragment(),
-                    getShortName(gameAgg.getAwayName()));
+                    Utils.getShortName(gameAgg.getAwayName()));
         }
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
 
         return rootView;
-    }
-
-    private String getShortName(String name) {
-        String[] result = name.split(" ");
-        return result[result.length-1];
     }
 }

@@ -22,9 +22,9 @@ import nanodegree.android.nba.rest.ApiUtils;
 import nanodegree.android.nba.rest.response.dailySchedule.DailySchedule;
 import nanodegree.android.nba.rest.response.dailySchedule.Game;
 import nanodegree.android.nba.utils.DisplayDateUtils;
+import nanodegree.android.nba.utils.Utils;
 
 public class GridWidgetService extends RemoteViewsService {
-
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
         return new GridRemoteViewsFactory(this.getApplicationContext());
@@ -35,7 +35,7 @@ class GridRemoteViewsFactory
         implements RemoteViewsService.RemoteViewsFactory {
 
     private Context context;
-    private ArrayList<Game> games = new ArrayList<Game>();
+    private static ArrayList<Game> games = new ArrayList<Game>();
 
     public GridRemoteViewsFactory(Context applicationContext) {
         this.context = applicationContext;
@@ -70,7 +70,7 @@ class GridRemoteViewsFactory
         views.setImageViewResource(R.id.home_team_logo_image_view,
                 NBAApplication.teamInfoHashMap.get(games.get(position).getHome().getAlias()).getLogo());
         views.setTextViewText(R.id.home_team_logo_text_view,
-                getShortName(games.get(position).getHome().getName()));
+                Utils.getShortName(games.get(position).getHome().getName()));
         views.setTextViewText(R.id.home_team_score_text_view,
                 games.get(position).getHomePoints());
 
@@ -82,7 +82,8 @@ class GridRemoteViewsFactory
         views.setImageViewResource(R.id.away_team_logo_image_view,
                 NBAApplication.teamInfoHashMap.get(games.get(position).getAway().getAlias()).getLogo());
         views.setTextViewText(R.id.away_team_logo_text_view,
-                getShortName(games.get(position).getAway().getName()));
+                Utils.getShortName(games.get(position).getAway().getName()));
+
 
         return views;
     }
@@ -141,11 +142,6 @@ class GridRemoteViewsFactory
                         R.string.display_date_pattern), Locale.ENGLISH);
         d.setTimeZone(TimeZone.getTimeZone(context.getString(R.string.est)));
         return d.format(date) + " " + context.getString(R.string.et);
-    }
-
-    private static String getShortName(String name) {
-        String[] result = name.split(" ");
-        return result[result.length-1];
     }
 
     @Override
