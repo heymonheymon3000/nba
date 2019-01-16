@@ -8,6 +8,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.LinearLayout;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+
+import java.util.Calendar;
+
+import nanodegree.android.nba.NBAApplication;
 import nanodegree.android.nba.R;
 import nanodegree.android.nba.utils.DisplayDateUtils;
 
@@ -17,11 +23,16 @@ public class GameActivity extends AppCompatActivity
     private TabAdapter adapter;
     private TabLayout tabLayout;
     private Boolean reloadMyGameFragment = false;
+    private Tracker mTracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        // Obtain the shared Tracker instance.
+        NBAApplication application = (NBAApplication) getApplication();
+        mTracker = application.getDefaultTracker();
 
         ViewPager viewPager = findViewById(R.id.viewPager);
         tabLayout = findViewById(R.id.tabLayout);
@@ -77,24 +88,35 @@ public class GameActivity extends AppCompatActivity
 
     @Override
     public void updateFragment(Integer index) {
+        Calendar cal;
         switch (index) {
             case 0:
+                cal = DisplayDateUtils.getCurrentDate(DisplayDateUtils.GAME);
                 GameFragment gameFragment =
                     GameFragment.newInstance(DisplayDateUtils.GAME, 0,
-                        DisplayDateUtils.getCurrentDate(DisplayDateUtils.GAME),
+                        cal,
                         true,
                         false);
                 adapter.replaceFragment(0, gameFragment);
                 adapter.notifyDataSetChanged();
+
+                // User getting all games for this date
+                mTracker.setScreenName("Tab " + getCurrentTabTitle(index) + " for " + DisplayDateUtils.convertDate(cal));
+                mTracker.send(new HitBuilders.ScreenViewBuilder().build());
                 break;
             case 1:
+                cal = DisplayDateUtils.getCurrentDate(DisplayDateUtils.MY_GAME);
                 GameFragment myGameFragment =
                     GameFragment.newInstance(DisplayDateUtils.MY_GAME, 1,
-                        DisplayDateUtils.getCurrentDate(DisplayDateUtils.MY_GAME),
+                        cal,
                         true,
                         true);
                 adapter.replaceFragment(1, myGameFragment);
                 adapter.notifyDataSetChanged();
+
+                // User getting his/her favorite games for this date
+                mTracker.setScreenName("Tab " + getCurrentTabTitle(index) + " for " + DisplayDateUtils.convertDate(cal));
+                mTracker.send(new HitBuilders.ScreenViewBuilder().build());
                 break;
         }
     }
@@ -118,5 +140,9 @@ public class GameActivity extends AppCompatActivity
             tabLayout.setAlpha(Float.parseFloat(
                     getApplicationContext().getString(R.string.disable_alpha_value)));
         }
+    }
+
+    private String getCurrentTabTitle(int index) {
+        return tabLayout.getTabAt(index).getText().toString();
     }
 }

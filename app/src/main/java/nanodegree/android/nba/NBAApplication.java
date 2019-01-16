@@ -6,6 +6,8 @@ import android.content.Context;
 import com.facebook.stetho.DumperPluginsProvider;
 import com.facebook.stetho.Stetho;
 import com.facebook.stetho.dumpapp.DumperPlugin;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.Tracker;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +15,9 @@ import java.util.HashMap;
 import nanodegree.android.nba.utils.TeamInfo;
 
 public class NBAApplication extends Application {
+    private static GoogleAnalytics sAnalytics;
+    private static Tracker sTracker;
+
     public static HashMap<String, TeamInfo> teamInfoHashMap = new HashMap<>();
     public static HashMap<String, String> teamLookup = new HashMap<>();
 
@@ -28,6 +33,8 @@ public class NBAApplication extends Application {
                         .build());
 
         super.onCreate();
+
+        sAnalytics = GoogleAnalytics.getInstance(this);
     }
 
     private static class SampleBumperPluginsProvider implements DumperPluginsProvider {
@@ -43,6 +50,19 @@ public class NBAApplication extends Application {
             }
             return plugins;
         }
+    }
+
+    /**
+     * Gets the default {@link Tracker} for this {@link Application}.
+     * @return tracker
+     */
+    synchronized public Tracker getDefaultTracker() {
+        // To enable debug logging use: adb shell setprop log.tag.GAv4 DEBUG
+        if (sTracker == null) {
+            sTracker = sAnalytics.newTracker(R.xml.global_tracker);
+        }
+
+        return sTracker;
     }
 
     private static void createTeamInfoMap() {
