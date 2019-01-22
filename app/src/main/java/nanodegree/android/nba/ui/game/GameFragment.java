@@ -235,7 +235,6 @@ public class GameFragment extends Fragment
                     if (requestedDateCal.equals(todayCal) || requestedDateCal.after(todayCal)) {
                         mListener.showAd();
                     }
-
                     mListener.updateFragment(index);
                 }
             }

@@ -35,9 +35,9 @@ public class FavoriteTeamAdaptor
                                OnFavoriteTeamSelectorClickListener favoriteTeamSelectorClickListener) {
         this.mFavoriteTeamSelectorClickListener = favoriteTeamSelectorClickListener;
         picassoInstance =
-                new Picasso.Builder(context.getApplicationContext())
-                        .loggingEnabled(true)
-                        .build();
+            new Picasso.Builder(context.getApplicationContext())
+                .loggingEnabled(true)
+                .build();
     }
 
     @NonNull

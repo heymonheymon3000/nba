@@ -6,6 +6,7 @@ import android.content.Context;
 import com.facebook.stetho.DumperPluginsProvider;
 import com.facebook.stetho.Stetho;
 import com.facebook.stetho.dumpapp.DumperPlugin;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 
@@ -23,6 +24,8 @@ public class NBAApplication extends Application {
 
     public void onCreate() {
         final Context context = this;
+
+        MobileAds.initialize(this, getString(R.string.ADMOB_APP_ID));
 
         createTeamInfoMap();
 

@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
-import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
@@ -23,8 +22,6 @@ public class GameDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_detail);
-
-        MobileAds.initialize(this, getString(R.string.ADMOB_APP_ID));
 
         mInterstitialAd = new InterstitialAd(this);
         mInterstitialAd.setAdUnitId(getApplicationContext()

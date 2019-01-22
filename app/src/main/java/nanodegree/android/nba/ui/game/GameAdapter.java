@@ -41,7 +41,6 @@ public class GameAdapter
         this.context = context;
         this.cardWidth = cardWidth;
         this.cardHeight = cardHeight;
-
     }
 
     @NonNull
