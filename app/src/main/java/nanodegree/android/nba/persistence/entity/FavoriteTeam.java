@@ -9,7 +9,6 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 import nanodegree.android.nba.NBAApplication;

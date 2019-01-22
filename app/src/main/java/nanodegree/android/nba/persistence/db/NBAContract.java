@@ -1,6 +1,5 @@
 package nanodegree.android.nba.persistence.db;
 
-import android.arch.persistence.room.ColumnInfo;
 import android.net.Uri;
 import android.provider.BaseColumns;
 

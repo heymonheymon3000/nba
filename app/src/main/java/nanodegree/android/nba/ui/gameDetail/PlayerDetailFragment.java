@@ -1,6 +1,5 @@
 package nanodegree.android.nba.ui.gameDetail;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,7 +10,6 @@ import android.widget.TextView;
 import nanodegree.android.nba.R;
 import nanodegree.android.nba.persistence.db.NBAContract;
 import nanodegree.android.nba.persistence.entity.LeaderBoxScore;
-import nanodegree.android.nba.ui.game.OnFragmentInteractionListener;
 
 public class PlayerDetailFragment extends Fragment {
     private LeaderBoxScore rebounds;

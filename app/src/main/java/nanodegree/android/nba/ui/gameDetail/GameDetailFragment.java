@@ -65,7 +65,7 @@ public class GameDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_game_detail, container, false);
 
-        Toolbar mToolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
+        Toolbar mToolbar = rootView.findViewById(R.id.toolbar);
         mToolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override

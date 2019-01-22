@@ -4,6 +4,10 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
@@ -13,11 +17,26 @@ import nanodegree.android.nba.persistence.entity.GameAgg;
 
 public class GameDetailActivity extends AppCompatActivity {
     private Tracker mTracker;
+    private InterstitialAd mInterstitialAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_detail);
+
+        MobileAds.initialize(this, getString(R.string.ADMOB_APP_ID));
+
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId(getApplicationContext()
+                .getString(R.string.TEST_ADMOB_UNIT_ID));
+        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+                mInterstitialAd.show();
+            }
+        });
 
         // Obtain the shared Tracker instance.
         NBAApplication application = (NBAApplication) getApplication();

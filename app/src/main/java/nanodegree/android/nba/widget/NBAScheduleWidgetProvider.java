@@ -5,15 +5,10 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
-import android.view.View;
 import android.widget.RemoteViews;
 
-import java.util.List;
-
-import nanodegree.android.nba.NBAApplication;
 import nanodegree.android.nba.R;
 import nanodegree.android.nba.rest.response.dailySchedule.DailySchedule;
-import nanodegree.android.nba.rest.response.dailySchedule.Game;
 import nanodegree.android.nba.ui.game.GameActivity;
 import nanodegree.android.nba.utils.DisplayDateUtils;
 

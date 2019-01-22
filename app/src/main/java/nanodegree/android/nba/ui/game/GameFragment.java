@@ -23,7 +23,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.Tracker;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -220,12 +219,23 @@ public class GameFragment extends Fragment
     }
 
     private void setupClickListeners(String tabName, Integer index) {
+        Calendar todayCal = Calendar.getInstance();
+        final Calendar requestedDateCal;
         mGameDateTextView.setText(DisplayDateUtils.getTodayDate(tabName));
         mBackNavImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mGameDateTextView.setText(DisplayDateUtils.getYesterdayDate(tabName));
+                Calendar requestedDateCal = DisplayDateUtils.getCurrentDate(tabName);
+
                 if (mListener != null) {
+                    // show Ad if we getting the game for today or after.  This is because for games for today and
+                    // after we need to send a request to get the data and there may be multiple request that we will
+                    // need to make and we can only make one request at a time.
+                    if (requestedDateCal.equals(todayCal) || requestedDateCal.after(todayCal)) {
+                        mListener.showAd();
+                    }
+
                     mListener.updateFragment(index);
                 }
             }
@@ -235,7 +245,16 @@ public class GameFragment extends Fragment
             @Override
             public void onClick(View v) {
                 mGameDateTextView.setText(DisplayDateUtils.getTomorrowDate(tabName));
+                Calendar requestedDateCal = DisplayDateUtils.getCurrentDate(tabName);
+
                 if (mListener != null) {
+                    // show Ad if we getting the game for today or after.  This is because for games for today and
+                    // after we need to send a request to get the data and there may be multiple request that we will
+                    // need to make and we can only make one request at a time.
+                    if (requestedDateCal.equals(todayCal) || requestedDateCal.after(todayCal)) {
+                        mListener.showAd();
+                    }
+
                     mListener.updateFragment(index);
                 }
             }

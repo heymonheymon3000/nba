@@ -8,6 +8,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.LinearLayout;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
@@ -24,11 +28,26 @@ public class GameActivity extends AppCompatActivity
     private TabLayout tabLayout;
     private Boolean reloadMyGameFragment = false;
     private Tracker mTracker;
+    private InterstitialAd mInterstitialAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        MobileAds.initialize(this, getString(R.string.ADMOB_APP_ID));
+
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId(getApplicationContext()
+                .getString(R.string.TEST_ADMOB_UNIT_ID));
+        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                mInterstitialAd.loadAd(new AdRequest.Builder().build());
+            }
+        });
+
 
         // Obtain the shared Tracker instance.
         NBAApplication application = (NBAApplication) getApplication();
@@ -139,6 +158,16 @@ public class GameActivity extends AppCompatActivity
             }
             tabLayout.setAlpha(Float.parseFloat(
                     getApplicationContext().getString(R.string.disable_alpha_value)));
+        }
+    }
+
+    @Override
+    public void showAd() {
+        if (mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+            Log.i("GameActivity", "The interstitial was loaded yet.");
+        } else {
+            Log.d("TAG", "The interstitial wasn't loaded yet.");
         }
     }
 

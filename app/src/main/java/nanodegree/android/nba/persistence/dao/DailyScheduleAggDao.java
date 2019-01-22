@@ -3,7 +3,6 @@ package nanodegree.android.nba.persistence.dao;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
-import android.database.Cursor;
 
 import nanodegree.android.nba.persistence.db.NBAContract;
 import nanodegree.android.nba.persistence.entity.DailyScheduleAgg;

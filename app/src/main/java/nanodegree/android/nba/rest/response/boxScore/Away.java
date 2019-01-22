@@ -1,13 +1,13 @@
 
 package nanodegree.android.nba.rest.response.boxScore;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+
+import java.io.Serializable;
 
 public class Away implements Serializable
 {

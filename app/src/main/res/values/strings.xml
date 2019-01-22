@@ -39,4 +39,7 @@
     <string name="add_widget">Add widget</string>
 
 
+    <string name="ADMOB_APP_ID">ca-app-pub-3522975650156746~1504824029</string>
+    <string name="ADMOB_UNIT_ID">ca-app-pub-3522975650156746/3594256154</string>
+    <string name="TEST_ADMOB_UNIT_ID">ca-app-pub-3940256099942544/1033173712</string>
 </resources>

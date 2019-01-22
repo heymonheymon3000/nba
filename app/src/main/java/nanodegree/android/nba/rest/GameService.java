@@ -1,16 +1,9 @@
 package nanodegree.android.nba.rest;
 
-import java.util.List;
-
-import io.reactivex.Observable;
-
-import io.reactivex.Observer;
 import io.reactivex.Single;
 import nanodegree.android.nba.rest.response.boxScore.BoxScore;
 import nanodegree.android.nba.rest.response.dailySchedule.DailySchedule;
-import nanodegree.android.nba.rest.response.dailySchedule.Game;
 import nanodegree.android.nba.rest.response.standing.Standing;
-import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
