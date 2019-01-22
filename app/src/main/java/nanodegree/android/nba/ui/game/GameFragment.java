@@ -14,6 +14,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -371,6 +372,8 @@ public class GameFragment extends Fragment
 
                     return dailyScheduleAgg;
                 } catch (Exception e) {
+                    Log.e(TAG, "Error ==> " + e.getMessage());
+                    e.printStackTrace();
                     return null;
                 }
             }
@@ -521,6 +524,7 @@ public class GameFragment extends Fragment
             }
             mGameAdapter.setGames(data.getGames());
         } else {
+
             Toast.makeText(this.getContext(),
                     mContext.getString(R.string.no_connection),
                     Toast.LENGTH_LONG).show();

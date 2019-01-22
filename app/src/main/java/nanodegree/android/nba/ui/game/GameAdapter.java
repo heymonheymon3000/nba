@@ -26,18 +26,19 @@ import nanodegree.android.nba.utils.TeamInfo;
 public class GameAdapter
         extends RecyclerView.Adapter<GameAdapter.MasterListGameAdapterViewHolder> {
 
+    private Context context;
     private Picasso picassoInstance;
     private List<GameAgg> mGames;
     private int cardWidth;
     private int cardHeight;
-    private Context context;
 
     public GameAdapter(Context context,
                          int cardWidth, int cardHeight) {
         picassoInstance =
-                new Picasso.Builder(context.getApplicationContext())
-                        .loggingEnabled(true)
-                        .build();
+            new Picasso.Builder(context.getApplicationContext())
+                .loggingEnabled(true)
+                .build();
+
         this.context = context;
         this.cardWidth = cardWidth;
         this.cardHeight = cardHeight;
@@ -70,22 +71,26 @@ public class GameAdapter
         holder.mTVNetworkTextView.setText(game.getBroadcast());
 
         picassoInstance
-                .load(awayTeamInfo.getLogo())
-                .resize(DisplayMetricUtils.convertDpToPixel(36),
-                        DisplayMetricUtils.convertDpToPixel(36))
-                .centerCrop()
-                .into(holder.mAwayTeamLogoImageView);
+            .load(awayTeamInfo.getLogo())
+            .resize(DisplayMetricUtils.convertDpToPixel(
+                    context.getResources().getInteger(R.integer.gameAdapterLogoSize)),
+                    DisplayMetricUtils.convertDpToPixel(
+                            context.getResources().getInteger(R.integer.gameAdapterLogoSize)))
+            .centerCrop()
+            .into(holder.mAwayTeamLogoImageView);
 
         holder.mAwayTeamLogoTextView.setText(awayTeamInfo.getName());
         holder.mAwayTeamRecordTextView.setText(GameFragment.recordMap.get(game.getAwayAlias()));
         holder.mAwayTeamScoreTextView.setText(game.getAwayPoints());
 
         picassoInstance
-                .load(homeTeamInfo.getLogo())
-                .resize(DisplayMetricUtils.convertDpToPixel(36),
-                        DisplayMetricUtils.convertDpToPixel(36))
-                .centerCrop()
-                .into(holder.mHomeTeamLogoImageView);
+            .load(homeTeamInfo.getLogo())
+                .resize(DisplayMetricUtils.convertDpToPixel(
+                    context.getResources().getInteger(R.integer.gameAdapterLogoSize)),
+                    DisplayMetricUtils.convertDpToPixel(
+                    context.getResources().getInteger(R.integer.gameAdapterLogoSize)))
+            .centerCrop()
+            .into(holder.mHomeTeamLogoImageView);
 
         holder.mHomeTeamLogoTextView.setText(homeTeamInfo.getName());
         holder.mHomeTeamRecordTextView.setText(GameFragment.recordMap.get(game.getHomeAlias()));

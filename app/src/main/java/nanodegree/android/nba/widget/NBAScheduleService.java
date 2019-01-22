@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.Calendar;
@@ -15,6 +16,8 @@ import nanodegree.android.nba.rest.ApiUtils;
 import nanodegree.android.nba.rest.response.dailySchedule.DailySchedule;
 
 public class NBAScheduleService extends IntentService {
+    private final static String TAG = NBAScheduleService.class.getSimpleName();
+
     public static final String ACTION_UPDATE_NBA_SCHEDULE_WIDGETS =
             "nanodegree.android.nba.widget.action.update.nba.schedule.widgets";
 
@@ -52,6 +55,7 @@ public class NBAScheduleService extends IntentService {
                             year, month, day, ".json",
                             BuildConfig.NBA_DB_API_KEY).blockingGet();
         } catch (Exception e) {
+            Log.e(TAG, getApplicationContext().getString(R.string.no_connection));
             Toast.makeText(getApplicationContext(),
                     getApplicationContext().getString(R.string.no_connection),
                     Toast.LENGTH_LONG).show();

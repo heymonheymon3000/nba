@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -30,6 +31,7 @@ public class MyGameActivity extends AppCompatActivity
     private RecyclerView mRecyclerView;
     private FavoriteTeamDao favoriteTeamDao;
     private FavoriteTeamAdaptor favoriteTeamAdaptor;
+    private final static String TAG = MyGameActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +110,7 @@ public class MyGameActivity extends AppCompatActivity
         if (data != null) {
             favoriteTeamAdaptor.setFavoriteTeams(data);
         } else {
+            Log.e(TAG,getApplicationContext().getString(R.string.db_failure) );
             Toast.makeText(getApplicationContext(),
                     getApplicationContext().getString(R.string.db_failure),
                     Toast.LENGTH_LONG).show();

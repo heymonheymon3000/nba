@@ -29,6 +29,8 @@ public class GameActivity extends AppCompatActivity
     private Tracker mTracker;
     private InterstitialAd mInterstitialAd;
 
+    private final static String TAG = GameActivity.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -162,9 +164,8 @@ public class GameActivity extends AppCompatActivity
     public void showAd() {
         if (mInterstitialAd.isLoaded()) {
             mInterstitialAd.show();
-            Log.i("GameActivity", "The interstitial was loaded yet.");
         } else {
-            Log.d("TAG", "The interstitial wasn't loaded yet.");
+            Log.d(TAG, "The interstitial wasn't loaded yet.");
         }
     }
 

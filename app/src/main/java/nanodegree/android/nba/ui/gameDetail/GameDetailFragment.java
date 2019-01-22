@@ -84,18 +84,22 @@ public class GameDetailFragment extends Fragment {
         mAwayTeamName = rootView.findViewById(R.id.away_team_logo_text_view);
 
         picassoInstance
-                .load(awayTeamInfo.getLogo())
-                .resize(DisplayMetricUtils.convertDpToPixel(60),
-                        DisplayMetricUtils.convertDpToPixel(60))
-                .centerCrop()
-                .into(awayImageView);
+            .load(awayTeamInfo.getLogo())
+                .resize(DisplayMetricUtils.convertDpToPixel(
+                getContext().getResources().getInteger(R.integer.detailFragmentLogoSize)),
+                DisplayMetricUtils.convertDpToPixel(
+                getContext().getResources().getInteger(R.integer.detailFragmentLogoSize)))
+            .centerCrop()
+            .into(awayImageView);
 
         picassoInstance
-                .load(homeTeamInfo.getLogo())
-                .resize(DisplayMetricUtils.convertDpToPixel(60),
-                        DisplayMetricUtils.convertDpToPixel(60))
-                .centerCrop()
-                .into(homeImageView);
+            .load(homeTeamInfo.getLogo())
+                .resize(DisplayMetricUtils.convertDpToPixel(
+                getContext().getResources().getInteger(R.integer.detailFragmentLogoSize)),
+                DisplayMetricUtils.convertDpToPixel(
+                getContext().getResources().getInteger(R.integer.detailFragmentLogoSize)))
+            .centerCrop()
+            .into(homeImageView);
 
         if(gameAgg.getAwayPoints() != null && gameAgg.getHomePoints() != null) {
             awayTeamScore = rootView.findViewById(R.id.away_team_score_text_view);
@@ -119,22 +123,22 @@ public class GameDetailFragment extends Fragment {
         if(gameAgg.getStatus().equals(getContext().getString(R.string.closed)) ||
                 gameAgg.getStatus().equals(getContext().getString(R.string.inprogress))) {
             adapter.addFragment(PlayerDetailFragment.newInstance(
-                    gameAgg.getHomeLeaderRebounds(),
-                    gameAgg.getHomeLeaderAssists(),
-                    gameAgg.getHomeLeaderPoints()),
-                    Utils.getShortName(gameAgg.getHomeName()));
+                gameAgg.getHomeLeaderRebounds(),
+                gameAgg.getHomeLeaderAssists(),
+                gameAgg.getHomeLeaderPoints()),
+                Utils.getShortName(gameAgg.getHomeName()));
 
             adapter.addFragment(PlayerDetailFragment.newInstance(
-                    gameAgg.getAwayLeaderRebounds(),
-                    gameAgg.getAwayLeaderAssists(),
-                    gameAgg.getAwayLeaderPoints()),
-                    Utils.getShortName(gameAgg.getAwayName()));
+                gameAgg.getAwayLeaderRebounds(),
+                gameAgg.getAwayLeaderAssists(),
+                gameAgg.getAwayLeaderPoints()),
+                Utils.getShortName(gameAgg.getAwayName()));
         } else {
             adapter.addFragment(new PlayerDetailFragment(),
-                    Utils.getShortName(gameAgg.getHomeName()));
+                Utils.getShortName(gameAgg.getHomeName()));
 
             adapter.addFragment(new PlayerDetailFragment(),
-                    Utils.getShortName(gameAgg.getAwayName()));
+                Utils.getShortName(gameAgg.getAwayName()));
         }
 
         viewPager.setAdapter(adapter);
