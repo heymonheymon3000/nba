@@ -1,7 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--activity_game.xml-->
+    <dimen name="tab_max_width">0dp</dimen>
+
     <!-- fragment_game.xml -->
     <dimen name="tab_item_padding">4dp</dimen>
+
+    <!--favorite_team_list_item.xml-->
+    <dimen name="image_view_padding_end">24dp</dimen>
+    <dimen name="text_view_text_size">18sp</dimen>
+
+    <!--fragment_game.xml-->
+    <dimen name="constraint_layout_padding">4dp</dimen>
+    <dimen name="fab_layout_margin">16dp</dimen>
+    <dimen name="fab_elevation">4dp</dimen>
+
+    <!--fragment_game_detail.xml-->
+    <dimen name="constraint_layout_margin">8dp</dimen>
+    <dimen name="image_view_margin">48dp</dimen>
+    <dimen name="text_view_margin">4dp</dimen>
+    <dimen name="image_view_margin_end">8dp</dimen>
+    <dimen name="tab_height">4dp</dimen>
+
+    <!--fragment_player_detail.xml-->
+    <dimen name="table_row_tv_padding">4dp</dimen>
+    <dimen name="table_row_tv_col1">170dp</dimen>
+    <dimen name="table_row_tv_colx">50dp</dimen>
+
+    <!-- game_list_item.xml -->
+    <dimen name="text_view_padding">8dp</dimen>
+    <dimen name="text_v_text_size">12sp</dimen>
+    <dimen name="text_v_padding">4dp</dimen>
+    <dimen name="card_elevation">4dp</dimen>
+    <dimen name="card_corner_radius">4dp</dimen>
+
+    <!-- nbaschedule_widget.xml -->
+    <dimen name="layout_width">300dp</dimen>
+    <dimen name="rel_padding">8dp</dimen>
+    <dimen name="image_view_size">36dp</dimen>
+    <dimen name="text_v_margin">8dp</dimen>
+
+    <!-- widget_grid_view.xml -->
+    <dimen name="text_v_elevation">8dp</dimen>
+    <dimen name="spacing">1dp</dimen>
+
+
 
     <!--
 Refer to App Widget Documentation for margin information

@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimaryDark"
-        android:padding="@dimen/tab_item_padding">
+        android:padding="@dimen/constraint_layout_padding">
 
         <ImageView
             android:id="@+id/back_image_view"
@@ -86,11 +86,11 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
             android:src="@drawable/baseline_add_24"
-            android:layout_margin="16dp"
+            android:layout_margin="@dimen/fab_layout_margin"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             android:visibility="gone"
-            android:elevation="4dp"/>
+            android:elevation="@dimen/fab_elevation"/>
 
     </android.support.constraint.ConstraintLayout>
 </LinearLayout>
