@@ -24,8 +24,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
@@ -341,14 +339,14 @@ public class GameFragment extends Fragment
                     Calendar requestedDateCal = Calendar.getInstance();
                     requestedDateCal.set(year, month-1, day);
 
-                    dailyScheduleAgg = new Gson().fromJson(getJsonString(
-                            "dailyScheduleAgg.json"), DailyScheduleAgg.class);
+//                    dailyScheduleAgg = new Gson().fromJson(getJsonString(
+//                            "dailyScheduleAgg.json"), DailyScheduleAgg.class);
 
-//                    if (requestedDateCal.before(todayCal)) {
-//                        dailyScheduleAgg = getDailyScheduleAggFromDb();
-//                    } else {
-//                        dailyScheduleAgg = getDailyScheduleAggFromNetwork();
-//                    }
+                    if (requestedDateCal.before(todayCal)) {
+                        dailyScheduleAgg = getDailyScheduleAggFromDb();
+                    } else {
+                        dailyScheduleAgg = getDailyScheduleAggFromNetwork();
+                    }
 
 //                    final DailyScheduleAgg d = dailyScheduleAgg;
 
@@ -548,13 +546,13 @@ public class GameFragment extends Fragment
         gameAgg.setHomeAlias(game.getHome().getAlias());
         gameAgg.setHomeName(game.getHome().getName());
 
-//        Thread.sleep(delay * 1000);
-        BoxScore boxScore = new Gson().fromJson(getJsonString(
-                "boxScore_"+gameAgg.getId()+".json"), BoxScore.class);
-//        BoxScore boxScore = ApiUtils.getGameService()
-//                .getBoxScore("en", gameAgg.getId(),
-//                        mContext.getString(R.string.format),
-//                        BuildConfig.NBA_DB_API_KEY).blockingGet();
+        Thread.sleep(delay * 1000);
+//        BoxScore boxScore = new Gson().fromJson(getJsonString(
+//                "boxScore_"+gameAgg.getId()+".json"), BoxScore.class);
+        BoxScore boxScore = ApiUtils.getGameService()
+                .getBoxScore("en", gameAgg.getId(),
+                        mContext.getString(R.string.format),
+                        BuildConfig.NBA_DB_API_KEY).blockingGet();
 
 //        ObjectMapper mapper = new ObjectMapper();
 //        //Object to JSON in String
@@ -581,14 +579,14 @@ public class GameFragment extends Fragment
         }
 
         if(recordMap.isEmpty()) {
-//            Thread.sleep(delay * 1000);
-            Standing standing = new Gson().fromJson(getJsonString(
-                    "standing.json"), Standing.class);
-//            Standing standing =
-//                    ApiUtils.getGameService().getStanding(mContext.getString(R.string.language_code),
-//                    2018,
-//                    mContext.getString(R.string.season) ,mContext.getString(R.string.format),
-//                    BuildConfig.NBA_DB_API_KEY).blockingGet();
+            Thread.sleep(delay * 1000);
+//            Standing standing = new Gson().fromJson(getJsonString(
+//                    "standing.json"), Standing.class);
+            Standing standing =
+                    ApiUtils.getGameService().getStanding(mContext.getString(R.string.language_code),
+                    2018,
+                    mContext.getString(R.string.season) ,mContext.getString(R.string.format),
+                    BuildConfig.NBA_DB_API_KEY).blockingGet();
 
             for(Conference conference : standing.getConferences()) {
                 for(Division division : conference.getDivisions()) {
