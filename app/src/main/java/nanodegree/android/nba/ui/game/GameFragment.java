@@ -205,7 +205,7 @@ public class GameFragment extends Fragment
         RecyclerViewMarginDecoration decoration =
                 new RecyclerViewMarginDecoration(RecyclerViewMarginDecoration.ORIENTATION_VERTICAL,
                         marginInPixel, column);
-        GridLayoutManager layoutManager = new GridLayoutManager(mContext, column,
+        GridLayoutManager layoutManager = new GridLayoutManager(mContext, getContext().getResources().getInteger(R.integer.num_cols),
                 LinearLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.addItemDecoration(decoration);

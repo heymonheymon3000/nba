@@ -2,5 +2,5 @@
 <resources>
     <integer name="gameAdapterLogoSize">36</integer>
     <integer name="detailFragmentLogoSize">60</integer>
-
+    <integer name="num_cols">1</integer>
 </resources>
