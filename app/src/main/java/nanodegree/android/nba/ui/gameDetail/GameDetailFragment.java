@@ -1,6 +1,8 @@
 package nanodegree.android.nba.ui.gameDetail;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,9 +11,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import nanodegree.android.nba.NBAApplication;
@@ -50,6 +55,8 @@ public class GameDetailFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        (getActivity()).supportPostponeEnterTransition();
+
         if (getArguments() != null) {
             gameAgg = getArguments().getParcelable(GAME_AGG_KEY);
         }
@@ -58,6 +65,13 @@ public class GameDetailFragment extends Fragment {
                 new Picasso.Builder(getContext())
                         .loggingEnabled(true)
                         .build();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Animation animFadeIn = AnimationUtils.loadAnimation(getContext(),R.anim.fade_in);
+        tabLayout.startAnimation(animFadeIn);
     }
 
     @Override
@@ -78,7 +92,9 @@ public class GameDetailFragment extends Fragment {
         TeamInfo homeTeamInfo = NBAApplication.teamInfoHashMap.get(gameAgg.getHomeAlias());
 
         awayImageView = rootView.findViewById(R.id.away_team_logo_image_view);
+        awayImageView.setTransitionName(Utils.getShortName(gameAgg.getAwayName()));
         homeImageView = rootView.findViewById(R.id.home_team_logo_image_view);
+        homeImageView.setTransitionName(Utils.getShortName(gameAgg.getHomeName()));
         mGameStatusTextView = rootView.findViewById(R.id.game_status_text_view);
         mHomeTeamName = rootView.findViewById(R.id.home_team_logo_text_view);
         mAwayTeamName = rootView.findViewById(R.id.away_team_logo_text_view);
@@ -89,8 +105,19 @@ public class GameDetailFragment extends Fragment {
                 getContext().getResources().getInteger(R.integer.detailFragmentLogoSize)),
                 DisplayMetricUtils.convertDpToPixel(
                 getContext().getResources().getInteger(R.integer.detailFragmentLogoSize)))
+            .noFade()
             .centerCrop()
-            .into(awayImageView);
+            .into(awayImageView, new Callback() {
+                @Override
+                public void onSuccess() {
+                    (getActivity()).supportStartPostponedEnterTransition();
+                }
+
+                @Override
+                public void onError() {
+                    (getActivity()).supportStartPostponedEnterTransition();
+                }
+            });
 
         picassoInstance
             .load(homeTeamInfo.getLogo())
@@ -98,8 +125,19 @@ public class GameDetailFragment extends Fragment {
                 getContext().getResources().getInteger(R.integer.detailFragmentLogoSize)),
                 DisplayMetricUtils.convertDpToPixel(
                 getContext().getResources().getInteger(R.integer.detailFragmentLogoSize)))
+            .noFade()
             .centerCrop()
-            .into(homeImageView);
+            .into(homeImageView, new Callback() {
+            @Override
+            public void onSuccess() {
+                (getActivity()).supportStartPostponedEnterTransition();
+            }
+
+            @Override
+            public void onError() {
+                (getActivity()).supportStartPostponedEnterTransition();
+            }
+        });
 
         if(gameAgg.getAwayPoints() != null && gameAgg.getHomePoints() != null) {
             awayTeamScore = rootView.findViewById(R.id.away_team_score_text_view);
@@ -116,6 +154,7 @@ public class GameDetailFragment extends Fragment {
 
         ViewPager viewPager = rootView.findViewById(R.id.viewPager);
         tabLayout = rootView.findViewById(R.id.tabLayout);
+
 
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         adapter = new TabAdapter(fragmentManager);
@@ -146,4 +185,6 @@ public class GameDetailFragment extends Fragment {
 
         return rootView;
     }
+
+
 }

@@ -65,7 +65,8 @@
             android:orientation="vertical"
             android:background="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            android:layoutAnimation="@anim/layout_animation_slide_right">
         </android.support.v7.widget.RecyclerView>
 
         <ProgressBar

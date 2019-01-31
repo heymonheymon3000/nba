@@ -31,7 +31,7 @@ public class GameDetailActivity extends AppCompatActivity {
             @Override
             public void onAdLoaded() {
                 super.onAdLoaded();
-                mInterstitialAd.show();
+               // mInterstitialAd.show();
             }
         });
 

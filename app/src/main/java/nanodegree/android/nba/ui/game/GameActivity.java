@@ -1,11 +1,15 @@
 package nanodegree.android.nba.ui.game;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.util.Pair;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.LinearLayout;
 
 import com.google.android.gms.ads.AdListener;
@@ -18,10 +22,14 @@ import java.util.Calendar;
 
 import nanodegree.android.nba.NBAApplication;
 import nanodegree.android.nba.R;
+import nanodegree.android.nba.persistence.entity.GameAgg;
+import nanodegree.android.nba.ui.gameDetail.GameDetailActivity;
 import nanodegree.android.nba.utils.DisplayDateUtils;
+import nanodegree.android.nba.utils.Utils;
+
 
 public class GameActivity extends AppCompatActivity
-        implements OnFragmentInteractionListener {
+        implements OnFragmentInteractionListener, OnGameDetailTransition {
 
     private TabAdapter adapter;
     private TabLayout tabLayout;
@@ -171,5 +179,15 @@ public class GameActivity extends AppCompatActivity
 
     private String getCurrentTabTitle(int index) {
         return tabLayout.getTabAt(index).getText().toString();
+    }
+
+    @Override
+    public void transitionToGameDetail(GameAgg gameAgg, View homeView, View awayView) {
+        Pair<View, String> p1 = Pair.create(homeView, Utils.getShortName(gameAgg.getHomeName()));
+        Pair<View, String> p2 = Pair.create(homeView, Utils.getShortName(gameAgg.getAwayName()));
+        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this,p1,p2);
+        Intent intent = new Intent(this, GameDetailActivity.class);
+        intent.putExtra("gameAgg", gameAgg);
+        startActivity(intent, options.toBundle());
     }
 }

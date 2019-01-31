@@ -1,13 +1,15 @@
 package nanodegree.android.nba.ui.game;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,9 +21,10 @@ import java.util.List;
 import nanodegree.android.nba.NBAApplication;
 import nanodegree.android.nba.R;
 import nanodegree.android.nba.persistence.entity.GameAgg;
-import nanodegree.android.nba.ui.gameDetail.GameDetailActivity;
 import nanodegree.android.nba.utils.DisplayMetricUtils;
 import nanodegree.android.nba.utils.TeamInfo;
+import nanodegree.android.nba.utils.Utils;
+
 
 public class GameAdapter
         extends RecyclerView.Adapter<GameAdapter.MasterListGameAdapterViewHolder> {
@@ -31,17 +34,22 @@ public class GameAdapter
     private List<GameAgg> mGames;
     private int cardWidth;
     private int cardHeight;
+    private OnGameDetailTransition gameDetailTransitionListener;
+    private int previousPosition = 0;
+    private RecyclerView recyclerView;
 
-    public GameAdapter(Context context,
+    public GameAdapter(Context context, OnGameDetailTransition gameDetailTransitionListener, RecyclerView recyclerView,
                          int cardWidth, int cardHeight) {
         picassoInstance =
             new Picasso.Builder(context.getApplicationContext())
                 .loggingEnabled(true)
                 .build();
 
+        this.gameDetailTransitionListener = gameDetailTransitionListener;
         this.context = context;
         this.cardWidth = cardWidth;
         this.cardHeight = cardHeight;
+        this.recyclerView = recyclerView;
     }
 
     @NonNull
@@ -79,6 +87,9 @@ public class GameAdapter
             .centerCrop()
             .into(holder.mAwayTeamLogoImageView);
 
+        ViewCompat.setTransitionName(holder.mAwayTeamLogoImageView, Utils.getShortName(game.getAwayName()));
+
+
         holder.mAwayTeamLogoTextView.setText(awayTeamInfo.getName());
         holder.mAwayTeamRecordTextView.setText(GameFragment.recordMap.get(game.getAwayAlias()));
         holder.mAwayTeamScoreTextView.setText(game.getAwayPoints());
@@ -91,6 +102,8 @@ public class GameAdapter
                     context.getResources().getInteger(R.integer.gameAdapterLogoSize)))
             .centerCrop()
             .into(holder.mHomeTeamLogoImageView);
+
+        ViewCompat.setTransitionName(holder.mHomeTeamLogoImageView, Utils.getShortName(game.getHomeName()));
 
         holder.mHomeTeamLogoTextView.setText(homeTeamInfo.getName());
         holder.mHomeTeamRecordTextView.setText(GameFragment.recordMap.get(game.getHomeAlias()));
@@ -113,7 +126,14 @@ public class GameAdapter
 
     public void setGames(List<GameAgg> games) {
         this.mGames = games;
-        notifyDataSetChanged();
+
+        final LayoutAnimationController controller =
+                AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation_slide_right);
+
+        recyclerView.setLayoutAnimation(controller);
+        recyclerView.getAdapter().notifyDataSetChanged();
+        recyclerView.scheduleLayoutAnimation();
+
     }
 
     public class MasterListGameAdapterViewHolder extends
@@ -154,14 +174,13 @@ public class GameAdapter
         }
 
         @Override
-        public void onClick(View v) {
+        public void onClick(View view) {
             int position = getAdapterPosition();
             GameAgg gameAgg  = mGames.get(position);
             if(gameAgg.getStatus().equals(context.getString(R.string.closed)) ||
                     gameAgg.getStatus().equals(context.getString(R.string.inprogress))) {
-                Intent intent = new Intent(context, GameDetailActivity.class);
-                intent.putExtra("gameAgg", gameAgg);
-                context.startActivity(intent);
+
+                gameDetailTransitionListener.transitionToGameDetail(gameAgg, mHomeTeamLogoImageView, mAwayTeamLogoImageView);
             } else {
                 Toast.makeText(context,
                         context.getString(R.string.game_not_started),
