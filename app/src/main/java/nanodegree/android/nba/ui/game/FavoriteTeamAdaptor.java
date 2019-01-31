@@ -92,7 +92,6 @@ public class FavoriteTeamAdaptor
         recyclerView.setLayoutAnimation(controller);
         recyclerView.getAdapter().notifyDataSetChanged();
         recyclerView.scheduleLayoutAnimation();
-
     }
 
     public class FavoriteTeamViewHolder extends RecyclerView.ViewHolder  {
