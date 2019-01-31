@@ -56,7 +56,7 @@ public class MyGameActivity extends AppCompatActivity
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
 
-        favoriteTeamAdaptor = new FavoriteTeamAdaptor(this, this);
+        favoriteTeamAdaptor = new FavoriteTeamAdaptor(this, mRecyclerView,this);
         mRecyclerView.setAdapter(favoriteTeamAdaptor);
 
         getAllFavoriteTeams();

@@ -89,7 +89,6 @@ public class GameAdapter
 
         ViewCompat.setTransitionName(holder.mAwayTeamLogoImageView, Utils.getShortName(game.getAwayName()));
 
-
         holder.mAwayTeamLogoTextView.setText(awayTeamInfo.getName());
         holder.mAwayTeamRecordTextView.setText(GameFragment.recordMap.get(game.getAwayAlias()));
         holder.mAwayTeamScoreTextView.setText(game.getAwayPoints());
@@ -179,7 +178,6 @@ public class GameAdapter
             GameAgg gameAgg  = mGames.get(position);
             if(gameAgg.getStatus().equals(context.getString(R.string.closed)) ||
                     gameAgg.getStatus().equals(context.getString(R.string.inprogress))) {
-
                 gameDetailTransitionListener.transitionToGameDetail(gameAgg, mHomeTeamLogoImageView, mAwayTeamLogoImageView);
             } else {
                 Toast.makeText(context,

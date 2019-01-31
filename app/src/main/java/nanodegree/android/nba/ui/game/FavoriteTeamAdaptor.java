@@ -6,6 +6,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -26,18 +28,22 @@ public class FavoriteTeamAdaptor
     private Picasso picassoInstance;
     private List<FavoriteTeam> mFavoriteTeams;
     private final OnFavoriteTeamSelectorClickListener mFavoriteTeamSelectorClickListener;
+    private Context context;
+    private RecyclerView recyclerView;
 
     public interface OnFavoriteTeamSelectorClickListener {
         void onFavoriteTeamSelector(FavoriteTeam favoriteTeam);
     }
 
-    public FavoriteTeamAdaptor(Context context,
+    public FavoriteTeamAdaptor(Context context, RecyclerView recyclerView,
                                OnFavoriteTeamSelectorClickListener favoriteTeamSelectorClickListener) {
         this.mFavoriteTeamSelectorClickListener = favoriteTeamSelectorClickListener;
         picassoInstance =
             new Picasso.Builder(context.getApplicationContext())
                 .loggingEnabled(true)
                 .build();
+        this.context = context;
+        this.recyclerView = recyclerView;
     }
 
     @NonNull
@@ -80,7 +86,13 @@ public class FavoriteTeamAdaptor
 
     public void setFavoriteTeams(List<FavoriteTeam> favoriteTeams) {
         this.mFavoriteTeams = favoriteTeams;
-        notifyDataSetChanged();
+        final LayoutAnimationController controller =
+                AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation_slide_right);
+        controller.getAnimation().setDuration(1000);
+        recyclerView.setLayoutAnimation(controller);
+        recyclerView.getAdapter().notifyDataSetChanged();
+        recyclerView.scheduleLayoutAnimation();
+
     }
 
     public class FavoriteTeamViewHolder extends RecyclerView.ViewHolder  {

@@ -71,7 +71,7 @@ public class GameDetailFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Animation animFadeIn = AnimationUtils.loadAnimation(getContext(),R.anim.fade_in);
-        tabLayout.startAnimation(animFadeIn);
+        view.startAnimation(animFadeIn);
     }
 
     @Override
