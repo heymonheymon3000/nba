@@ -235,8 +235,9 @@ public class GameFragment extends Fragment
                 Calendar requestedDateCal = DisplayDateUtils.getCurrentDate(tabName);
 
                 if (mListener != null) {
-                    // Show ads only on Tuesdays and Fridays.
-                    if (requestedDateCal.get(Calendar.DAY_OF_WEEK) == Calendar.TUESDAY ||
+                    // Show ads only on Monday, Wednesday and Fridays.
+                    if (requestedDateCal.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY ||
+                            requestedDateCal.get(Calendar.DAY_OF_WEEK) == Calendar.WEDNESDAY ||
                             requestedDateCal.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY) {
                         mListener.showAd();
                     }
@@ -252,8 +253,9 @@ public class GameFragment extends Fragment
                 Calendar requestedDateCal = DisplayDateUtils.getCurrentDate(tabName);
 
                 if (mListener != null) {
-                    // Show ads only on Tuesdays and Fridays.
-                    if (requestedDateCal.get(Calendar.DAY_OF_WEEK) == Calendar.TUESDAY ||
+                    // Show ads only on Monday, Wednesday and Fridays.
+                    if (requestedDateCal.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY ||
+                            requestedDateCal.get(Calendar.DAY_OF_WEEK) == Calendar.WEDNESDAY ||
                             requestedDateCal.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY) {
                         mListener.showAd();
                     }
