@@ -88,7 +88,7 @@ public class FavoriteTeamAdaptor
         this.mFavoriteTeams = favoriteTeams;
         final LayoutAnimationController controller =
                 AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation_slide_right);
-        controller.getAnimation().setDuration(1000);
+        controller.getAnimation().setDuration(700);
         recyclerView.setLayoutAnimation(controller);
         recyclerView.getAdapter().notifyDataSetChanged();
         recyclerView.scheduleLayoutAnimation();
