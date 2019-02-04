@@ -49,7 +49,7 @@ android {
     }
 
     buildTypes.each {
-        it.buildConfigField 'String', 'NBA_DB_API_KEY', '"rwb3wfuxrt9hmc9mmt4r456f"'
+        it.buildConfigField 'String', 'NBA_DB_API_KEY', '"8e7589jseuweysz3pzwqgysq"'
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

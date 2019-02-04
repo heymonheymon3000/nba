@@ -1,8 +1,11 @@
 package nanodegree.android.nba.ui.game;
 
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,8 +26,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -80,6 +81,7 @@ public class GameFragment extends Fragment
     private final static String FILTER_TEAMS = "FILTER_TEAMS";
     private final static String TAB_NAME = "TAB_NAME";
     private final static String TAB_INDEX = "TAB_INDEX";
+    private final static String INSERT_INTO_DB = "INSERT_INTO_DB";
 
     private Integer year;
     private Integer month;
@@ -216,7 +218,8 @@ public class GameFragment extends Fragment
         mRecyclerView.addItemDecoration(decoration);
         mRecyclerView.setHasFixedSize(true);
         mGameAdapter =
-                new GameAdapter(Objects.requireNonNull(mContext), gameDetailTransitionListener, mRecyclerView,
+                new GameAdapter(Objects.requireNonNull(mContext),
+                        gameDetailTransitionListener, mRecyclerView,
                         cardWidthInDp,
                         cardHeightInDp);
         mRecyclerView.setAdapter(mGameAdapter);
@@ -319,7 +322,72 @@ public class GameFragment extends Fragment
 
     private void getAllGames() {
         if(loadData) {
+            DailyScheduleAgg dailyScheduleAgg = null;
+
+            Calendar todayCal = Calendar.getInstance();
+
+            Calendar requestedDateCal = Calendar.getInstance();
+            requestedDateCal.set(year, month-1, day);
+
+            if (requestedDateCal.before(todayCal)) {
+                String id = createDailyScheduleAggId();
+                RetrieveDailyScheduleByIdViewFactory retrieveDailyScheduleByIdViewFactory =
+                        new RetrieveDailyScheduleByIdViewFactory(AppDatabase.getInstance(mContext), id);
+                RetrieveDailyScheduleByIdViewModel retrieveDailyScheduleByIdViewModel =
+                        ViewModelProviders.of(this, retrieveDailyScheduleByIdViewFactory)
+                        .get(RetrieveDailyScheduleByIdViewModel.class);
+
+                retrieveDailyScheduleByIdViewModel.getDailyScheduleAgg()
+                    .observe(getActivity(), new Observer<DailyScheduleAgg>() {
+                        @Override
+                        public void onChanged(@Nullable final DailyScheduleAgg dailyScheduleAgg) {
+                            if(dailyScheduleAgg == null) {
+                                Log.i("GET ALL GAMES", "dailyScheduleAgg ==> NULL");
+                                loadGames(true);
+                            } else {
+                                Log.i("GET ALL GAMES", "ID ==> " + dailyScheduleAgg.getId());
+                                if(retrieveDailyScheduleByIdViewModel.getGameAgg() != null && getActivity() !=null) {
+                                    retrieveDailyScheduleByIdViewModel.getGameAgg().observe(getActivity(),
+                                    new Observer<List<GameAgg>>() {
+                                        @Override
+                                        public void onChanged(@Nullable List<GameAgg> gameAggs) {
+                                            dailyScheduleAgg.setGames((ArrayList<GameAgg>)gameAggs);
+                                            if(filterTeams) {
+                                                new GetFavoriteTeamAsyncTask().execute(dailyScheduleAgg);
+                                            } else {
+                                                mGameAdapter.setGames(gameAggs);
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    });
+
+            } else {
+                loadGames(false);
+            }
+        }
+    }
+
+    private class GetFavoriteTeamAsyncTask extends AsyncTask<DailyScheduleAgg, Void, DailyScheduleAgg> {
+
+        @Override
+        protected DailyScheduleAgg doInBackground(DailyScheduleAgg... dailyScheduleAggs) {
+            return filterMyTeams(dailyScheduleAggs[0]);
+        }
+
+        @Override
+        protected void onPostExecute(DailyScheduleAgg dailyScheduleAgg) {
+            super.onPostExecute(dailyScheduleAgg);
+            mGameAdapter.setGames(dailyScheduleAgg.getGames());
+        }
+    }
+
+    private void loadGames(Boolean flag) {
+        if(loadData) {
             Bundle allGamesBundle = new Bundle();
+            allGamesBundle.putBoolean(INSERT_INTO_DB, flag);
             LoaderManager loaderManager = getLoaderManager();
             Loader<DailyScheduleAgg> loader = loaderManager.getLoader(GAME_FRAGMENT_LOADER);
             if (loader == null) {
@@ -331,165 +399,16 @@ public class GameFragment extends Fragment
     }
 
     @SuppressLint("StaticFieldLeak")
+    @NonNull
     @Override
     public Loader<DailyScheduleAgg> onCreateLoader(int id, @Nullable Bundle args) {
         return new AsyncTaskLoader<DailyScheduleAgg>(this.getContext()) {
             DailyScheduleAgg resultFromDailyScheduleAgg;
+            @Nullable
             @Override
             public DailyScheduleAgg loadInBackground() {
+                DailyScheduleAgg dailyScheduleAgg = new DailyScheduleAgg();
                 try {
-                    DailyScheduleAgg dailyScheduleAgg = null;
-
-                    Calendar todayCal = Calendar.getInstance();
-
-                    Calendar requestedDateCal = Calendar.getInstance();
-                    requestedDateCal.set(year, month-1, day);
-
-                    dailyScheduleAgg = new Gson().fromJson(getJsonString(
-                            "dailyScheduleAgg.json"), DailyScheduleAgg.class);
-
-//                    if (requestedDateCal.before(todayCal)) {
-//                        dailyScheduleAgg = getDailyScheduleAggFromDb();
-//                    } else {
-//                        dailyScheduleAgg = getDailyScheduleAggFromNetwork();
-//                    }
-
-//                    final DailyScheduleAgg d = dailyScheduleAgg;
-
-//                    (new Thread() { public void run() {
-//                        ObjectMapper mapper = new ObjectMapper();
-//                        //Object to JSON in String
-//                        try {
-//                            String jsonInString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(d);
-//                            logLargeString(jsonInString);
-//
-//                        } catch (JsonProcessingException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }}).start();
-
-
-
-                    if(filterTeams) {
-                        dailyScheduleAgg = filterMyTeams(dailyScheduleAgg);
-                    }
-
-                    return dailyScheduleAgg;
-                } catch (Exception e) {
-                    Log.e(TAG, "Error ==> " + e.getMessage());
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-
-//            public void logLargeString(String str) {
-//                if(str.length() > 3000) {
-//                    Log.i("dailyScheduleAgg.json", str.substring(0, 3000));
-//                    logLargeString(str.substring(3000));
-//                } else {
-//                    Log.i("dailyScheduleAgg.json", str); // continuation
-//                }
-//            }
-
-
-            @Override
-            protected void onStartLoading() {
-                disableView();
-                if(resultFromDailyScheduleAgg != null) {
-                    // To skip loadInBackground call
-                    deliverResult(resultFromDailyScheduleAgg);
-                } else {
-                    forceLoad();
-                }
-            }
-
-            @Override
-            public void deliverResult(DailyScheduleAgg data) {
-                resultFromDailyScheduleAgg = data;
-                super.deliverResult(data);
-            }
-
-            private DailyScheduleAgg filterMyTeams(DailyScheduleAgg dailyScheduleAgg) {
-                ArrayList<GameAgg> gameAggList = new ArrayList<GameAgg>();
-                List<FavoriteTeam> favoriteTeams = favoriteTeamDao.getAllSelectedFavoriteTeams(true);
-                ArrayList<GameAgg> games = dailyScheduleAgg.getGames();
-
-                for(GameAgg gameAgg : games) {
-                  for(FavoriteTeam favoriteTeam : favoriteTeams) {
-                      if(favoriteTeam.getAlias().equals(gameAgg.getAwayAlias()) ||
-                              favoriteTeam.getAlias().equals(gameAgg.getHomeAlias())) {
-                          gameAggList.add(gameAgg);
-                      }
-                  }
-                }
-
-                dailyScheduleAgg.setGames(gameAggList);
-                return dailyScheduleAgg;
-            }
-
-            private DailyScheduleAgg getDailyScheduleAggFromDb()
-                    throws ParseException, InterruptedException {
-                String id = createDailyScheduleAggId();
-
-                DailyScheduleAgg dailyScheduleAgg =
-                        dailyScheduleAggDao.getDailyScheduleAggById(id);
-
-                if(dailyScheduleAgg == null) {
-                    // cache DailyScheduleAgg into db
-                    insertDailyScheduleAggIntoDb();
-
-                    // build dailyScheduleAgg object from db
-                    dailyScheduleAgg = dailyScheduleAggDao.getDailyScheduleAggById(id);
-                    dailyScheduleAgg = addGameAgg(dailyScheduleAgg, id);
-
-                    return dailyScheduleAgg;
-                } else {
-                    // build dailyScheduleAgg object from db
-                    dailyScheduleAgg = addGameAgg(dailyScheduleAgg, id);
-                    return dailyScheduleAgg;
-                }
-            }
-
-            private DailyScheduleAgg addGameAgg(DailyScheduleAgg dailyScheduleAgg, String id) {
-                List<GameAgg> gameAgg = gameAggDao.getGameAggByDailyScheduleId(id);
-                for(GameAgg game : gameAgg) {
-                    game.setAwayLeaderPoints(leaderBoxScoreDao.getLeaderBoxScore(
-                            game.getId(), NBAContract.AWAY, NBAContract.POINTS));
-                    game.setAwayLeaderAssists(leaderBoxScoreDao.getLeaderBoxScore(
-                            game.getId(), NBAContract.AWAY, NBAContract.ASSISTS));
-                    game.setAwayLeaderRebounds(leaderBoxScoreDao.getLeaderBoxScore(
-                            game.getId(), NBAContract.AWAY, NBAContract.REBOUNDS));
-                    game.setHomeLeaderPoints(leaderBoxScoreDao.getLeaderBoxScore(
-                            game.getId(), NBAContract.HOME, NBAContract.POINTS));
-                    game.setHomeLeaderAssists(leaderBoxScoreDao.getLeaderBoxScore(
-                            game.getId(), NBAContract.HOME, NBAContract.ASSISTS));
-                    game.setHomeLeaderRebounds(leaderBoxScoreDao.getLeaderBoxScore(
-                            game.getId(), NBAContract.HOME, NBAContract.REBOUNDS));
-                }
-
-                dailyScheduleAgg.setGames((ArrayList<GameAgg>)gameAgg);
-                return dailyScheduleAgg;
-            }
-
-            private void insertDailyScheduleAggIntoDb() throws ParseException, InterruptedException {
-                DailyScheduleAgg dailyScheduleAgg = getDailyScheduleAggFromNetwork();
-                dailyScheduleAggDao.insert(dailyScheduleAgg);
-                ArrayList<GameAgg> games = dailyScheduleAgg.getGames();
-                for(GameAgg game : games) {
-                    gameAggDao.insert(game);
-                    leaderBoxScoreDao.insert(game.getAwayLeaderAssists());
-                    leaderBoxScoreDao.insert(game.getAwayLeaderRebounds());
-                    leaderBoxScoreDao.insert(game.getAwayLeaderPoints());
-                    leaderBoxScoreDao.insert(game.getHomeLeaderAssists());
-                    leaderBoxScoreDao.insert(game.getHomeLeaderRebounds());
-                    leaderBoxScoreDao.insert(game.getHomeLeaderPoints());
-                }
-            }
-
-            private DailyScheduleAgg getDailyScheduleAggFromNetwork()
-                    throws ParseException, InterruptedException {
-                try {
-                    DailyScheduleAgg dailyScheduleAgg = new DailyScheduleAgg();
                     ArrayList<GameAgg> gameAggs = new ArrayList<GameAgg>();
 
                     Thread.sleep(delay * 1000);
@@ -498,9 +417,7 @@ public class GameFragment extends Fragment
                             .getGameScheduleByDate(mContext.getString(R.string.language_code),
                                     year, month, day, mContext.getString(R.string.format),
                                     BuildConfig.NBA_DB_API_KEY).blockingGet();
-
                     dailyScheduleAgg.setId(dailySchedule.getDate());
-
                     List<Game> games = dailySchedule.getGames();
                     for(Game game : games) {
                         gameAggs.add(createGameAgg(game, dailyScheduleAgg.getId()));
@@ -508,9 +425,47 @@ public class GameFragment extends Fragment
 
                     dailyScheduleAgg.setGames(gameAggs);
 
+                    if(args.getBoolean(INSERT_INTO_DB)) {
+                        dailyScheduleAggDao.insert(dailyScheduleAgg);
+                        ArrayList<GameAgg> g = dailyScheduleAgg.getGames();
+                        for(GameAgg game : g) {
+                            gameAggDao.insert(game);
+                            leaderBoxScoreDao.insert(game.getAwayLeaderAssists());
+                            leaderBoxScoreDao.insert(game.getAwayLeaderRebounds());
+                            leaderBoxScoreDao.insert(game.getAwayLeaderPoints());
+                            leaderBoxScoreDao.insert(game.getHomeLeaderAssists());
+                            leaderBoxScoreDao.insert(game.getHomeLeaderRebounds());
+                            leaderBoxScoreDao.insert(game.getHomeLeaderPoints());
+                        }
+                    }
+
+                    if(filterTeams) {
+                        dailyScheduleAgg = filterMyTeams(dailyScheduleAgg);
+                    }
+
                     return dailyScheduleAgg;
+
                 } catch(Exception e) {
-                    throw e;
+                    e.printStackTrace();
+                }
+                return dailyScheduleAgg;
+            }
+
+            @Override
+            public void deliverResult(DailyScheduleAgg data) {
+                resultFromDailyScheduleAgg = data;
+                super.deliverResult(data);
+            }
+
+            @Override
+            protected void onStartLoading() {
+                super.onStartLoading();
+                disableView();
+                if(resultFromDailyScheduleAgg != null) {
+                    // To skip loadInBackground call
+                    deliverResult(resultFromDailyScheduleAgg);
+                } else {
+                    forceLoad();
                 }
             }
         };
@@ -518,14 +473,16 @@ public class GameFragment extends Fragment
 
     @Override
     public void onLoadFinished(@NonNull Loader<DailyScheduleAgg> loader, DailyScheduleAgg data) {
-        if (data != null) {
-            if(data.getGames().isEmpty()) {
-                mRecyclerView.setVisibility(View.GONE);
-                noGames.setVisibility(View.VISIBLE);
-            } else {
-                noGames.setVisibility(View.GONE);
-                mRecyclerView.setVisibility(View.VISIBLE);
-            }
+        if (data != null && data.getGames() != null) {
+//            if(data.getGames().isEmpty()) {
+//                mRecyclerView.setVisibility(View.GONE);
+//                noGames.setVisibility(View.VISIBLE);
+//            } else {
+//                noGames.setVisibility(View.GONE);
+//                mRecyclerView.setVisibility(View.VISIBLE);
+//            }
+
+
             mGameAdapter.setGames(data.getGames());
         } else {
 
@@ -538,6 +495,24 @@ public class GameFragment extends Fragment
 
     @Override
     public void onLoaderReset(@NonNull Loader<DailyScheduleAgg> loader) {}
+
+    public DailyScheduleAgg filterMyTeams(DailyScheduleAgg dailyScheduleAgg) {
+        ArrayList<GameAgg> gameAggList = new ArrayList<GameAgg>();
+        List<FavoriteTeam> favoriteTeams = favoriteTeamDao.getAllSelectedFavoriteTeams(true);
+        ArrayList<GameAgg> games = dailyScheduleAgg.getGames();
+
+        for(GameAgg gameAgg : games) {
+            for(FavoriteTeam favoriteTeam : favoriteTeams) {
+                if(favoriteTeam.getAlias().equals(gameAgg.getAwayAlias()) ||
+                        favoriteTeam.getAlias().equals(gameAgg.getHomeAlias())) {
+                    gameAggList.add(gameAgg);
+                }
+            }
+        }
+
+        dailyScheduleAgg.setGames(gameAggList);
+        return dailyScheduleAgg;
+    }
 
     private GameAgg createGameAgg(Game game, String date)
             throws InterruptedException, ParseException {
@@ -552,13 +527,13 @@ public class GameFragment extends Fragment
         gameAgg.setHomeAlias(game.getHome().getAlias());
         gameAgg.setHomeName(game.getHome().getName());
 
-//        Thread.sleep(delay * 1000);
-        BoxScore boxScore = new Gson().fromJson(getJsonString(
-                "boxScore_"+gameAgg.getId()+".json"), BoxScore.class);
-//        BoxScore boxScore = ApiUtils.getGameService()
-//                .getBoxScore("en", gameAgg.getId(),
-//                        mContext.getString(R.string.format),
-//                        BuildConfig.NBA_DB_API_KEY).blockingGet();
+        Thread.sleep(delay * 1000);
+//        BoxScore boxScore = new Gson().fromJson(getJsonString(
+//                "boxScore_"+gameAgg.getId()+".json"), BoxScore.class);
+        BoxScore boxScore = ApiUtils.getGameService()
+                .getBoxScore("en", gameAgg.getId(),
+                        mContext.getString(R.string.format),
+                        BuildConfig.NBA_DB_API_KEY).blockingGet();
 
 //        ObjectMapper mapper = new ObjectMapper();
 //        //Object to JSON in String
@@ -585,14 +560,14 @@ public class GameFragment extends Fragment
         }
 
         if(recordMap.isEmpty()) {
-//            Thread.sleep(delay * 1000);
-            Standing standing = new Gson().fromJson(getJsonString(
-                    "standing.json"), Standing.class);
-//            Standing standing =
-//                    ApiUtils.getGameService().getStanding(mContext.getString(R.string.language_code),
-//                    2018,
-//                    mContext.getString(R.string.season) ,mContext.getString(R.string.format),
-//                    BuildConfig.NBA_DB_API_KEY).blockingGet();
+            Thread.sleep(delay * 1000);
+//            Standing standing = new Gson().fromJson(getJsonString(
+//                    "standing.json"), Standing.class);
+            Standing standing =
+                    ApiUtils.getGameService().getStanding(mContext.getString(R.string.language_code),
+                    2018,
+                    mContext.getString(R.string.season) ,mContext.getString(R.string.format),
+                    BuildConfig.NBA_DB_API_KEY).blockingGet();
 
             for(Conference conference : standing.getConferences()) {
                 for(Division division : conference.getDivisions()) {
@@ -793,5 +768,10 @@ public class GameFragment extends Fragment
                 String.valueOf(boxScore.getHome().getLeaders().getPoints().get(0).getStatistics().getRebounds()),
                 String.valueOf(boxScore.getHome().getLeaders().getPoints().get(0).getStatistics().getAssists()))
         );
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 }
