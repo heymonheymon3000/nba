@@ -15,9 +15,5 @@ public interface DailyScheduleAggDao {
 
     @Query("SELECT * FROM " + NBAContract.DailyScheduleEntry.TABLE_NAME + " WHERE "
             + NBAContract.DailyScheduleEntry.COLUMN_ID + " = :id")
-    DailyScheduleAgg getDailyScheduleAggById(String id);
-
-    @Query("SELECT * FROM " + NBAContract.DailyScheduleEntry.TABLE_NAME + " WHERE "
-            + NBAContract.DailyScheduleEntry.COLUMN_ID + " = :id")
-    LiveData<DailyScheduleAgg> getDailyScheduleAggById1(String id);
+    LiveData<DailyScheduleAgg> getDailyScheduleAggById(String id);
 }

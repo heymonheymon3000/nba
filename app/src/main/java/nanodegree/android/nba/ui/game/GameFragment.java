@@ -17,7 +17,6 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -342,10 +341,8 @@ public class GameFragment extends Fragment
                         @Override
                         public void onChanged(@Nullable final DailyScheduleAgg dailyScheduleAgg) {
                             if(dailyScheduleAgg == null) {
-                                Log.i("GET ALL GAMES", "dailyScheduleAgg ==> NULL");
                                 loadGames(true);
                             } else {
-                                Log.i("GET ALL GAMES", "ID ==> " + dailyScheduleAgg.getId());
                                 if(retrieveDailyScheduleByIdViewModel.getGameAgg() != null && getActivity() !=null) {
                                     retrieveDailyScheduleByIdViewModel.getGameAgg().observe(getActivity(),
                                     new Observer<List<GameAgg>>() {

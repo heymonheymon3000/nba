@@ -19,9 +19,5 @@ public interface GameAggDao {
 
     @Query("SELECT * FROM " + NBAContract.GameEntry.TABLE_NAME + " WHERE "
             + NBAContract.GameEntry.COLUMN_DAILY_SCHEDULE_ID + " = :id")
-    List<GameAgg> getGameAggByDailyScheduleId(String id);
-
-    @Query("SELECT * FROM " + NBAContract.GameEntry.TABLE_NAME + " WHERE "
-            + NBAContract.GameEntry.COLUMN_DAILY_SCHEDULE_ID + " = :id")
-    LiveData<List<GameAgg>> getGameAggByDailyScheduleId1(String id);
+    LiveData<List<GameAgg>> getGameAggByDailyScheduleId(String id);
 }

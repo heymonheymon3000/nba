@@ -14,8 +14,8 @@ public class RetrieveDailyScheduleByIdViewModel extends ViewModel {
     private LiveData<List<GameAgg>> gameAgg;
 
     public RetrieveDailyScheduleByIdViewModel(AppDatabase appDatabase, String id) {
-        dailyScheduleAgg = appDatabase.dailyScheduleAggDao().getDailyScheduleAggById1(id);
-        gameAgg = appDatabase.gameAggDao().getGameAggByDailyScheduleId1(id);
+        dailyScheduleAgg = appDatabase.dailyScheduleAggDao().getDailyScheduleAggById(id);
+        gameAgg = appDatabase.gameAggDao().getGameAggByDailyScheduleId(id);
     }
 
     public LiveData<DailyScheduleAgg> getDailyScheduleAgg() {
